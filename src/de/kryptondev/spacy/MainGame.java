@@ -12,21 +12,26 @@ public class MainGame extends Game {
     
     @Override
     public void init() {
-        logo = new Texture();
+        SpriteSheet sheet = new SpriteSheet("data/sheet.xml");
+
+        logo = sheet.getTexture("buttonBlue.png");
     }
 
     @Override
     public void draw() {
-        for(int i = 0; i < 100000; i++) {
+        /*for(int i = 0; i < 100000; i++) {
             logo.draw(new Vector2f(i, i));
-        }
+        }*/
+        
+        logo.draw(new Vector2f(0, 0));
+        logo.draw(new Vector2f(100, 100));
     }
 
     @Override
     public void update(long delta) {
         if(delta != 0)
             Display.setTitle("FPS: " + Math.round((1000 / delta)));
-        System.out.println(delta);
+        //System.out.println(delta);
     }
 
     public static void main(String[] args) {
