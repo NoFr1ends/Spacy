@@ -18,6 +18,10 @@ public class Texture extends RenderObject {
         try {
             t = TextureLoader.getTexture("PNG", new FileInputStream(texture));
             texId = t.getTextureID();
+            
+            if(rect == null) {
+                rect = new Rectangle(0, 0, t.getImageWidth(), t.getImageHeight());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return;

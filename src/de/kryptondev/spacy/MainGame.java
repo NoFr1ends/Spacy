@@ -9,12 +9,15 @@ import org.lwjgl.util.vector.Vector2f;
 public class MainGame extends Game {
 
     private Texture logo;
+    private Texture fullSheet;
     
     @Override
     public void init() {
         SpriteSheet sheet = new SpriteSheet("data/sheet.xml");
 
         logo = sheet.getTexture("buttonBlue.png");
+        
+        fullSheet = new Texture("data/sheet.png");
     }
 
     @Override
@@ -25,6 +28,8 @@ public class MainGame extends Game {
         
         logo.draw(new Vector2f(0, 0));
         logo.draw(new Vector2f(100, 100));
+        
+        fullSheet.draw(new Vector2f(50, 50));
     }
 
     @Override
