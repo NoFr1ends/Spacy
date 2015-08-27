@@ -4,11 +4,11 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.sun.media.jfxmediaimpl.MediaDisposer.Disposable;
+import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.Version;
 import java.util.ArrayList;
 
 public class SpacyServer implements Disposable{
-    private static SpacyServer instance;
     private int maxSlots = 32;
     private int port = 30300;
     private Server server;
@@ -29,7 +29,6 @@ public class SpacyServer implements Disposable{
     private void stdConstr(){
         clients = new ArrayList<>(maxSlots);
         server = new Server();
-        instance = this;
     }
     
     public SpacyServer() {
@@ -63,8 +62,14 @@ public class SpacyServer implements Disposable{
         listener = new Listener() {
             @Override
             public void connected(Connection cnctn) {
-                GameClient gc = new GameClient(cnctn);
-                clients.add(gc);
+                if (getUsedSlots() < getMaxSlots()) {
+                    GameClient gc = new GameClient(cnctn);
+                    clients.add(gc);
+                }
+                else {
+                    cnctn.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.ServerFull));
+                    cnctn.close();
+                }
                 super.connected(cnctn);
             }      
         };
@@ -108,13 +113,9 @@ public class SpacyServer implements Disposable{
     public ArrayList<GameClient> getClients() {
         return clients;
     }
-
-    public static SpacyServer getInstance() {
-        return instance;
-    }
-
-    public static void setInstance(SpacyServer instance) {
-        SpacyServer.instance = instance;
+    
+    public int getUsedSlots(){
+        return clients.size();
     }
 
     public int getPort() {

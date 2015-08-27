@@ -9,15 +9,14 @@ import de.kryptondev.spacy.share.Version;
 
 import java.time.Instant;
 import java.util.Date;
-import sun.security.jca.GetInstance;
 
 public class GameClient {
 
-    public Connection connection;
-    public Version version;
-    public Date connectionTimeStamp;
-    public PlayerInfo playerInfo;
-    
+    private final Connection connection;
+    private Version version;
+    private final Date connectionTimeStamp;
+    private PlayerInfo playerInfo;
+    private SpacyServer spacyServer;
     public GameClient(Connection connection) {
         
         this.connection = connection;
@@ -27,21 +26,17 @@ public class GameClient {
             public void disconnected(Connection cnctn) {
                 onDisconnect(cnctn);
                 super.disconnected(cnctn);
-            }
-            @Override
-            public void connected(Connection cnctn) {
-            
-            }
-            
+            }            
         });
     }
+    
     private void onDisconnect(Connection cnctn){
-        SpacyServer.getInstance().removeClient(this);
+        spacyServer.removeClient(this);
     }
     
     
     private void validateConnection(Object data){
-        if(versionMismatch(data)){
+        if(versionMismatch((Version)data)){
             connection.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.VersionMismatch));
             return;
         }
@@ -66,14 +61,37 @@ public class GameClient {
     }
     
     private boolean versionMismatch(Version version){
-        return version.isCompatible(SpacyServer.serverVersion);
+        return !version.isCompatible(SpacyServer.serverVersion);
     }
     
     public void onRecv(Object data){
-        //todo: improwve performance
+        //todo: improve performance with return statements
         if(data instanceof Version)
             validateConnection(data);
         if(data instanceof PlayerInfo)
             playerInfo = (PlayerInfo)data;
     }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public Version getVersion() {
+        return version;
+    }
+
+    public Date getConnectionTimeStamp() {
+        return connectionTimeStamp;
+    }
+
+    public PlayerInfo getPlayerInfo() {
+        return playerInfo;
+    }
+
+    public SpacyServer getSpacyServer() {
+        return spacyServer;
+    }
+    
+    
+     
 }

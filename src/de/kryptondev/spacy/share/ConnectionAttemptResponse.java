@@ -11,6 +11,7 @@ public class ConnectionAttemptResponse {
     public enum Type{
         OK,
         VersionMismatch,
-        Banned
+        Banned,
+        ServerFull
     }    
 }
