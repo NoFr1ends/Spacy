@@ -4,7 +4,6 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.sun.media.jfxmediaimpl.MediaDisposer.Disposable;
-import de.kryptondev.spacy.share.GameClient;
 import de.kryptondev.spacy.share.Version;
 import java.util.ArrayList;
 

@@ -9,12 +9,12 @@ public class Version {
         this.bugfix = bugfix;
     }
     
-    static boolean isCompatible(Version ver1, Version ver2){
+    public static boolean isCompatible(Version ver1, Version ver2){
         return (ver1.major == ver2.major &
                 ver1.minor == ver1.minor);
     }
     
-    boolean isCompatible(Version ver){
+    public boolean isCompatible(Version ver){
         return (this.major == ver.major &
                 this.minor == ver.minor);
     }

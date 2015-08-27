@@ -2,7 +2,7 @@ package de.kryptondev.spacy.share;
 
 /**
 * For multiple packages for one type of packet (class)
-* Example:      Position, Death, Chatmessage
+* Example:      Position, Death, Chatmessage, Kill notification, Hitmarker
 * 
 * No IMulti:    Version, ConnectionInfo
 *               This packages were sent just 1 time.

@@ -1,5 +1,6 @@
 package de.kryptondev.spacy.share;
 
-public class Player {
+public class PlayerInfo {
+    public String OS;
     public String playerName;   
 }

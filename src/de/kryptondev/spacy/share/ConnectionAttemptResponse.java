@@ -1,14 +1,14 @@
 package de.kryptondev.spacy.share;
 
 
-public class ConnectionAttempt {
+public class ConnectionAttemptResponse {
 
-    public ConnectionAttempt(Type type) {
+    public ConnectionAttemptResponse(Type type) {
         this.type = type;
     }
     
-    Type type;
-    enum Type{
+    public Type type;
+    public enum Type{
         OK,
         VersionMismatch,
         Banned
