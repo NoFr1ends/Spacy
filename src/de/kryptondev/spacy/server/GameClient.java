@@ -65,9 +65,8 @@ public class GameClient {
         return false;
     }
     
-    private boolean versionMismatch(Object version){
-        Version v = (Version)version;
-        return v.isCompatible(SpacyServer.serverVersion);
+    private boolean versionMismatch(Version version){
+        return version.isCompatible(SpacyServer.serverVersion);
     }
     
     public void onRecv(Object data){
