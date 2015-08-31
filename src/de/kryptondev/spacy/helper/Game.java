@@ -9,6 +9,8 @@ import org.lwjgl.opengl.GL11;
 
 public abstract class Game {
 
+    private boolean closeRequest;
+    
     /**
      * Starts the main loop and initialize a OpenGL window.
      */
@@ -46,7 +48,7 @@ public abstract class Game {
         init();
         
         long last = getTime();
-        while(!Display.isCloseRequested()) {
+        while(!Display.isCloseRequested() && !closeRequest) {
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
             
             long now = getTime();
@@ -88,6 +90,13 @@ public abstract class Game {
      */
     public long getTime() {
         return (Sys.getTime() * 1000) / Sys.getTimerResolution();
+    }
+    
+    /**
+     * Close the game and ends the loop.
+     */
+    public void close() {
+        closeRequest = true;
     }
 
     /**

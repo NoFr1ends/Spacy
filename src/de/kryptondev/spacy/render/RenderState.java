@@ -21,8 +21,10 @@ public class RenderState {
             return;
         
         GL11.glEnd();
-        if(renderMode > 0)
+        if(renderMode > 0) {
+            System.out.println("Begin with mode " + renderMode);
             GL11.glBegin(renderMode);
+        }
         
         RenderState.renderMode = renderMode;
     }
@@ -31,6 +33,7 @@ public class RenderState {
         if(RenderState.color.equals(color))
             return;
         
+        System.out.println("Set color to " + color.toString());
         GL11.glColor4f(color.x, color.y, color.z, color.w);
         
         RenderState.color = color;
@@ -40,7 +43,14 @@ public class RenderState {
         if(RenderState.texture == texture)
             return;
         
+        if(RenderState.renderMode != 0)
+            GL11.glEnd();
+        
+        System.out.println("Bind texture " + texture);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture);
+        
+        if(RenderState.renderMode != 0)
+            GL11.glBegin(RenderState.renderMode);
         
         RenderState.texture = texture;
     }
