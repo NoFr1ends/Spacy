@@ -1,5 +1,7 @@
 package de.kryptondev.spacy;
 
+import de.kryptondev.spacy.data.BitmapFont;
+import de.kryptondev.spacy.data.SpriteSheet;
 import de.kryptondev.spacy.helper.Game;
 import de.kryptondev.spacy.render.ColoredRect;
 import de.kryptondev.spacy.render.RenderState;
@@ -16,12 +18,16 @@ public class MainGame extends Game {
     private Texture fullSheet;
     private ColoredRect test;
     
+    private BitmapFont font;
+    
     @Override
     public void init() {
         SpriteSheet sheet = new SpriteSheet("data/sheet.xml");
 
         logo = sheet.getTexture("playerLife1_blue.png");
         test = new ColoredRect(100, 100, new Vector4f(1, 0, 0, 1));
+        
+        font = new BitmapFont("data/kenpixel_16.fnt");
         
         fullSheet = new Texture("data/sheet.png");
     }
@@ -35,6 +41,9 @@ public class MainGame extends Game {
         logo.draw(new Vector2f(0, 0));
         
         test.draw(new Vector2f(100, 100));
+        
+        font.getCharacter('A').draw(50, 50);
+        
         //logo.draw(new Vector2f(100, 100));
         
         //fullSheet.draw(new Vector2f(50, 50));

@@ -11,6 +11,10 @@ public abstract class RenderObject {
     protected Vector2f size;
     protected Vector2f[] texCoords = new Vector2f[0];
     
+    public void draw(float x, float y) {
+        draw(new Vector2f(x, y));
+    }
+    
     public void draw(Vector2f pos) {
         RenderState.setTexture(texture);
         RenderState.setRenderMode(GL11.GL_QUADS);
