@@ -1,6 +1,6 @@
 package de.kryptondev.spacy.share.serveradmincommands;
 
 public class Kick implements ICommand {
-    String command = "kick";
-    String help = "Kicks a player from the Server.";
+    public String command = "kick";
+    public String help = "Kicks a player from the Server.";
 }
