@@ -1,7 +1,7 @@
 package de.kryptondev.spacy.share;
 
-import de.kryptondev.spacy.share.serveradmincommands.ICommand;
+import de.kryptondev.spacy.share.serveradmincommands.Command;
 
 public class ServerCommand {
-    public ICommand command;
+    public Command command;
 }

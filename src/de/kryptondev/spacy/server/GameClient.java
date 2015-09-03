@@ -12,9 +12,9 @@ import java.util.Date;
 
 public class GameClient {
 
-    private final Connection connection;
+    private Connection connection;
     private Version version;
-    private final Date connectionTimeStamp;
+    private Date connectionTimeStamp;
     private PlayerInfo playerInfo;
     private SpacyServer spacyServer;
     public GameClient(Connection connection) {
@@ -29,6 +29,17 @@ public class GameClient {
             }            
         });
     }
+
+    /**
+     * Constructor for the internal Server-GameClient
+     * @param spacyServer the Server
+     */
+    public GameClient(SpacyServer spacyServer) {
+        this.spacyServer = spacyServer;
+        this.version = SpacyServer.serverVersion;
+    }
+    
+    
     
     private void onDisconnect(Connection cnctn){
         spacyServer.removeClient(this);

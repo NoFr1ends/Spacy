@@ -9,6 +9,7 @@ import de.kryptondev.spacy.share.Version;
 import java.util.ArrayList;
 
 public class SpacyServer implements Disposable{
+    private GameClient gameClient;
     private int maxSlots = 32;
     private int port = 30300;
     private Server server;
@@ -29,13 +30,17 @@ public class SpacyServer implements Disposable{
     private void stdConstr(){
         clients = new ArrayList<>(maxSlots);
         server = new Server();
+        gameClient = new GameClient(this);
+           
     }
     
     public SpacyServer() {
+       
         stdConstr();
     }
 
     public SpacyServer(int maxSlots) {
+        
         if(maxSlots > 0)
             this.maxSlots = maxSlots;
         if(maxSlots == -1)
@@ -44,6 +49,7 @@ public class SpacyServer implements Disposable{
     }
 
     public SpacyServer(int maxSlots, int port) {
+        
         if(maxSlots > 0)
             this.maxSlots = maxSlots;
         if(maxSlots == -1)
@@ -53,7 +59,28 @@ public class SpacyServer implements Disposable{
             this.port = port;
     }
     
-     
+    public static boolean isBadName(String playerName){
+       ArrayList<String> badNames = new ArrayList<>(16);
+       badNames.add("*");      
+       badNames.add("\\");       
+       badNames.add("/");       
+       badNames.add("admin");       
+       badNames.add("\t");
+       badNames.add("\n");
+       badNames.add("'");
+       badNames.add("\"");
+
+
+       for(String c : badNames){
+           if(playerName.contains(c))
+               return false;
+       }
+       return true;
+    }
+    
+    public GameClient getServerGameClient() {
+        return gameClient;
+    }
     
     public boolean start() {
         try{
@@ -121,6 +148,8 @@ public class SpacyServer implements Disposable{
     public int getPort() {
         return port;
     }
+    
+   
     
     
 }
