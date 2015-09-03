@@ -1,4 +1,4 @@
-package de.kryptondev.spacy;
+package de.kryptondev.spacy.data;
 
 import de.kryptondev.spacy.render.Texture;
 import java.io.FileInputStream;
