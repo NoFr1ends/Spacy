@@ -7,15 +7,14 @@ import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.PlayerInfo;
 import de.kryptondev.spacy.share.Version;
-import de.kryptondev.spacy.share.serveradmincommands.BanCommand;
+import de.kryptondev.spacy.share.serveradmincommands.Ban;
+import de.kryptondev.spacy.share.serveradmincommands.Command;
 import de.kryptondev.spacy.share.serveradmincommands.Kick;
-import de.kryptondev.spacy.share.serveradmincommands.KickCommand;
 
 import java.time.Instant;
 import java.util.Date;
 
 public class GameClient {
-
     private Connection connection;
     private Version version;
     private Date connectionTimeStamp;
@@ -85,32 +84,14 @@ public class GameClient {
         if (data instanceof Chatmessage) {
             spacyServer.broadcast(data);
         }
-        if (data instanceof KickCommand) {
-            //Check wether sender is admin
-            if (isAdmin()) {
-                KickCommand kick = (KickCommand)data;
-                for (GameClient gc : spacyServer.getClients()) {
-                    if (gc.playerInfo.playerUID == kick.uid) {
-                        gc.getConnection().sendTCP(new KickCommand(kick.uid));
-                        gc.getConnection().close();
-                        this.getSpacyServer().broadcast( gc.playerInfo.playerName + " has been kicked!");
-                        return;
-                    }
-                }
-            }
-        }
-        if (data instanceof BanCommand) {
-            //Check wether sender is admin
-            if (isAdmin()) {
-                BanCommand kick = (BanCommand)data;
-                for (GameClient gc : spacyServer.getClients()) {
-                    if (gc.playerInfo.playerUID == kick.uid) {
-                        gc.getConnection().sendTCP(new BanCommand(kick.uid));
-                        gc.getConnection().close();
-                        this.getSpacyServer().broadcast( gc.playerInfo.playerName + " has been banned!");
-                        return;
-                    }
-                }
+        if (data instanceof Command) {
+            if(((Command)data).isAdminCommand() && this.isAdmin())
+                ((Command)data).onAction(this);
+            else if(!((Command)data).isAdminCommand())
+                ((Command)data).onAction(this);
+            else {
+                //No Permissions
+                //TODO: Output message
             }
         }
 

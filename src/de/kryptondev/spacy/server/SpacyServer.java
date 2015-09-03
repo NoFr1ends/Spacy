@@ -8,16 +8,13 @@ import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.Stop;
 import de.kryptondev.spacy.share.Version;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
+import de.kryptondev.spacy.share.serveradmincommands.Command;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Set;
+import java.util.Base64;
+
 
 public class SpacyServer implements Disposable{
+    public static SpacyServer instance;
     private GameClient gameClient;
     private boolean visibleInLan = true;
     private int maxSlots = 32;
@@ -27,7 +24,9 @@ public class SpacyServer implements Disposable{
     public static final Version serverVersion = new Version(1, 0, 0);
     private ArrayList<GameClient> clients;
     private ArrayList<byte[]> bans;
-    private ArrayList<byte[]> admins;
+    private ArrayList<byte[]> admins;    
+    public ArrayList<Command> commands;
+    
     public void writeWarning(String s) {
         System.out.println(s);
     }
@@ -46,7 +45,8 @@ public class SpacyServer implements Disposable{
         gameClient = new GameClient(this);
         bans = new ArrayList<>(Management.getLocalBannedClients());        
         admins = new ArrayList<>(Management.getAdmins());
-
+        commands = new ArrayList<>();
+        instance = this;
         //TODO register all classes
     } 
 
@@ -145,16 +145,27 @@ public class SpacyServer implements Disposable{
     }
 
     public void broadcast(Object obj){
-        for(GameClient gc : clients){
+        for(GameClient gc : getClients()){
             gc.getConnection().sendTCP(obj);
         }
     }
     
      public void broadcast(String message){
-        for(GameClient gc : clients){
+        for(GameClient gc : getClients()){
             gc.getConnection().sendTCP(new Chatmessage(message));
         }
     }
+     
+    public void addToBanList(GameClient gc){
+        
+    }
+    
+    public void addToBanList(byte[] gc){
+        this.bans.add(gc);
+        
+        //Base64.getEncoder().encode(gc).toString()
+    }
+    
     
     @Override
     public void dispose() {
@@ -181,6 +192,20 @@ public class SpacyServer implements Disposable{
 
     public ArrayList<GameClient> getClients() {
         return clients;
+    }
+    
+    public GameClient getClientByName(String playerName){
+        for(GameClient item : getClients())
+            if(item.getPlayerInfo().playerName.equals(playerName))
+                return item;
+        return null;
+    }
+    
+    public GameClient getClientByUID(byte[] uid){
+        for(GameClient item : getClients())
+            if(item.getPlayerInfo().playerUID == uid)
+                return item;
+        return null;
     }
 
     public int getUsedSlots() {
