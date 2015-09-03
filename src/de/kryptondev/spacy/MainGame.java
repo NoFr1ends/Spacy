@@ -55,6 +55,12 @@ public class MainGame extends Game {
     public void update(long delta) {
         if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) 
             close();
+        if(Keyboard.isKeyDown(Keyboard.KEY_F2) && Keyboard.isRepeatEvent()){
+            //Open Debug Screen
+            SpacyClient c = new SpacyClient();
+            c.connect("localhost");
+            
+        }
         
         if(delta != 0)
             Display.setTitle("FPS: " + Math.round((1000 / delta)));

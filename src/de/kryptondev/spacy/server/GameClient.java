@@ -63,7 +63,7 @@ public class GameClient {
     public String toString() {
         return "Player '" + playerInfo.playerName + "' with '"
                 + connection.getRemoteAddressTCP().getHostString() + "' on "
-                + playerInfo.OS + ". Spacy Client " + this.version.toString() + " is connected since " + connectionTimeStamp + "(" + (Instant.now().getEpochSecond() - connectionTimeStamp.getTime()) + ")";
+                + playerInfo.OS + ". Spacy Client " + this.version.toString() + " is connected since " + connectionTimeStamp;
     }
 
     private boolean versionMismatch(Version version) {
