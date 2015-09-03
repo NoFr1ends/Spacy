@@ -7,9 +7,6 @@ import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.PlayerInfo;
 import de.kryptondev.spacy.share.Version;
-import de.kryptondev.spacy.share.serveradmincommands.Ban;
-import de.kryptondev.spacy.share.serveradmincommands.Command;
-import de.kryptondev.spacy.share.serveradmincommands.Kick;
 
 import java.time.Instant;
 import java.util.Date;
@@ -84,16 +81,7 @@ public class GameClient {
         if (data instanceof Chatmessage) {
             spacyServer.broadcast(data);
         }
-        if (data instanceof Command) {
-            if(((Command)data).isAdminCommand() && this.isAdmin())
-                ((Command)data).onAction(this);
-            else if(!((Command)data).isAdminCommand())
-                ((Command)data).onAction(this);
-            else {
-                //No Permissions
-                //TODO: Output message
-            }
-        }
+        
 
     }
 

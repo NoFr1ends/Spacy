@@ -8,12 +8,12 @@ import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.Stop;
 import de.kryptondev.spacy.share.Version;
-import de.kryptondev.spacy.share.serveradmincommands.Command;
+
 import java.util.ArrayList;
 import java.util.Base64;
 
+public class SpacyServer implements Disposable {
 
-public class SpacyServer implements Disposable{
     public static SpacyServer instance;
     private GameClient gameClient;
     private boolean visibleInLan = true;
@@ -24,9 +24,9 @@ public class SpacyServer implements Disposable{
     public static final Version serverVersion = new Version(1, 0, 0);
     private ArrayList<GameClient> clients;
     private ArrayList<byte[]> bans;
-    private ArrayList<byte[]> admins;    
-    public ArrayList<Command> commands;
+    private ArrayList<byte[]> admins;
     
+
     public void writeWarning(String s) {
         System.out.println(s);
     }
@@ -43,20 +43,19 @@ public class SpacyServer implements Disposable{
         clients = new ArrayList<>(maxSlots);
         server = new Server();
         gameClient = new GameClient(this);
-        bans = new ArrayList<>(Management.getLocalBannedClients());        
-        admins = new ArrayList<>(Management.getAdmins());
-        commands = new ArrayList<>();
+        bans = new ArrayList<>();
+        admins = new ArrayList<>();
+        //commands = new ArrayList<>();
         instance = this;
         //TODO register all classes
-    } 
+    }
 
-    
     public SpacyServer() {
-       
+
         stdConstr();
     }
 
-    public SpacyServer(int maxSlots) {        
+    public SpacyServer(int maxSlots) {
         if (maxSlots > 0) {
             this.maxSlots = maxSlots;
         }
@@ -78,29 +77,31 @@ public class SpacyServer implements Disposable{
             this.port = port;
         }
     }
-    
-    public static boolean isBadName(String playerName){
-       ArrayList<String> badNames = new ArrayList<>(16);
-       badNames.add("*");      
-       badNames.add("\\");       
-       badNames.add("/");       
-       badNames.add("admin");       
-       badNames.add("\t");
-       badNames.add("\n");
-       badNames.add("'");
-       badNames.add("\"");
 
+    public static boolean isBadName(String playerName) {
+        ArrayList<String> badNames = new ArrayList<>(16);
+        badNames.add("*");
+        badNames.add("\\");
+        badNames.add("/");
+        badNames.add("admin");
+        badNames.add("\t");
+        badNames.add("\n");
+        badNames.add("'");
+        badNames.add("\"");
+        badNames.add("root");
 
-       for(String c : badNames){
-           if(playerName.contains(c))
-               return false;
-       }
-       return true;
+        for (String c : badNames) {
+            if (playerName.toLowerCase().contains(c.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
     }
-    
+
     public GameClient getServerGameClient() {
         return gameClient;
     }
+
     public boolean start() {
         try {
             server.start();
@@ -128,14 +129,14 @@ public class SpacyServer implements Disposable{
         return true;
     }
 
-    public void stop(){
+    public void stop() {
         broadcast(new Stop());
     }
-    
-    public void stop(String reason){
+
+    public void stop(String reason) {
         broadcast(new Stop(reason));
     }
-    
+
     public void addClient(GameClient gc) {
         this.clients.add(gc);
     }
@@ -144,37 +145,35 @@ public class SpacyServer implements Disposable{
         this.clients.remove(gc);
     }
 
-    public void broadcast(Object obj){
-        for(GameClient gc : getClients()){
+    public void broadcast(Object obj) {
+        for (GameClient gc : getClients()) {
             gc.getConnection().sendTCP(obj);
         }
     }
-    
-     public void broadcast(String message){
-        for(GameClient gc : getClients()){
+
+    public void broadcast(String message) {
+        for (GameClient gc : getClients()) {
             gc.getConnection().sendTCP(new Chatmessage(message));
         }
     }
-     
-    public void addToBanList(GameClient gc){
-        
+
+    public void addToBanList(GameClient gc) {
+
     }
-    
-    public void addToBanList(byte[] gc){
+
+    public void addToBanList(byte[] gc) {
         this.bans.add(gc);
-        
+
         //Base64.getEncoder().encode(gc).toString()
     }
-    
-    
+
     @Override
     public void dispose() {
-        if(server != null)
-        {   
+        if (server != null) {
             broadcast("Server has been disposed!");
             server.close();
         }
-        
+
         server = null;
     }
 
@@ -193,18 +192,22 @@ public class SpacyServer implements Disposable{
     public ArrayList<GameClient> getClients() {
         return clients;
     }
-    
-    public GameClient getClientByName(String playerName){
-        for(GameClient item : getClients())
-            if(item.getPlayerInfo().playerName.equals(playerName))
+
+    public GameClient getClientByName(String playerName) {
+        for (GameClient item : getClients()) {
+            if (item.getPlayerInfo().playerName.equals(playerName)) {
                 return item;
+            }
+        }
         return null;
     }
-    
-    public GameClient getClientByUID(byte[] uid){
-        for(GameClient item : getClients())
-            if(item.getPlayerInfo().playerUID == uid)
+
+    public GameClient getClientByUID(byte[] uid) {
+        for (GameClient item : getClients()) {
+            if (item.getPlayerInfo().playerUID == uid) {
                 return item;
+            }
+        }
         return null;
     }
 
@@ -224,18 +227,17 @@ public class SpacyServer implements Disposable{
         this.visibleInLan = visibleInLan;
     }
 
-    public boolean isPlayerBanned(byte[] uid){
+    public boolean isPlayerBanned(byte[] uid) {
         ArrayList<byte[]> player = new ArrayList<byte[]>(1);
         player.add(uid);
         return bans.containsAll(player);
         //TODO: Implement hasGlobalBan
     }
-    
-    public boolean isPlayerAdmin(byte[] uid){
+
+    public boolean isPlayerAdmin(byte[] uid) {
         ArrayList<byte[]> player = new ArrayList<byte[]>(1);
         player.add(uid);
         return admins.containsAll(player);
-        //TODO: Implement hasGlobalBan
     }
-    
+
 }
