@@ -35,7 +35,7 @@ public class SpacyClient {
         try {
             client = new Client();
             KryoRegisterer.registerAll(client.getKryo());
-           
+           //client.setKeepAliveTCP(port);
 
             listener = new Listener() {
 

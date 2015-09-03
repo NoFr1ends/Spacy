@@ -49,7 +49,7 @@ public class GameClient {
             return;
         }
         GameClient.this.spacyServer.broadcast(new Chatmessage(GameClient.this.getPlayerInfo().playerName + " joined the party!"));
-        GameClient.this.getSpacyServer().writeInfo(GameClient.this.getPlayerInfo().playerName + " joined the party!");
+        GameClient.this.getSpacyServer().writeInfo(GameClient.this.toString() + " connected right now!");
     }
 
     @Override
