@@ -6,6 +6,7 @@ import de.kryptondev.spacy.helper.Game;
 import de.kryptondev.spacy.render.ColoredRect;
 import de.kryptondev.spacy.render.RenderState;
 import de.kryptondev.spacy.render.Texture;
+import de.kryptondev.spacy.server.SpacyServer;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -13,7 +14,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
 public class MainGame extends Game {
-
+    private boolean debugmode = false;
     private Texture logo;
     private Texture fullSheet;
     private ColoredRect test;
@@ -48,15 +49,19 @@ public class MainGame extends Game {
         
         //fullSheet.draw(new Vector2f(50, 50));
         
-        System.out.println("-----------------------------");
+        //System.out.println("-----------------------------");
     }
 
     @Override
     public void update(long delta) {
         if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) 
             close();
-        if(Keyboard.isKeyDown(Keyboard.KEY_F2) && Keyboard.isRepeatEvent()){
+        if(Keyboard.isKeyDown(Keyboard.KEY_SPACE) & ! debugmode){
             //Open Debug Screen
+            debugmode = true;
+            SpacyServer svr = new SpacyServer(4);
+            svr.start();            
+            
             SpacyClient c = new SpacyClient();
             c.connect("localhost");
             

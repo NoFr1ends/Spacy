@@ -3,6 +3,7 @@ package de.kryptondev.spacy;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.helper.UID;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
@@ -27,14 +28,14 @@ public class SpacyClient {
         //For test pourpose
         info.playerName = System.getProperty("user.name");
 
-    }
+    }   
+   
 
     public void connect(String server) {
         try {
             client = new Client();
-            client.start();
-            client.connect(timeout, server, port);
-            client.addListener(listener);
+            KryoRegisterer.registerAll(client.getKryo());
+           
 
             listener = new Listener() {
 
@@ -50,11 +51,19 @@ public class SpacyClient {
 
                 @Override
                 public void connected(Connection cnctn) {
+                    System.out.println("Client is connected!");
                     client.sendTCP(clientVersion);
-                    client.sendTCP(info);
+                    client.sendTCP(SpacyClient.this.info);
+                   
+                   
                 }
             };
+            client.addListener(listener);
+            client.start();
+            client.connect(timeout, server, port);
+            
         } catch (Exception ex) {
+             System.err.println(ex.getLocalizedMessage());
             //TODO Handle error
         }
     }
@@ -65,10 +74,12 @@ public class SpacyClient {
 
     private void connected() {
         //GUI Update
+        System.out.println("Client is connected!");
     }
 
     private void connectionDropped(ConnectionAttemptResponse.Type reason) {
         //GUI Update
+        System.out.println("Client is not connected! Reason: " + reason.toString());
     }
 
     public void sendMessage(String message) {
@@ -90,4 +101,21 @@ public class SpacyClient {
 
         }
     }
+
+    public static SpacyClient getInstance() {
+        return instance;
+    }
+
+    public static void setInstance(SpacyClient instance) {
+        SpacyClient.instance = instance;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+    
 }

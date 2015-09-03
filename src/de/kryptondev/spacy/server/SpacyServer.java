@@ -4,9 +4,9 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.sun.media.jfxmediaimpl.MediaDisposer.Disposable;
+import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
-import de.kryptondev.spacy.share.Stop;
 import de.kryptondev.spacy.share.Version;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.Base64;
 public class SpacyServer implements Disposable {
 
     public static SpacyServer instance;
-    private GameClient gameClient;
+    //private GameClient gameClient;
     private boolean visibleInLan = true;
     private int maxSlots = 32;
     private int port = 30300;
@@ -40,13 +40,11 @@ public class SpacyServer implements Disposable {
     }
 
     private void stdConstr() {
-        clients = new ArrayList<>(maxSlots);
-        server = new Server();
-        gameClient = new GameClient(this);
+        clients = new ArrayList<>(maxSlots);        
         bans = new ArrayList<>();
-        admins = new ArrayList<>();
-        //commands = new ArrayList<>();
+        admins = new ArrayList<>();        
         instance = this;
+        server = new Server(port, port);        
         //TODO register all classes
     }
 
@@ -76,6 +74,7 @@ public class SpacyServer implements Disposable {
         if (port <= Short.MAX_VALUE & port > 0) {
             this.port = port;
         }
+        stdConstr();
     }
 
     public static boolean isBadName(String playerName) {
@@ -88,7 +87,9 @@ public class SpacyServer implements Disposable {
         badNames.add("\n");
         badNames.add("'");
         badNames.add("\"");
-        badNames.add("root");
+        badNames.add("root");        
+        badNames.add("server");
+
 
         for (String c : badNames) {
             if (playerName.toLowerCase().contains(c.toLowerCase())) {
@@ -98,19 +99,15 @@ public class SpacyServer implements Disposable {
         return false;
     }
 
-    public GameClient getServerGameClient() {
-        return gameClient;
-    }
-
     public boolean start() {
-        try {
-            server.start();
-            server.bind(port);
+        try {           
+            KryoRegisterer.registerAll(server.getKryo()); 
+            
             listener = new Listener() {
                 @Override
                 public void connected(Connection cnctn) {
                     if (getUsedSlots() < getMaxSlots()) {
-                        GameClient gc = new GameClient(cnctn);
+                        GameClient gc = new GameClient(cnctn, SpacyServer.this);
                         clients.add(gc);
                     } else {
                         cnctn.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.ServerFull));
@@ -119,22 +116,18 @@ public class SpacyServer implements Disposable {
                     super.connected(cnctn);
                 }
             };
-
             server.addListener(listener);
-        } catch (Exception ex) {
-            writeError(ex.getMessage());
+            server.start();
+            server.bind(port);
+
+            
+            
+        } catch (Exception ex) { 
+            writeError(ex.getLocalizedMessage());
             writeError("Maybe a server is already running on this port?");
             return false;
         }
         return true;
-    }
-
-    public void stop() {
-        broadcast(new Stop());
-    }
-
-    public void stop(String reason) {
-        broadcast(new Stop(reason));
     }
 
     public void addClient(GameClient gc) {
@@ -158,13 +151,11 @@ public class SpacyServer implements Disposable {
     }
 
     public void addToBanList(GameClient gc) {
-
+        this.bans.add(gc.getPlayerInfo().playerUID);
     }
 
     public void addToBanList(byte[] gc) {
         this.bans.add(gc);
-
-        //Base64.getEncoder().encode(gc).toString()
     }
 
     @Override
