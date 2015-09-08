@@ -1,9 +1,9 @@
-package de.kryptondev.spacy.helper;
+package de.kryptondev.spacy;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-public class Java {
+public class JavaHelper {
 
     /**
      * Adds the specified path to the java library path

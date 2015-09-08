@@ -1,11 +1,12 @@
-package de.kryptondev.spacy.data;
+package de.kryptondev.spacy;
 
-import de.kryptondev.spacy.render.Texture;
 import java.io.FileInputStream;
 import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.lwjgl.util.Rectangle;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -16,9 +17,10 @@ public class SpriteSheet {
     private String descFile;
     private String textureFile;
     
-    private org.newdawn.slick.opengl.Texture t;
+    private Texture t;
+    private Image i;
     
-    private HashMap<String, SubTexture> subTextures = new HashMap<>();
+    private HashMap<String, Rectangle> subTextures = new HashMap<>();
     
     public SpriteSheet(String descFile) {
         this.descFile = descFile;
@@ -36,9 +38,10 @@ public class SpriteSheet {
             for(int i = 0; i < subTextures.getLength(); i++) {
                 Node subTexture = subTextures.item(i);
                 
-                SubTexture texture = new SubTexture();
-                texture.setName(subTexture.getAttributes()
-                        .getNamedItem("name").getNodeValue());
+                Rectangle texture = new Rectangle();
+                String name = subTexture.getAttributes()
+                        .getNamedItem("name").getNodeValue();
+                
                 texture.setX(Integer.parseInt(subTexture.getAttributes()
                         .getNamedItem("x").getNodeValue()));
                 texture.setY(Integer.parseInt(subTexture.getAttributes()
@@ -48,7 +51,7 @@ public class SpriteSheet {
                 texture.setHeight(Integer.parseInt(subTexture.getAttributes()
                         .getNamedItem("height").getNodeValue()));
                 
-                this.subTextures.put(texture.getName(), texture);
+                this.subTextures.put(name, texture);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,19 +60,19 @@ public class SpriteSheet {
         
         try {
             t = TextureLoader.getTexture("PNG", new FileInputStream(textureFile));
+            i = new Image(t);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
-    public Texture getTexture(String name) {
+    public void draw(String name, float x, float y) {
         if(!subTextures.containsKey(name))
-            return null;
+            return;
         
-        SubTexture texture = subTextures.get(name);
+        Rectangle bounds = subTextures.get(name);
         
-        return new Texture(t, new Rectangle(texture.getX(), texture.getY(), 
-                texture.getWidth(), texture.getHeight()));
+        i.draw(x, y, bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
     }
     
     private class SubTexture {
