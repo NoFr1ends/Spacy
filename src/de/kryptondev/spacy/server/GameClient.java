@@ -3,73 +3,86 @@ package de.kryptondev.spacy.server;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import de.kryptondev.spacy.server.SpacyServer;
+import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.PlayerInfo;
 import de.kryptondev.spacy.share.Version;
+import java.io.Console;
 
 import java.time.Instant;
 import java.util.Date;
 
 public class GameClient {
-
-    private final Connection connection;
+    private Connection connection;
     private Version version;
-    private final Date connectionTimeStamp;
+    private Date connectionTimeStamp;
     private PlayerInfo playerInfo;
     private SpacyServer spacyServer;
-    public GameClient(Connection connection) {
-        
+    
+    public GameClient(Connection connection, SpacyServer server) {
+        this.spacyServer = server;
         this.connection = connection;
         this.connectionTimeStamp = new Date(Instant.now().getEpochSecond());
         this.connection.addListener(new Listener() {
             @Override
-            public void disconnected(Connection cnctn) {
-                onDisconnect(cnctn);
+            public void disconnected(Connection cnctn) {         
+                //GameClient.this.getSpacyServer().writeInfo(GameClient.this.playerInfo.playerName + " left the party!");
+                //GameClient.this.getSpacyServer().broadcast(GameClient.this.playerInfo.playerName + " left the party!");
+                System.out.println(".disconnected()");
+                GameClient.this.spacyServer.removeClient(GameClient.this);                
                 super.disconnected(cnctn);
-            }            
+            }
+
+            @Override
+            public void received(Connection cnctn, Object o) {                
+                super.received(cnctn, o);
+                onRecv(o);
+                
+            }
+            
         });
     }
-    
-    private void onDisconnect(Connection cnctn){
-        spacyServer.removeClient(this);
-    }
-    
-    
-    private void validateConnection(Object data){
-        if(versionMismatch((Version)data)){
-            connection.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.VersionMismatch));
-            return;
-        }
-        if(isClientBanned()){
+   
+    private void validateConnection() {       
+        if (spacyServer.isPlayerBanned(playerInfo.playerUID)) {
             connection.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.Banned));
             return;
         }
-        //Receive PlayerInfo Object        
+        GameClient.this.spacyServer.broadcast(new Chatmessage(GameClient.this.getPlayerInfo().playerName + " joined the party!"));
+        GameClient.this.getSpacyServer().writeInfo(GameClient.this.toString() + " connected right now!");
     }
 
     @Override
     public String toString() {
-        return "Player '" +playerInfo.playerName +  "' with '" + 
-                connection.getRemoteAddressTCP().getHostString() + "' on " + 
-                playerInfo.OS + ". Spacy Client "  + this.version.toString() + " is connected since " + connectionTimeStamp + "(" + (Instant.now().getEpochSecond() - connectionTimeStamp.getTime()) + ")";
+        return "Player '" + playerInfo.playerName + "' with '"
+                + connection.getRemoteAddressTCP().getHostString() + "' on "
+                + playerInfo.OS + ". Spacy Client " + this.version.toString() + " is connected since " + connectionTimeStamp;
     }
-    
-    
-    private boolean isClientBanned(){
-        //TODO: Implement
-        return false;
-    }
-    
-    private boolean versionMismatch(Version version){
+
+    private boolean versionMismatch(Version version) {
         return !version.isCompatible(SpacyServer.serverVersion);
     }
-    
-    public void onRecv(Object data){
-        //todo: improve performance with return statements
-        if(data instanceof Version)
-            validateConnection(data);
-        if(data instanceof PlayerInfo)
-            playerInfo = (PlayerInfo)data;
+
+    public void onRecv(Object data) {        
+        if (data instanceof Version) {
+            this.version = (Version)data;
+            if(versionMismatch(this.version)){
+                connection.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.VersionMismatch));
+                connection.close();
+                return;
+            }
+        }
+        if (data instanceof PlayerInfo) {
+            playerInfo = (PlayerInfo) data;
+            validateConnection();
+            return;
+        }
+        if (data instanceof Chatmessage) {
+            spacyServer.broadcast(data);
+            return;
+        }
+        
+
     }
 
     public Connection getConnection() {
@@ -91,7 +104,9 @@ public class GameClient {
     public SpacyServer getSpacyServer() {
         return spacyServer;
     }
-    
-    
-     
+
+    public boolean isAdmin() {
+        return spacyServer.isPlayerAdmin(this.playerInfo.playerUID);
+    }
+
 }

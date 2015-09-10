@@ -72,7 +72,8 @@ public class SpriteSheet {
         
         Rectangle bounds = subTextures.get(name);
         
-        i.draw(x, y, bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
+        i.draw(x, y, x + bounds.getWidth(), y + bounds.getHeight(), 
+                bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
     }
     
     private class SubTexture {
