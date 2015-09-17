@@ -1,7 +1,5 @@
 package de.kryptondev.spacy.data;
-import de.kryptondev.spacy.*;
 import de.kryptondev.spacy.share.PlayerInfo;
-import java.util.ArrayList;
 import org.lwjgl.util.Rectangle;
 import org.lwjgl.util.vector.*;
 
@@ -26,7 +24,8 @@ public class Ship extends Entity implements IHittable{
     public Ship() {
         this.position = new Vector2f(0,0);
         this.direction = new Vector2f(0,0);
-        this.speed = 1;
+        this.speed = 0;
+        this.maxSpeed=1;
         this.bounds = new Rectangle(0,0,5,5);
         this.activeWeapon = new Weapon();
         this.image = "";
