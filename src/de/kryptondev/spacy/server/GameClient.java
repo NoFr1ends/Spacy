@@ -9,7 +9,6 @@ import de.kryptondev.spacy.share.PlayerInfo;
 import de.kryptondev.spacy.share.Version;
 import java.io.Console;
 
-import java.time.Instant;
 import java.util.Date;
 
 public class GameClient {
@@ -22,7 +21,7 @@ public class GameClient {
     public GameClient(Connection connection, SpacyServer server) {
         this.spacyServer = server;
         this.connection = connection;
-        this.connectionTimeStamp = new Date(Instant.now().getEpochSecond());
+        this.connectionTimeStamp = new Date();
         this.connection.addListener(new Listener() {
             @Override
             public void disconnected(Connection cnctn) {         

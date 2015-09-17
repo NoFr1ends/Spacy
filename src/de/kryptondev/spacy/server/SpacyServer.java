@@ -3,16 +3,14 @@ package de.kryptondev.spacy.server;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
-import com.sun.media.jfxmediaimpl.MediaDisposer.Disposable;
 import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.Version;
 
 import java.util.ArrayList;
-import java.util.Base64;
 
-public class SpacyServer implements Disposable {
+public class SpacyServer {
 
     public static SpacyServer instance;
     //private GameClient gameClient;
@@ -159,16 +157,6 @@ public class SpacyServer implements Disposable {
 
     public void addToBanList(byte[] gc) {
         this.bans.add(gc);
-    }
-
-    @Override
-    public void dispose() {
-        if (server != null) {
-            broadcast("Server has been disposed!");
-            server.close();
-        }
-
-        server = null;
     }
 
     public int getMaxSlots() {
