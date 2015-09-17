@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.kryptondev.spacy;
+package de.kryptondev.spacy.data;
 
 /**
  *
  * @author cssand
  */
-public enum DamageType {
-    balistic,laser,plasma,gauss,mine,emp;
+public class Weapon {
+ private Projectile ammo;
+ private String name;
+ private void fire(){}
 }

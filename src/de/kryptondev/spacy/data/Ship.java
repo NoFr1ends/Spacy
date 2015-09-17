@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.kryptondev.spacy;
+package de.kryptondev.spacy.data;
 import de.kryptondev.spacy.*;
 import java.util.ArrayList;
 import org.lwjgl.util.Rectangle;
