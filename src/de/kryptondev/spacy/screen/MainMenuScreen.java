@@ -1,11 +1,8 @@
 package de.kryptondev.spacy.screen;
 
 import de.kryptondev.spacy.input.KeyInputManager;
-import de.kryptondev.spacy.input.MouseInputManager;
 import java.awt.Font;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import org.lwjgl.input.Keyboard;
+import java.util.ArrayList;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -14,14 +11,21 @@ import org.newdawn.slick.TrueTypeFont;
 
 public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener {
 
-    private LinkedHashMap<String, Object> menuEntries;
+    private ArrayList<String> menuEntries;
     private TrueTypeFont font;
     private int currentEntry;
     
+    private static final String START_GAME = "Start game";
+    private static final String OPTIONS = "Options";
+    private static final String EXIT_GAME = "Exit game";
+    
+    private boolean exit;
+    
     public MainMenuScreen() {
-        menuEntries = new LinkedHashMap<>();
-        menuEntries.put("Start game", null);
-        menuEntries.put("Exit game", null);
+        menuEntries = new ArrayList<>();
+        menuEntries.add(START_GAME);
+        menuEntries.add(OPTIONS);
+        menuEntries.add(EXIT_GAME);
     }
     
     @Override
@@ -34,29 +38,50 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener {
                 Input.KEY_DOWN, 
                 this
         );
+        
+        KeyInputManager.getInstance().registerListener(
+                "Menu Up", 
+                Input.KEY_UP, 
+                this
+        );
+        
+        KeyInputManager.getInstance().registerListener(
+                "Menu Enter", 
+                Input.KEY_ENTER, 
+                this
+        );
     }
 
     @Override
     public void update(GameContainer gc, int delta) {
-        
+        if(exit) 
+            gc.exit();
     }
 
     @Override
     public void draw(GameContainer gc, Graphics g) {
         int y = 100;
         int i = 0;
-        for(Map.Entry<String, Object> entry: menuEntries.entrySet()) {
+        for(String entry: menuEntries) {
             Color color = Color.white;
             if(currentEntry == i) {
                 color = Color.yellow;
             }
             
-            font.drawString((gc.getWidth() - font.getWidth(entry.getKey())) / 2, 
-                    y, entry.getKey(), color);
+            font.drawString((gc.getWidth() - font.getWidth(entry)) / 2, 
+                    y, entry, color);
             
-            y+=font.getHeight(entry.getKey()) + 10;
+            y+=font.getHeight(entry) + 10;
             
             i++;
+        }
+    }
+    
+    public void onMenuPressed(String entry) {
+        switch(entry) {
+            case EXIT_GAME:
+                exit = true;
+                break;
         }
     }
 
@@ -67,9 +92,18 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener {
 
     @Override
     public void onKeyPressed(int key) {
-        currentEntry++;
-        if(currentEntry == menuEntries.size()) {
-            currentEntry = 0;
+        if(key == Input.KEY_DOWN) {
+            currentEntry++;
+            if(currentEntry == menuEntries.size()) {
+                currentEntry = 0;
+            }
+        } else if(key == Input.KEY_UP) {
+            currentEntry--;
+            if(currentEntry < 0) {
+                currentEntry = menuEntries.size() - 1;
+            }
+        } else if(key == Input.KEY_ENTER) {
+            onMenuPressed(menuEntries.get(currentEntry));
         }
     }
     
