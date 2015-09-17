@@ -11,6 +11,7 @@ public abstract class Entity {
     public Rectangle bounds;
     public long id;
     public float maxSpeed;
+    public boolean visible=true; //Vorbereitung für eventuelles PowerUp "Unsichtbarkeit"
 
     public void move() {
         Vector2f newPosition = new Vector2f();
