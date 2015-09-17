@@ -3,6 +3,7 @@ package de.kryptondev.spacy.server;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import de.kryptondev.spacy.data.World;
 import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
@@ -23,6 +24,7 @@ public class SpacyServer {
     private ArrayList<GameClient> clients;
     private ArrayList<byte[]> bans;
     private ArrayList<byte[]> admins;
+    public World world;
     
 
     public void writeWarning(String s) {
@@ -221,5 +223,7 @@ public class SpacyServer {
         player.add(uid);
         return admins.containsAll(player);
     }
+    
+    
 
 }

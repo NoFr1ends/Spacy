@@ -2,6 +2,7 @@ package de.kryptondev.spacy.server;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.server.SpacyServer;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
@@ -10,6 +11,7 @@ import de.kryptondev.spacy.share.Version;
 import java.io.Console;
 
 import java.util.Date;
+import org.lwjgl.util.vector.Vector2f;
 
 public class GameClient {
     private Connection connection;
@@ -41,7 +43,15 @@ public class GameClient {
             
         });
     }
-   
+   /**
+    * Neues Schiff mit Standartwerten erstellen und zur Welt hinzufügen.
+    * @return das neue Schiff
+    */
+    public Ship addShip(){
+        Ship s = new Ship();
+        SpacyServer.instance.world.ships.add(s);
+        return s;
+    }
     private void validateConnection() {       
         if (spacyServer.isPlayerBanned(playerInfo.playerUID)) {
             connection.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.Banned));
@@ -49,6 +59,9 @@ public class GameClient {
         }
         GameClient.this.spacyServer.broadcast(new Chatmessage(GameClient.this.getPlayerInfo().playerName + " joined the party!"));
         GameClient.this.getSpacyServer().writeInfo(GameClient.this.toString() + " connected right now!");
+        
+        connection.sendTCP(spacyServer.world);
+        connection.sendTCP(this.addShip());
     }
 
     @Override

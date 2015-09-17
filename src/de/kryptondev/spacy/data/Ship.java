@@ -1,31 +1,36 @@
 package de.kryptondev.spacy.data;
 import de.kryptondev.spacy.*;
+import de.kryptondev.spacy.share.PlayerInfo;
 import java.util.ArrayList;
 import org.lwjgl.util.Rectangle;
 import org.lwjgl.util.vector.*;
 
-public class Ship implements IHittable{
-    public Vector2f position;
-    public Vector2f direction;
+public class Ship extends Entity implements IHittable{
     //public float direction;
-    public float speed;
     public float turnspeed;
-    public Rectangle bounds;
-    public ArrayList<Weapon> weapons;
+    public PlayerInfo owner;
     public Weapon activeWeapon;
     public String image;
     public Shield shield;
 
-    public Ship(Vector2f position, Vector2f direction, float speed, float turnspeed, Rectangle bounds, ArrayList<Weapon> weapons, Weapon activeWeapon, String image, Shield shield) {
+    public Ship(Vector2f position, Vector2f direction, float speed, Rectangle bounds, Weapon activeWeapon, String image, Shield shield) {
         this.position = position;
         this.direction = direction;
         this.speed = speed;
-        this.turnspeed = turnspeed;
         this.bounds = bounds;
-        this.weapons = weapons;
         this.activeWeapon = activeWeapon;
         this.image = image;
         this.shield = shield;
+    }
+
+    public Ship() {
+        this.position = new Vector2f(0,0);
+        this.direction = new Vector2f(0,0);
+        this.speed = 1;
+        this.bounds = new Rectangle(0,0,5,5);
+        this.activeWeapon = new Weapon();
+        this.image = "";
+        this.shield = new Shield();
     }
 
     

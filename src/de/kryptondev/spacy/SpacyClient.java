@@ -3,6 +3,8 @@ package de.kryptondev.spacy;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import de.kryptondev.spacy.data.Ship;
+import de.kryptondev.spacy.data.World;
 import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.helper.UID;
 import de.kryptondev.spacy.share.Chatmessage;
@@ -19,6 +21,8 @@ public class SpacyClient {
     public static final Version clientVersion = new Version(1, 0, 0);
     private Listener listener;
     private PlayerInfo info;
+    private World world;
+    private Ship ship;
 
     public SpacyClient() {
         this.info = new PlayerInfo();
@@ -99,6 +103,13 @@ public class SpacyClient {
                 connectionDropped(response.type);
             }
 
+        }
+        if(o instanceof World){
+            this.world=(World) o;
+        }
+        if(o instanceof Ship)
+        {
+            this.ship = (Ship) o;   
         }
     }
 
