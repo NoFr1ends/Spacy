@@ -14,10 +14,9 @@ import java.util.ArrayList;
 public class SpacyServer {
 
     public static SpacyServer instance;
-    //private GameClient gameClient;
-    private boolean visibleInLan = true;
     private int maxSlots = 32;
-    private int port = 30300;
+    private int port = 30300;    
+    private final int broadcastPort = 54777;
     private Server server;
     private Listener listener;
     public static final Version serverVersion = new Version(1, 0, 0);
@@ -34,6 +33,10 @@ public class SpacyServer {
     public void writeInfo(String s) {
         System.out.println(s);
     }
+    
+    public void writeDebug(String s) {
+        System.out.println(s);
+    }
 
     public void writeError(String s) {
         System.err.println(s);
@@ -44,12 +47,11 @@ public class SpacyServer {
         bans = new ArrayList<>();
         admins = new ArrayList<>();        
         instance = this;
-        server = new Server(port, port);        
+        server = new Server(port, broadcastPort);        
         //TODO register all classes
     }
 
     public SpacyServer() {
-
         stdConstr();
     }
 
@@ -118,17 +120,18 @@ public class SpacyServer {
             };
             server.addListener(listener);
             server.start();
-            server.bind(port);
+            server.bind(port,broadcastPort);
+            
 
-            
-            
+            writeInfo("Sever started.");            
+          
         } catch (Exception ex) { 
             writeError(ex.getLocalizedMessage());
             writeError("Maybe a server is already running on this port?");
             return false;
         }
         
-        System.out.println("Sever started.");
+        
         
         return true;
     }
@@ -201,14 +204,6 @@ public class SpacyServer {
 
     public int getPort() {
         return port;
-    }
-
-    public boolean isVisibleInLan() {
-        return visibleInLan;
-    }
-
-    public void setVisibleInLan(boolean visibleInLan) {
-        this.visibleInLan = visibleInLan;
     }
 
     public boolean isPlayerBanned(byte[] uid) {

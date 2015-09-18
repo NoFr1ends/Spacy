@@ -1,5 +1,6 @@
 package de.kryptondev.spacy.screen;
 
+import de.kryptondev.spacy.MainGame;
 import de.kryptondev.spacy.input.KeyInputManager;
 import java.awt.Font;
 import java.util.ArrayList;
@@ -81,6 +82,9 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener {
         switch(entry) {
             case EXIT_GAME:
                 exit = true;
+                break;
+            case START_GAME:
+                MainGame.getScreenManager().changeScreen(new ConnectMenuScreen(this));
                 break;
         }
     }

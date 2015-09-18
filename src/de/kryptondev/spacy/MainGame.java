@@ -15,7 +15,7 @@ public class MainGame extends BasicGame {
     
     private KeyInputManager keyInputManager;
     private MouseInputManager mouseInputManager;
-    private ScreenManager screenManager;
+    private static ScreenManager screenManager;
     
     public MainGame() {
         super("Spacy");
@@ -55,5 +55,15 @@ public class MainGame extends BasicGame {
             e.printStackTrace();
         }
     }
+
+    public static ScreenManager getScreenManager() {
+        return screenManager;
+    }
+
+    public static void setScreenManager(ScreenManager screenManager) {
+        MainGame.screenManager = screenManager;
+    }
+    
+    
     
 }
