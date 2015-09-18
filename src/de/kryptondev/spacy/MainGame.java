@@ -33,7 +33,7 @@ public class MainGame extends BasicGame {
     @Override
     public void update(GameContainer gc, int i) throws SlickException {        
         keyInputManager.update(gc.getInput());
-        mouseInputManager.update();
+        mouseInputManager.update(gc.getInput());
         
         screenManager.update(gc, i);
     }

@@ -58,7 +58,7 @@ public class SpacyClient {
                     System.out.println("Client is connected!");
                     client.sendTCP(clientVersion);
                     client.sendTCP(SpacyClient.this.info);
-                   
+                    //Recv World & Ship
                    
                 }
             };
@@ -128,5 +128,30 @@ public class SpacyClient {
     public void setTimeout(int timeout) {
         this.timeout = timeout;
     }
+
+    public PlayerInfo getInfo() {
+        return info;
+    }
+
+    public void setInfo(PlayerInfo info) {
+        this.info = info;
+    }
+
+    public World getWorld() {
+        return world;
+    }
+
+    public void setWorld(World world) {
+        this.world = world;
+    }
+
+    public Ship getShip() {
+        return ship;
+    }
+
+    public void setShip(Ship ship) {
+        this.ship = ship;
+    }
+    
     
 }

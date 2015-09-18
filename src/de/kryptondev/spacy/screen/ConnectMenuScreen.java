@@ -98,6 +98,7 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener 
                 //Connect to selected Entry
                 SpacyClient.setInstance(new SpacyClient());
                 SpacyClient.getInstance().connect(entry);
+                ScreenManager.getInstance().changeScreen(new Game(this,SpacyClient.getInstance()));
         }
     }
 
@@ -115,6 +116,7 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener 
             }
         } else if(key == Input.KEY_ESCAPE){
             exit = true;
+            //TODO deregister
         }
         else if(key == Input.KEY_ENTER) {
             onMenuPressed(menuEntries.get(currentEntry));
@@ -124,15 +126,17 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener 
     @Override
     public void update(GameContainer gc, int delta) {
        if(exit) 
-            gc.exit();
+       {
+           
+       }
     }
 
     @Override
     public void draw(GameContainer gc, Graphics g) {
         int y = 100;
         int i = 0;
-      
-        if(modifying || menuEntries.size() < 1 || exit)
+      try{
+        if(exit ||modifying || menuEntries.size() < 1)
             return;
         List<String> buffer = menuEntries;
         for (String entry : buffer) {
@@ -148,7 +152,10 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener 
 
             i++;
         }
-     
+      }
+      catch(java.util.ConcurrentModificationException e){
+          e.printStackTrace();
+      }
        
     }
 
