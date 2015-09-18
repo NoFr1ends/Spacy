@@ -7,22 +7,23 @@ import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.data.World;
 import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.helper.UID;
+import de.kryptondev.spacy.server.GameClient;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.PlayerInfo;
 import de.kryptondev.spacy.share.Version;
 
-public class SpacyClient {
+public class SpacyClient extends Listener{
 
     private static SpacyClient instance;
     private Client client;
     private int port = 30300;
     private int timeout = 2500;
     public static final Version clientVersion = new Version(1, 0, 0);
-    private Listener listener;
     private PlayerInfo info;
     private World world;
     private Ship ship;
+
 
     public SpacyClient() {
         this.info = new PlayerInfo();
@@ -39,30 +40,9 @@ public class SpacyClient {
         try {
             client = new Client();
             KryoRegisterer.registerAll(client.getKryo());
-           //client.setKeepAliveTCP(port);
 
-            listener = new Listener() {
-
-                @Override
-                public void received(Connection cnctn, Object o) {
-                    onRecv(cnctn, o);
-                }
-
-                @Override
-                public void disconnected(Connection cnctn) {
-                    onDisconnect(cnctn);
-                }
-
-                @Override
-                public void connected(Connection cnctn) {
-                    System.out.println("Client is connected!");
-                    client.sendTCP(clientVersion);
-                    client.sendTCP(SpacyClient.this.info);
-                    //Recv World & Ship
-                   
-                }
-            };
-            client.addListener(listener);
+          
+            client.addListener(this);
             client.start();
             client.connect(timeout, server, port);
             
@@ -70,15 +50,6 @@ public class SpacyClient {
              System.err.println(ex.getLocalizedMessage());
             //TODO Handle error
         }
-    }
-
-    private void onDisconnect(Connection cnctn) {
-        //GUI Update
-    }
-
-    private void connected() {
-        //GUI Update
-        System.out.println("Client is connected!");
     }
 
     private void connectionDropped(ConnectionAttemptResponse.Type reason) {
@@ -97,12 +68,18 @@ public class SpacyClient {
             //Antwort auswerten
             ConnectionAttemptResponse response = (ConnectionAttemptResponse) o;
             if (response.type == ConnectionAttemptResponse.Type.OK) {
-                connected();
+                
             } else {
                 this.client.close();
                 connectionDropped(response.type);
             }
 
+        }
+        if(o instanceof PlayerInfo){
+            PlayerInfo pi = (PlayerInfo)o;
+            GameClient.SGameClient c = (GameClient.SGameClient)cnctn;
+            c.setPlayerInfo(pi);
+            return;
         }
         if(o instanceof World){
             this.world=(World) o;
@@ -113,6 +90,28 @@ public class SpacyClient {
         }
     }
 
+    
+    
+     @Override
+    public void received(Connection cnctn, Object o) {
+        onRecv(cnctn, o);
+    }
+
+    @Override
+    public void disconnected(Connection cnctn) {
+        
+    }
+
+    @Override
+    public void connected(Connection cnctn) {
+        System.out.println("Client is connected!");
+        client.sendTCP(clientVersion);
+        client.sendTCP(SpacyClient.this.info);
+        //Recv World & Ship
+
+    }
+                
+                
     public static SpacyClient getInstance() {
         return instance;
     }

@@ -11,16 +11,14 @@ import de.kryptondev.spacy.share.Version;
 
 import java.util.ArrayList;
 
-public class SpacyServer {
+public class SpacyServer extends Listener {
 
     public static SpacyServer instance;
     private int maxSlots = 32;
     private int port = 30300;    
     private final int broadcastPort = 54777;
     private Server server;
-    private Listener listener;
     public static final Version serverVersion = new Version(1, 0, 0);
-    private ArrayList<GameClient> clients;
     private ArrayList<byte[]> bans;
     private ArrayList<byte[]> admins;
     public World world;
@@ -42,13 +40,18 @@ public class SpacyServer {
         System.err.println(s);
     }
 
-    private void stdConstr() {
-        clients = new ArrayList<>(maxSlots);        
+    private void stdConstr() {           
         bans = new ArrayList<>();
         admins = new ArrayList<>();        
         instance = this;
-        server = new Server(port, broadcastPort);        
-        //TODO register all classes
+        server = new Server(port, broadcastPort){
+
+            @Override
+            protected Connection newConnection() {
+                return new GameClient(SpacyServer.this).instance;
+            }
+        
+        };            
     }
 
     public SpacyServer() {
@@ -78,7 +81,7 @@ public class SpacyServer {
         }
         stdConstr();
     }
-
+/*
     public static boolean isBadName(String playerName) {
         ArrayList<String> badNames = new ArrayList<>(16);
         badNames.add("*");
@@ -100,28 +103,13 @@ public class SpacyServer {
         }
         return false;
     }
-
+*/
     public boolean start() {
-        try {           
+        try {
             KryoRegisterer.registerAll(server.getKryo()); 
-            
-            listener = new Listener() {
-                @Override
-                public void connected(Connection cnctn) {
-                    if (getUsedSlots() < getMaxSlots()) {
-                        GameClient gc = new GameClient(cnctn, SpacyServer.this);
-                        clients.add(gc);
-                    } else {
-                        cnctn.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.ServerFull));
-                        cnctn.close();
-                    }
-                    super.connected(cnctn);
-                }
-            };
-            server.addListener(listener);
-            server.start();
+            server.addListener(this);
             server.bind(port,broadcastPort);
-            
+            server.start();            
 
             writeInfo("Sever started.");            
           
@@ -136,14 +124,8 @@ public class SpacyServer {
         return true;
     }
 
-    public void addClient(GameClient gc) {
-        this.clients.add(gc);
-    }
-
-    public void removeClient(GameClient gc) {
-        this.clients.remove(gc);
-    }
-
+    
+/*
     public void broadcast(Object obj) {
         for (GameClient gc : getClients()) {
             gc.getConnection().sendTCP(obj);
@@ -163,7 +145,7 @@ public class SpacyServer {
     public void addToBanList(byte[] gc) {
         this.bans.add(gc);
     }
-
+*/
     public int getMaxSlots() {
         return maxSlots;
     }
@@ -171,35 +153,27 @@ public class SpacyServer {
     public Server getServer() {
         return server;
     }
-
-    public Listener getListener() {
-        return listener;
-    }
-
-    public ArrayList<GameClient> getClients() {
-        return clients;
-    }
-
+  
     public GameClient getClientByName(String playerName) {
-        for (GameClient item : getClients()) {
+        for (GameClient.SGameClient item : (GameClient.SGameClient[])server.getConnections()) {
             if (item.getPlayerInfo().playerName.equals(playerName)) {
-                return item;
+                return item.gameClient;
             }
         }
         return null;
     }
 
     public GameClient getClientByUID(byte[] uid) {
-        for (GameClient item : getClients()) {
+        for (GameClient.SGameClient item : (GameClient.SGameClient[])server.getConnections()) {
             if (item.getPlayerInfo().playerUID == uid) {
-                return item;
+                return item.gameClient;
             }
         }
         return null;
     }
 
     public int getUsedSlots() {
-        return clients.size();
+        return server.getConnections().length;
     }
 
     public int getPort() {
@@ -217,6 +191,27 @@ public class SpacyServer {
         ArrayList<byte[]> player = new ArrayList<byte[]>(1);
         player.add(uid);
         return admins.containsAll(player);
+    }
+
+    @Override
+    public void idle(Connection cnctn) {
+        super.idle(cnctn); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void received(Connection cnctn, Object o) {
+        super.received(cnctn, o); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void disconnected(Connection cnctn) {
+        super.disconnected(cnctn); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void connected(Connection cnctn) {        
+        System.out.println("Max");
+        cnctn.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.OK));        
     }
     
     
