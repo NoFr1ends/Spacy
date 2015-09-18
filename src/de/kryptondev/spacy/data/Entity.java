@@ -12,7 +12,8 @@ public abstract class Entity {
     public long id;
     public float maxSpeed;
     public boolean visible=true; //Vorbereitung für eventuelles PowerUp "Unsichtbarkeit"
-
+    
+    
     public void move() {
         Vector2f newPosition = new Vector2f();
         newPosition.x = position.x + (direction.x * speed);
