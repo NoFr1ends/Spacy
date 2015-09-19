@@ -8,6 +8,7 @@ import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.Version;
+import java.io.Console;
 
 import java.util.ArrayList;
 
@@ -200,17 +201,18 @@ public class SpacyServer extends Listener {
 
     @Override
     public void received(Connection cnctn, Object o) {
-        super.received(cnctn, o); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Server: Data was received!");
+        System.out.println(o.toString());
     }
 
     @Override
     public void disconnected(Connection cnctn) {
-        super.disconnected(cnctn); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Server: Client is disconnected!");        
     }
 
     @Override
-    public void connected(Connection cnctn) {        
-        System.out.println("Max");
+    public void connected(Connection cnctn) {
+        System.out.println("Server: Client is connected!");
         cnctn.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.OK));        
     }
     

@@ -11,4 +11,12 @@ package de.kryptondev.spacy.data;
  */
 public interface IHittable {
     public void hit (Projectile hitting); 
+    
+    public int hp = 100; //hatten wir glatt vergessen
+    public int maxHp = 100;
+    /*
+    life und maxLife könnten eventuell auch in die Entity-Klasse gepackt werden,
+    aber Projektile und Hindernisse haben diese Atribute nicht.
+    Bester Ort wäre vermutlich das Interface IHittable.
+    */
 }

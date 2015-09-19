@@ -1,7 +1,6 @@
 package de.kryptondev.spacy.helper;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.sun.javafx.geom.Vec2f;
 import de.kryptondev.spacy.data.*;
 import de.kryptondev.spacy.share.*;
 import java.util.Date;
@@ -22,7 +21,8 @@ public class KryoRegisterer {
         k.register(Weapon.class);    
         k.register(Ship.class);  
         k.register(Projectile.class);  
-        
+        k.register(Shield.class);
+        k.register(DamageType.class);
         
         k.register(Rectangle.class);
         k.register(Vector2f.class); 

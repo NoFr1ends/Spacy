@@ -84,7 +84,7 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener 
                 this
         );
         
-        t.start();
+        t.start();       
     }
     
     public void onMenuPressed(String entry) {

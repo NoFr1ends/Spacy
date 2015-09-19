@@ -2,15 +2,13 @@ package de.kryptondev.spacy.server;
 
 import com.esotericsoftware.kryonet.*;
 import de.kryptondev.spacy.data.Ship;
-import de.kryptondev.spacy.server.SpacyServer;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.PlayerInfo;
 import de.kryptondev.spacy.share.Version;
-import java.io.Console;
 
 import java.util.Date;
-import org.lwjgl.util.vector.Vector2f;
+
 
 public class GameClient extends Listener {
     public SGameClient instance;
@@ -21,7 +19,7 @@ public class GameClient extends Listener {
     
     public class SGameClient extends Connection {
         private Version version;
-        private Date connectionTimeStamp;
+        private final Date connectionTimeStamp;
         private PlayerInfo playerInfo;
         private SpacyServer spacyServer;
         public GameClient gameClient;
@@ -32,7 +30,7 @@ public class GameClient extends Listener {
             this.connectionTimeStamp = new Date();
 
         }
-       /**onDisconnect(cnctn);
+        /**
         * Neues Schiff mit Standartwerten erstellen und zur Welt hinzufügen.
         * @return das neue Schiff
         */
@@ -64,13 +62,12 @@ public class GameClient extends Listener {
         private boolean versionMismatch(Version version) {
             return !version.isCompatible(SpacyServer.serverVersion);
         }
-
-
-
+        
         public void onDisconnect(){
             GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.instance.playerInfo.playerName + " left the party!");      
             System.out.println(".disconnected()");
         }
+        
         public void onRecv(Object data) {        
             if (data instanceof Version) {
                 this.version = (Version)data;
@@ -92,7 +89,7 @@ public class GameClient extends Listener {
 
 
         }
-
+        
         public Version getVersion() {
             return version;
         }

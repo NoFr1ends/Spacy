@@ -4,19 +4,12 @@ import org.lwjgl.util.Rectangle;
 import org.lwjgl.util.vector.*;
 
 public class Ship extends Entity implements IHittable{
-    //public float direction;
     public float turnspeed;
     public PlayerInfo owner;
     public Weapon activeWeapon;
     public String image;
     public Shield shield;
-    public int life; //hatten wir glatt vergessen
-    public int maxLife;
-    /*
-    life und maxLife könnten eventuell auch in die Entity-Klasse gepackt werden,
-    aber Projektile und Hindernisse haben diese Atribute nicht.
-    Bester Ort wäre vermutlich das Interface IHittable.
-    */
+   
     public Ship(Vector2f position, Vector2f direction, float speed, Rectangle bounds, Weapon activeWeapon, String image, Shield shield) {
         this.position = position;
         this.direction = direction;
