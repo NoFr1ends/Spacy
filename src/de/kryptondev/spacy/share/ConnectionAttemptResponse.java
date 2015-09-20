@@ -13,6 +13,7 @@ public class ConnectionAttemptResponse {
         VersionMismatch,
         Banned,
         ServerFull,
-        BadName
+        BadName,
+        Disconnect
     }    
 }

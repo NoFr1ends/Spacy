@@ -23,6 +23,10 @@ public class ScreenManager {
         newScreen = screen;
     }
     
+    public IScreen getCurrentScreen(){
+        return currentScreen;
+    }
+    
     public void draw(GameContainer gc, Graphics g) {
         if(currentScreen != null) {
             currentScreen.draw(gc, g);

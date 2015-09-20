@@ -8,19 +8,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.paint.Color;
 import org.lwjgl.util.vector.Vector2f;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.opengl.pbuffer.FBOGraphics;
 
 
 
 public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputManager.MouseListener {
     private final org.newdawn.slick.Color backgroundColor = new org.newdawn.slick.Color(8,8,64);
-    private ArrayList<test> backgroundStars;
     private SpacyClient spacyClient;
-    
+    private Image background;
     public class test{
         public Vector2f pos;
         public float size;
@@ -35,7 +39,7 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
     public Game(IScreen prevScreen, SpacyClient spacyClient) {
        //TODO Disable prevScreen
         this.spacyClient = spacyClient;
-        backgroundStars = new ArrayList(1000);
+        
     }
     
     @Override
@@ -44,9 +48,28 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
         MouseInputManager.getInstance().registerListener("Throttle", Input.MOUSE_RIGHT_BUTTON, this);
         KeyInputManager.getInstance().registerListener("Throttle", Input.KEY_SPACE, this);
         Random r = new Random();
-        for(int i = 0; i < 10000; i++){
-           backgroundStars.add(new test(r.nextInt(2048), r.nextInt(2048), (int)(r.nextFloat() * 6)));
+        
+        try {
+            int width = gc.getWidth();
+            int height = gc.getHeight();            
+           
+            Graphics g = new Graphics(width,height);
+            int max = gc.getWidth() * gc.getHeight() / 1000;
+            for(int i = 0; i < max; i++){
+                int rad = (int)(r.nextFloat() * 6);                
+                g.fillOval(r.nextInt(width), r.nextInt(height), rad,rad);
+            }
+            
+            background = new Image(width, height);
+            g.copyArea(background,100,100);
+            //TOOD: Fix
+            
+        } catch (SlickException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+      
+            
     }
 
     @Override
@@ -57,9 +80,8 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
     @Override
     public void draw(GameContainer gc, Graphics g) {
         g.setBackground(backgroundColor);
-        for(test star : backgroundStars)
-            g.fillOval(star.pos.x, star.pos.y, star.size, star.size);
-        
+        g.drawImage(background, 0, 0);
+       
         
         if(spacyClient.getWorld() == null)
             return;
@@ -71,7 +93,19 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
         
         
     }
-
+    
+    public void onDisconnect() {
+        
+    }
+    
+    public void onRecv(Object o){
+        
+    }
+    
+    public void onConnected(){
+        
+    }
+    
     @Override
     public void onKeyDown(int key) {
       

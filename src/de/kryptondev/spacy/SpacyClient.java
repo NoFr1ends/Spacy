@@ -7,6 +7,8 @@ import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.data.World;
 import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.helper.UID;
+import de.kryptondev.spacy.screen.Game;
+import de.kryptondev.spacy.screen.ScreenManager;
 import de.kryptondev.spacy.server.GameClient;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
@@ -69,37 +71,45 @@ public class SpacyClient extends Listener{
             ConnectionAttemptResponse response = (ConnectionAttemptResponse) o;
             if (response.type == ConnectionAttemptResponse.Type.OK) {
                 
+                return;
             } else {
                 this.client.close();
                 connectionDropped(response.type);
+                return;
             }
 
-        }
-        if(o instanceof PlayerInfo){
-            PlayerInfo pi = (PlayerInfo)o;
-            GameClient.SGameClient c = (GameClient.SGameClient)cnctn;
-            c.setPlayerInfo(pi);
-            return;
-        }
+        }      
         if(o instanceof World){
             this.world=(World) o;
         }
-        if(o instanceof Ship)
-        {
+        if(o instanceof Ship){
             this.ship = (Ship) o;   
+            if(ScreenManager.getInstance().getCurrentScreen() instanceof Game){
+                Game game = (Game)ScreenManager.getInstance().getCurrentScreen();
+                game.onConnected();
+            }
+        }
+        
+        
+        
+        
+        
+        if(ScreenManager.getInstance().getCurrentScreen() instanceof Game){
+            Game game = (Game)ScreenManager.getInstance().getCurrentScreen();
+            game.onRecv(o);
         }
     }
 
     
     
-     @Override
+    @Override
     public void received(Connection cnctn, Object o) {
         onRecv(cnctn, o);
     }
 
     @Override
     public void disconnected(Connection cnctn) {
-        
+        connectionDropped(ConnectionAttemptResponse.Type.Disconnect);
     }
 
     @Override

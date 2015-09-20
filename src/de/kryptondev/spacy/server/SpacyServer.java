@@ -7,6 +7,7 @@ import de.kryptondev.spacy.data.World;
 import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
+import de.kryptondev.spacy.share.PlayerInfo;
 import de.kryptondev.spacy.share.Version;
 import java.io.Console;
 
@@ -203,6 +204,8 @@ public class SpacyServer extends Listener {
     public void received(Connection cnctn, Object o) {
         System.out.println("Server: Data was received!");
         System.out.println(o.toString());
+        GameClient.SGameClient gc = (GameClient.SGameClient)cnctn;
+        gc.onRecv(o);          
     }
 
     @Override
