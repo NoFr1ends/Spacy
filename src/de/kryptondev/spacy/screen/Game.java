@@ -4,20 +4,15 @@ import de.kryptondev.spacy.SpacyClient;
 import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.input.KeyInputManager;
 import de.kryptondev.spacy.input.MouseInputManager;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.paint.Color;
-import org.lwjgl.util.vector.Vector2f;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.opengl.pbuffer.FBOGraphics;
+
 
 
 
@@ -25,17 +20,7 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
     private final org.newdawn.slick.Color backgroundColor = new org.newdawn.slick.Color(8,8,64);
     private SpacyClient spacyClient;
     private Image background;
-    public class test{
-        public Vector2f pos;
-        public float size;
-
-        public test(int x, int y, float size) {
-            this.pos = new Vector2f(x,y);
-            this.size = size;
-        }
-        
-    }
-    
+   
     public Game(IScreen prevScreen, SpacyClient spacyClient) {
        //TODO Disable prevScreen
         this.spacyClient = spacyClient;
@@ -50,18 +35,28 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
         Random r = new Random();
         
         try {
+            
             int width = gc.getWidth();
             int height = gc.getHeight();            
            
-            Graphics g = new Graphics(width,height);
-            int max = gc.getWidth() * gc.getHeight() / 1000;
+            /*
+            int width = 4096;
+            int height = width;
+            */
+            Graphics g = new Graphics(width, height);
+            g.clear();
+            //g.setAntiAlias(true);
+            int max = width * height / 1000;
+            System.out.println("Creating " + max + " stars for background...");
             for(int i = 0; i < max; i++){
-                int rad = (int)(r.nextFloat() * 6);                
+                int rad = (int)(r.nextFloat() * 5 + 2);                
                 g.fillOval(r.nextInt(width), r.nextInt(height), rad,rad);
             }
             
+            g.flush();
+            
             background = new Image(width, height);
-            g.copyArea(background,100,100);
+            g.copyArea(background,0,0);
             //TOOD: Fix
             
         } catch (SlickException ex) {
