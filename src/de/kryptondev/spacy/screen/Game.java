@@ -45,7 +45,7 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
         KeyInputManager.getInstance().registerListener("Throttle", Input.KEY_SPACE, this);
         Random r = new Random();
         for(int i = 0; i < 10000; i++){
-           backgroundStars.add(new test(r.nextInt(2048), r.nextInt(2048), r.nextFloat() * 5));
+           backgroundStars.add(new test(r.nextInt(2048), r.nextInt(2048), (int)(r.nextFloat() * 6)));
         }
     }
 
@@ -57,6 +57,10 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
     @Override
     public void draw(GameContainer gc, Graphics g) {
         g.setBackground(backgroundColor);
+        for(test star : backgroundStars)
+            g.fillOval(star.pos.x, star.pos.y, star.size, star.size);
+        
+        
         if(spacyClient.getWorld() == null)
             return;
         for(Ship ship : spacyClient.getWorld().ships){
@@ -64,9 +68,6 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
         }
         
         
-        /*for(test star : backgroundStars)
-            g.fillOval(star.pos.x, star.pos.y, star.size, star.size);
-        */
         
         
     }
