@@ -3,6 +3,9 @@ package de.kryptondev.spacy.share;
 
 public class ConnectionAttemptResponse {
 
+    public ConnectionAttemptResponse() {
+    }
+    
     public ConnectionAttemptResponse(Type type) {
         this.type = type;
     }

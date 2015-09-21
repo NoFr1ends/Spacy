@@ -5,6 +5,9 @@ import java.util.ArrayList;
 
 public class Projectile extends Entity {
 
+    public Projectile() {
+    }
+
     public double damage;
     public int damagerange;
     public int lifetime;

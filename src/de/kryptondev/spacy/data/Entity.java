@@ -12,6 +12,9 @@ public abstract class Entity {
     public long id;
     public float maxSpeed;
     public boolean visible=true; //Vorbereitung für eventuelles PowerUp "Unsichtbarkeit"
+
+    public Entity() {
+    }
     
     
     public void move() {

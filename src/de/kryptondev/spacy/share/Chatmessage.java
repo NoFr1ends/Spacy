@@ -7,6 +7,9 @@ public class Chatmessage  {
     public String message = "";
     public String sender = "";  
     public Date sendTime = new Date();
+
+    public Chatmessage() {
+    }
    
     public Chatmessage(String message) {
         this.sender = "SERVER";

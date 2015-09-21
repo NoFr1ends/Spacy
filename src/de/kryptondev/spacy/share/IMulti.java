@@ -9,4 +9,5 @@ package de.kryptondev.spacy.share;
 */
 public interface IMulti {
     int packageId = 0;
+    
 }

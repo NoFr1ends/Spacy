@@ -12,8 +12,9 @@ import java.util.Date;
 
 public class GameClient extends Listener {
     public SGameClient instance;
-
+    
     public GameClient(SpacyServer server) {
+         System.out.println("New Instance of GameClient");
         instance = new SGameClient(server, this);
     }
     
@@ -28,8 +29,12 @@ public class GameClient extends Listener {
             this.gameClient = gc;
             this.spacyServer = server;
             this.connectionTimeStamp = new Date();
-
+            
+            System.out.println("New Instance of SGameClient");
         }
+        
+        
+        
         /**
         * Neues Schiff mit Standartwerten erstellen und zur Welt hinzufügen.
         * @return das neue Schiff
@@ -55,8 +60,8 @@ public class GameClient extends Listener {
         @Override
         public String toString() {
             return "Player '" + playerInfo.playerName + "' with '"
-                    + this.getRemoteAddressTCP().getHostString() + "' on "
-                    + playerInfo.OS + ". Spacy Client " + this.version.toString() + " is connected since " + connectionTimeStamp;
+                + this.getRemoteAddressTCP().getHostString() + "' on "
+                + playerInfo.OS + ". Spacy Client " + this.version.toString() + " is connected since " + connectionTimeStamp;
         }
 
         private boolean versionMismatch(Version version) {

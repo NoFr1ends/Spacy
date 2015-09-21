@@ -23,6 +23,9 @@ public class Version {
     public String toString() {
         return major + "." + minor + "." + bugfix;
     }    
+
+    public Version() {
+    }
     
     public int major;
     public int minor;

@@ -42,12 +42,10 @@ public class SpacyClient extends Listener{
         try {
             client = new Client();
             KryoRegisterer.registerAll(client.getKryo());
-
-          
+            new Thread(client).start();
             client.addListener(this);
-            client.start();
-            client.connect(timeout, server, port);
-            
+            client.connect(timeout, server, port, 54777);
+
         } catch (Exception ex) {
              System.err.println(ex.getLocalizedMessage());
             //TODO Handle error
@@ -70,7 +68,10 @@ public class SpacyClient extends Listener{
             //Antwort auswerten
             ConnectionAttemptResponse response = (ConnectionAttemptResponse) o;
             if (response.type == ConnectionAttemptResponse.Type.OK) {
-                
+                   if(ScreenManager.getInstance().getCurrentScreen() instanceof Game){
+                        Game game = (Game)ScreenManager.getInstance().getCurrentScreen();
+                        game.onConnected();
+                    }
                 return;
             } else {
                 this.client.close();
@@ -84,10 +85,7 @@ public class SpacyClient extends Listener{
         }
         if(o instanceof Ship){
             this.ship = (Ship) o;   
-            if(ScreenManager.getInstance().getCurrentScreen() instanceof Game){
-                Game game = (Game)ScreenManager.getInstance().getCurrentScreen();
-                game.onConnected();
-            }
+           
         }
         
         
@@ -104,6 +102,7 @@ public class SpacyClient extends Listener{
     
     @Override
     public void received(Connection cnctn, Object o) {
+        System.out.println("Package received!");
         onRecv(cnctn, o);
     }
 
@@ -114,9 +113,11 @@ public class SpacyClient extends Listener{
 
     @Override
     public void connected(Connection cnctn) {
-        System.out.println("Client is connected!");
+        System.out.println("Sending ClientVersion");
         client.sendTCP(clientVersion);
+        System.out.println("Sending PlayerInfo");
         client.sendTCP(SpacyClient.this.info);
+        System.out.println("OK");
         //Recv World & Ship
 
     }

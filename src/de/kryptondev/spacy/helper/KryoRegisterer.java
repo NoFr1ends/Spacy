@@ -11,8 +11,22 @@ import org.lwjgl.util.vector.Vector2f;
 
 public class KryoRegisterer {
     public static void registerAll(Kryo k){        
+        k.register(boolean.class);  
+        k.register(float.class);
+        k.register(int.class);
+        k.register(byte[].class);
+        k.register(String.class);
+        k.register(Date.class);
+        k.register(HashMap.class); 
+        k.register(java.util.ArrayList.class);
+        
+        k.register(Rectangle.class);
+        k.register(Vector2f.class); 
+        
+        
         k.register(Chatmessage.class);        
-        k.register(ConnectionAttemptResponse.class);
+        k.register(ConnectionAttemptResponse.class);        
+        k.register(ConnectionAttemptResponse.Type.class);
         k.register(ConnectionInfo.class);
         k.register(PlayerInfo.class);
         k.register(Version.class);  
@@ -24,16 +38,7 @@ public class KryoRegisterer {
         k.register(Shield.class);
         k.register(DamageType.class);
         
-        k.register(Rectangle.class);
-        k.register(Vector2f.class); 
-        
-        k.register(boolean.class);  
-        k.register(float.class);
-        k.register(int.class);
-        k.register(byte[].class);
-        k.register(String.class);
-        k.register(Date.class);
-        k.register(HashMap.class);  
+
         
         
 

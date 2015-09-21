@@ -46,14 +46,17 @@ public class SpacyServer extends Listener {
         bans = new ArrayList<>();
         admins = new ArrayList<>();        
         instance = this;
+        world = new World();
         server = new Server(port, broadcastPort){
-
+            
+            
             @Override
             protected Connection newConnection() {
                 return new GameClient(SpacyServer.this).instance;
             }
         
-        };            
+        };
+        
     }
 
     public SpacyServer() {
@@ -111,8 +114,8 @@ public class SpacyServer extends Listener {
             KryoRegisterer.registerAll(server.getKryo()); 
             server.addListener(this);
             server.bind(port,broadcastPort);
-            server.start();            
-
+            new Thread(server).start();       
+            
             writeInfo("Sever started.");            
           
         } catch (Exception ex) { 
@@ -215,6 +218,7 @@ public class SpacyServer extends Listener {
 
     @Override
     public void connected(Connection cnctn) {
+        
         System.out.println("Server: Client is connected!");
         cnctn.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.OK));        
     }
