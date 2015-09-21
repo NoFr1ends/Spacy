@@ -8,13 +8,14 @@ import de.kryptondev.spacy.share.PlayerInfo;
 import de.kryptondev.spacy.share.Version;
 
 import java.util.Date;
+import java.util.Random;
+import org.lwjgl.util.vector.Vector2f;
 
 
 public class GameClient extends Listener {
     public SGameClient instance;
     
-    public GameClient(SpacyServer server) {
-         System.out.println("New Instance of GameClient");
+    public GameClient(SpacyServer server) {        
         instance = new SGameClient(server, this);
     }
     
@@ -23,14 +24,13 @@ public class GameClient extends Listener {
         private final Date connectionTimeStamp;
         private PlayerInfo playerInfo;
         private SpacyServer spacyServer;
-        public GameClient gameClient;
-
+        private GameClient gameClient;
+        private Ship myShip;
+        
         public SGameClient(SpacyServer server, GameClient gc) {
             this.gameClient = gc;
             this.spacyServer = server;
-            this.connectionTimeStamp = new Date();
-            
-            System.out.println("New Instance of SGameClient");
+            this.connectionTimeStamp = new Date();          
         }
         
         
@@ -41,9 +41,12 @@ public class GameClient extends Listener {
         */
         public Ship addShip(){
             Ship s = new Ship();
-            SpacyServer.instance.world.ships.add(s);
+            Random r = new Random();
+            s.position = new Vector2f(r.nextFloat() * 600,r.nextFloat() * 600);
+            spacyServer.world.ships.add(s);
             return s;
         }
+        
         private void validateConnection() {       
             if (spacyServer.isPlayerBanned(playerInfo.playerUID)) {
                 this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.Banned));
@@ -54,7 +57,9 @@ public class GameClient extends Listener {
             this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.OK));
 
             this.sendTCP(spacyServer.world);
-            this.sendTCP(this.addShip());
+            Ship s = this.addShip();
+            s.owner = playerInfo;
+            this.spacyServer.getServer().sendToAllTCP(s);
         }
 
         @Override
@@ -116,6 +121,22 @@ public class GameClient extends Listener {
 
         public void setPlayerInfo(PlayerInfo playerInfo) {
             this.playerInfo = playerInfo;
+        }
+
+        public GameClient getGameClient() {
+            return gameClient;
+        }
+
+        public void setGameClient(GameClient gameClient) {
+            this.gameClient = gameClient;
+        }
+
+        public Ship getMyShip() {
+            return myShip;
+        }
+
+        public void setMyShip(Ship myShip) {
+            this.myShip = myShip;
         }
 
 

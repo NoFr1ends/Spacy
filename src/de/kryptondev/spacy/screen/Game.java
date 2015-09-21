@@ -37,15 +37,12 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
         try {
             
             int width = gc.getWidth();
-            int height = gc.getHeight();            
+            int height = gc.getHeight();           
            
-            /*
-            int width = 4096;
-            int height = width;
-            */
+
             Graphics g = new Graphics(width, height);
             g.clear();
-            //g.setAntiAlias(true);
+           
             int max = width * height / 1000;
             System.out.println("Creating " + max + " stars for background...");
             for(int i = 0; i < max; i++){
@@ -57,7 +54,6 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
             
             background = new Image(width, height);
             g.copyArea(background,0,0);
-            //TOOD: Fix
             
         } catch (SlickException ex) {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
@@ -80,7 +76,7 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
         
         if(spacyClient.getWorld() == null)
             return;
-        for(Ship ship : spacyClient.getWorld().ships){
+        for(Ship ship : spacyClient.getWorld().ships){            
             g.fillRect(ship.bounds.getX() + ship.position.getX(), ship.bounds.getY() + ship.position.getY(), ship.bounds.getWidth(), ship.bounds.getHeight());
         }
         

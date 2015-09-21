@@ -3,6 +3,7 @@ package de.kryptondev.spacy.helper;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.security.MessageDigest;
+import java.util.Random;
 
 /**
  * Generates a UID for the current computer 
@@ -36,7 +37,10 @@ public class UID {
             return md.digest();            
         }
         catch(Exception ex) {
-            return new byte[] {};
+            Random r = new Random();
+            byte[] uid = new byte[32];
+            r.nextBytes(uid);
+            return uid;
         }
         
         

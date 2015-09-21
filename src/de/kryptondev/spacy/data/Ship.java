@@ -25,7 +25,7 @@ public class Ship extends Entity implements IHittable{
         this.direction = new Vector2f(0,0);
         this.speed = 0;
         this.maxSpeed=1;
-        this.bounds = new Rectangle(0,0,5,5);
+        this.bounds = new Rectangle(0,0,100,100);
         this.activeWeapon = new Weapon();
         this.image = "";
         this.shield = new Shield();

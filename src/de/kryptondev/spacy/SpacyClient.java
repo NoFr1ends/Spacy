@@ -9,7 +9,6 @@ import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.helper.UID;
 import de.kryptondev.spacy.screen.Game;
 import de.kryptondev.spacy.screen.ScreenManager;
-import de.kryptondev.spacy.server.GameClient;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.PlayerInfo;
@@ -25,8 +24,9 @@ public class SpacyClient extends Listener{
     private PlayerInfo info;
     private World world;
     private Ship ship;
+    
 
-
+    
     public SpacyClient() {
         this.info = new PlayerInfo();
         info.OS = System.getProperty("os.name");
@@ -82,10 +82,17 @@ public class SpacyClient extends Listener{
         }      
         if(o instanceof World){
             this.world=(World) o;
+            return;
         }
         if(o instanceof Ship){
-            this.ship = (Ship) o;   
-           
+            Ship s = (Ship)o;
+            this.getWorld().ships.add(s);   
+            //ist es mein Schiff?
+            //todo: fix            
+            if(s.owner.playerUID.equals(info.playerUID)){
+                setShip(s);
+            }
+            return;
         }
         
         
@@ -112,14 +119,9 @@ public class SpacyClient extends Listener{
     }
 
     @Override
-    public void connected(Connection cnctn) {
-        System.out.println("Sending ClientVersion");
-        client.sendTCP(clientVersion);
-        System.out.println("Sending PlayerInfo");
+    public void connected(Connection cnctn) {        
+        client.sendTCP(clientVersion);       
         client.sendTCP(SpacyClient.this.info);
-        System.out.println("OK");
-        //Recv World & Ship
-
     }
                 
                 

@@ -5,13 +5,10 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import de.kryptondev.spacy.data.World;
 import de.kryptondev.spacy.helper.KryoRegisterer;
-import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
-import de.kryptondev.spacy.share.PlayerInfo;
 import de.kryptondev.spacy.share.Version;
-import java.io.Console;
-
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class SpacyServer extends Listener {
 
@@ -24,8 +21,8 @@ public class SpacyServer extends Listener {
     private ArrayList<byte[]> bans;
     private ArrayList<byte[]> admins;
     public World world;
+    private GameTick tick;
     
-
     public void writeWarning(String s) {
         System.out.println(s);
     }
@@ -47,9 +44,7 @@ public class SpacyServer extends Listener {
         admins = new ArrayList<>();        
         instance = this;
         world = new World();
-        server = new Server(port, broadcastPort){
-            
-            
+        server = new Server(port, broadcastPort){         
             @Override
             protected Connection newConnection() {
                 return new GameClient(SpacyServer.this).instance;
@@ -115,6 +110,10 @@ public class SpacyServer extends Listener {
             server.addListener(this);
             server.bind(port,broadcastPort);
             new Thread(server).start();       
+            tick = new GameTick(this);
+            Thread t = new Thread(tick);
+            t.setName("Tick");
+            t.start();
             
             writeInfo("Sever started.");            
           
@@ -162,7 +161,7 @@ public class SpacyServer extends Listener {
     public GameClient getClientByName(String playerName) {
         for (GameClient.SGameClient item : (GameClient.SGameClient[])server.getConnections()) {
             if (item.getPlayerInfo().playerName.equals(playerName)) {
-                return item.gameClient;
+                return item.getGameClient();
             }
         }
         return null;
@@ -171,7 +170,7 @@ public class SpacyServer extends Listener {
     public GameClient getClientByUID(byte[] uid) {
         for (GameClient.SGameClient item : (GameClient.SGameClient[])server.getConnections()) {
             if (item.getPlayerInfo().playerUID == uid) {
-                return item.gameClient;
+                return item.getGameClient();
             }
         }
         return null;
@@ -217,8 +216,7 @@ public class SpacyServer extends Listener {
     }
 
     @Override
-    public void connected(Connection cnctn) {
-        
+    public void connected(Connection cnctn) {        
         System.out.println("Server: Client is connected!");
         cnctn.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.OK));        
     }
