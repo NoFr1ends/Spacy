@@ -1,23 +1,30 @@
 package de.kryptondev.spacy.server;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.esotericsoftware.kryonet.Connection;
+import de.kryptondev.spacy.data.Ship;
+import de.kryptondev.spacy.server.GameClient.SGameClient;
+import java.util.ArrayList;
+
 
 
 public class GameTick implements Runnable{
-    public final int ticksPerSecond = 1;        
-    public final int masterTicksPerSecondFactor = 2;
+    //TEST VALUES!
+    public final int ticksPerSecond = 50;       
+   
     private SpacyServer server;
     public GameTick(SpacyServer server) {
         this.server = server;
     }
 
     private void onMasterTick(){
-        if(server.getServer().getConnections().length > 1){
-            GameClient.SGameClient gc = (GameClient.SGameClient)server.getServer().getConnections()[0];
-            gc.getMyShip().position.x+=5;
+     
+        for(Ship ship : server.world.ships){  
+            //TEST!
+            ship.position.x -= 3;
+            ship.position.y += 1;
+            
         }
-        
+
         server.getServer().sendToAllTCP(this.server.world);
     }
     
@@ -27,16 +34,12 @@ public class GameTick implements Runnable{
 
     @Override
     public void run() {
-        int i = 0;
         while(true){
             try {               
                 onTick();
-                Thread.sleep(1000 / ticksPerSecond);
-                if(i >= ticksPerSecond * masterTicksPerSecondFactor){
-                    i = 0;
-                    onMasterTick();
-                }
-                i++;
+                onMasterTick();
+                Thread.sleep(1000 / ticksPerSecond);              
+               
             } catch (InterruptedException ex) {
                 return;
             }
