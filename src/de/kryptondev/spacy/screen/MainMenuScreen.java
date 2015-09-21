@@ -2,6 +2,7 @@ package de.kryptondev.spacy.screen;
 
 import de.kryptondev.spacy.MainGame;
 import de.kryptondev.spacy.input.KeyInputManager;
+import static de.kryptondev.spacy.screen.Game.BackgroundColor;
 import java.awt.Font;
 import java.util.ArrayList;
 import org.newdawn.slick.Color;
@@ -13,7 +14,9 @@ import org.newdawn.slick.TrueTypeFont;
 public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener {
 
     private ArrayList<String> menuEntries;
-    private TrueTypeFont font;
+    private TrueTypeFont font;    
+    private TrueTypeFont titleFont;
+
     private int currentEntry;
     
     private static final String START_GAME = "Start game";
@@ -33,6 +36,9 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener {
     public void init(GameContainer gc) {
         Font awtFont = new Font("Arial", Font.BOLD, 20);
         font = new TrueTypeFont(awtFont, true);
+        
+        awtFont = new Font("Geometos", Font.BOLD, 60);
+        titleFont = new TrueTypeFont(awtFont, true);
         
         KeyInputManager.getInstance().registerListener(
                 "Menu Down", 
@@ -61,7 +67,10 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener {
 
     @Override
     public void draw(GameContainer gc, Graphics g) {
-        int y = 100;
+        g.setBackground(BackgroundColor);
+        titleFont.drawString((gc.getWidth() - titleFont.getWidth("SPACY")) / 2, 
+                20, "SPACY", Color.white);
+        int y = 300;
         int i = 0;
         for(String entry: menuEntries) {
             Color color = Color.white;

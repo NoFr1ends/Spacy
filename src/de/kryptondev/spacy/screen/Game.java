@@ -17,7 +17,7 @@ import org.newdawn.slick.SlickException;
 
 
 public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputManager.MouseListener {
-    private final org.newdawn.slick.Color backgroundColor = new org.newdawn.slick.Color(8,8,64);
+    public static final org.newdawn.slick.Color BackgroundColor = new org.newdawn.slick.Color(8,8,64);
     private SpacyClient spacyClient;
     private Image background;
    
@@ -74,7 +74,7 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
 
     @Override
     public void draw(GameContainer gc, Graphics g) {
-        g.setBackground(backgroundColor);
+        g.setBackground(BackgroundColor);
         g.drawImage(background, 0, 0);
        
         
