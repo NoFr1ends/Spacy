@@ -5,8 +5,8 @@ import de.kryptondev.spacy.data.*;
 import de.kryptondev.spacy.share.*;
 import java.util.Date;
 import java.util.HashMap;
-import org.lwjgl.util.Rectangle;
-import org.lwjgl.util.vector.Vector2f;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Vector2f;
 
 
 public class KryoRegisterer {
@@ -21,8 +21,7 @@ public class KryoRegisterer {
         k.register(java.util.ArrayList.class);
         
         k.register(Rectangle.class);
-        k.register(Vector2f.class); 
-        
+        k.register(Vector2f.class);         
         
         k.register(Chatmessage.class);        
         k.register(ConnectionAttemptResponse.class);        
@@ -37,10 +36,8 @@ public class KryoRegisterer {
         k.register(Projectile.class);  
         k.register(Shield.class);
         k.register(DamageType.class);
-        
-
-        
-        
-
+        k.register(PlayerRotate.class);        
+        k.register(PlayerMove.class);
+        k.register(PlayerMove.Status.class);
     }
 }

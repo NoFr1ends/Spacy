@@ -5,11 +5,14 @@ import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.PlayerInfo;
+import de.kryptondev.spacy.share.PlayerMove;
+import de.kryptondev.spacy.share.PlayerRotate;
 import de.kryptondev.spacy.share.Version;
 
 import java.util.Date;
 import java.util.Random;
-import org.lwjgl.util.vector.Vector2f;
+import org.newdawn.slick.geom.Vector2f;
+
 
 
 public class GameClient extends Listener {
@@ -94,6 +97,15 @@ public class GameClient extends Listener {
             }
             if (data instanceof Chatmessage) {
                 //spacyServer.broadcast(data);
+                return;
+            }
+            if(data instanceof PlayerMove){
+                //todo implement
+                return;
+            }
+            if(data instanceof PlayerRotate){
+                PlayerRotate rotation = (PlayerRotate)data;
+                this.myShip.direction = rotation.direction;
                 return;
             }
 

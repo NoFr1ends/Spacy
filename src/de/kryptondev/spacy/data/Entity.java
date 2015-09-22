@@ -1,7 +1,8 @@
 package de.kryptondev.spacy.data;
 
-import org.lwjgl.util.Rectangle;
-import org.lwjgl.util.vector.Vector2f;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Vector2f;
+
 
 public abstract class Entity {
 

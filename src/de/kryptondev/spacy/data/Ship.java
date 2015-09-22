@@ -1,7 +1,8 @@
 package de.kryptondev.spacy.data;
 import de.kryptondev.spacy.share.PlayerInfo;
-import org.lwjgl.util.Rectangle;
-import org.lwjgl.util.vector.*;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Vector2f;
+
 
 public class Ship extends Entity implements IHittable{
     public float turnspeed;
@@ -31,15 +32,10 @@ public class Ship extends Entity implements IHittable{
         this.shield = new Shield();
     }
 
-    
-    /**
-     *
-     * @param hitting
-     */
     @Override
     public void hit(Projectile hitting) {
-    //Was geschieht wenn das Projektil eintrifft. 
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //Was geschieht wenn das Projektil eintrifft. 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
 }
