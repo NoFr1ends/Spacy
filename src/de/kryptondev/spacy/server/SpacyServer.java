@@ -8,7 +8,6 @@ import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.Version;
 import java.util.ArrayList;
-import java.util.HashSet;
 
 public class SpacyServer extends Listener {
 
@@ -20,7 +19,7 @@ public class SpacyServer extends Listener {
     public static final Version serverVersion = new Version(1, 0, 0);
     private ArrayList<byte[]> bans;
     private ArrayList<byte[]> admins;
-    public World world;
+    public volatile World world;
     private GameTick tick;
     
     public void writeWarning(String s) {

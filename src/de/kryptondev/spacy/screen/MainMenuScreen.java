@@ -2,18 +2,26 @@ package de.kryptondev.spacy.screen;
 
 import de.kryptondev.spacy.MainGame;
 import de.kryptondev.spacy.input.KeyInputManager;
-import static de.kryptondev.spacy.screen.Game.BackgroundColor;
+import de.kryptondev.spacy.input.MouseInputManager;
+import static de.kryptondev.spacy.screen.GameScreen.BackgroundColor;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import org.lwjgl.util.Rectangle;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.TrueTypeFont;
+import org.newdawn.slick.geom.Vector2f;
 
-public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener {
+public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener, 
+        MouseInputManager.MouseListener {
 
     private ArrayList<String> menuEntries;
+    private HashMap<String, Rectangle> rectCache;
+    
     private TrueTypeFont font;    
     private TrueTypeFont titleFont;
 
@@ -37,6 +45,7 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener {
         Font awtFont = new Font("Arial", Font.BOLD, 20);
         font = new TrueTypeFont(awtFont, true);
         
+        // TODO: Try to implement load from ttf file
         awtFont = new Font("Geometos", Font.BOLD, 60);
         titleFont = new TrueTypeFont(awtFont, true);
         
@@ -57,10 +66,23 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener {
                 Input.KEY_ENTER, 
                 this
         );
+        
+        MouseInputManager.getInstance().registerListener(
+                "Left Button", 
+                Input.MOUSE_LEFT_BUTTON, 
+                this
+        );
     }
 
     @Override
     public void update(GameContainer gc, int delta) {
+        fillCache(gc);
+        
+        String menuHover = getMenuPointAtMouse();
+        if(menuHover != null) {
+            currentEntry = menuEntries.indexOf(menuHover);
+        }
+        
         if(exit) 
             gc.exit();
     }
@@ -87,6 +109,31 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener {
         }
     }
     
+    private void fillCache(GameContainer gc) {
+        if(rectCache != null)
+            return;
+        
+        rectCache = new HashMap<>();
+        
+        int y = 300;
+        int i = 0;
+        for(String entry: menuEntries) {
+            int width = font.getWidth(entry);
+            int height = font.getHeight();
+            
+            Rectangle bounds = new Rectangle(
+                    (gc.getWidth() - width) / 2, 
+                    y, 
+                    width, 
+                    height
+            );
+            y += height + 10;
+            
+            rectCache.put(entry, bounds);
+        }
+    }
+    
+    
     public void onMenuPressed(String entry) {
         switch(entry) {
             case EXIT_GAME:
@@ -100,6 +147,11 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener {
 
     @Override
     public void onKeyDown(int key) {
+        
+    }
+    
+    @Override
+    public void onKeyUp(int key) {
         
     }
 
@@ -118,6 +170,33 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener {
         } else if(key == Input.KEY_ENTER) {
             onMenuPressed(menuEntries.get(currentEntry));
         }
+    }
+
+    @Override
+    public void onButtonDown(int button) {
+    }
+    
+    @Override
+    public void onButtonUp(int button) {   
+    }
+
+    @Override
+    public void onButtonPressed(int button) {
+        String menuPoint = getMenuPointAtMouse();
+        if(menuPoint != null)
+            onMenuPressed(menuPoint);
+    }
+    
+    private String getMenuPointAtMouse() {
+        Vector2f mousePos = MouseInputManager.getInstance().getPosition();
+        
+        for(Map.Entry<String, Rectangle> cache: rectCache.entrySet()) {
+            if(cache.getValue().contains((int)mousePos.x, (int)mousePos.y)) {                
+                return cache.getKey();
+            }
+        }
+        
+        return null;
     }
     
 }

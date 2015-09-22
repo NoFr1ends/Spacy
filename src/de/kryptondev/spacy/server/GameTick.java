@@ -1,35 +1,26 @@
 package de.kryptondev.spacy.server;
 
-import com.esotericsoftware.kryonet.Connection;
 import de.kryptondev.spacy.data.Ship;
-import de.kryptondev.spacy.server.GameClient.SGameClient;
-import java.util.ArrayList;
-
+import org.newdawn.slick.geom.Vector2f;
 
 
 public class GameTick implements Runnable{
-    //TEST VALUES!
-    public final int ticksPerSecond = 50;       
-   
+    private GameTick instance;
+    public static final int ticksPerSecond = 16;        
     private SpacyServer server;
     public GameTick(SpacyServer server) {
         this.server = server;
     }
 
-    private void onMasterTick(){
-     
-        for(Ship ship : server.world.ships){  
-            //TEST!
-            ship.position.x -= 3;
-            ship.position.y += 1;
-            
-        }
-
-        server.getServer().sendToAllTCP(this.server.world);
-    }
-    
     private void onTick(){
-       
+        for(Ship ship: server.world.ships) {            
+            if(ship.isMoving){
+                ship.move();
+            }            
+        }
+        
+     
+        server.getServer().sendToAllTCP(this.server.world);
     }
 
     @Override
@@ -37,12 +28,25 @@ public class GameTick implements Runnable{
         while(true){
             try {               
                 onTick();
-                onMasterTick();
-                Thread.sleep(1000 / ticksPerSecond);              
-               
+                Thread.sleep(1000 / ticksPerSecond);             
+          
             } catch (InterruptedException ex) {
                 return;
             }
         }
     }
+
+    public GameTick getInstance() {
+        return instance;
+    }
+
+    public void setInstance(GameTick instance) {
+        this.instance = instance;
+    }
+
+    public SpacyServer getServer() {
+        return server;
+    }
+    
+    
 }
