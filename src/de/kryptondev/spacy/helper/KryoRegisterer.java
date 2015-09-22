@@ -5,6 +5,7 @@ import de.kryptondev.spacy.data.*;
 import de.kryptondev.spacy.share.*;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.newdawn.slick.geom.Vector2f;
 
 
@@ -19,6 +20,7 @@ public class KryoRegisterer {
         k.register(Date.class);
         k.register(HashMap.class); 
         k.register(java.util.ArrayList.class);
+        k.register(CopyOnWriteArrayList.class);
         
         k.register(Rect.class);
         k.register(Vector2f.class);         
@@ -40,6 +42,5 @@ public class KryoRegisterer {
         k.register(Move.class);
         k.register(PlayerConnectionEvent.class);
         k.register(PlayerConnectionEvent.Type.class);
-
     }
 }

@@ -1,26 +1,46 @@
 package de.kryptondev.spacy.server;
 
+import de.kryptondev.spacy.data.Projectile;
 import de.kryptondev.spacy.data.Ship;
+import java.util.Iterator;
+import java.util.List;
 import org.newdawn.slick.geom.Vector2f;
 
 
 public class GameTick implements Runnable{
     private GameTick instance;
     public static final int ticksPerSecond = 16;        
-    private SpacyServer server;
+    private SpacyServer server;    
     public GameTick(SpacyServer server) {
         this.server = server;
     }
 
-    private void onTick(){
-        
+    private void onTick(){        
         for(Ship ship: server.world.ships) {            
             if(ship.isMoving){
-                System.out.println("Moving...");
                 ship.move();
-            }            
+            }
         }
         
+        
+        List<Projectile> projectiles = server.world.projectiles;
+        Iterator<Projectile> i= projectiles.iterator();
+        while (i.hasNext()) {
+            Projectile p = i.next();
+            if(p.remainingLifetime <= 0){
+                i.remove();
+                System.out.println("Deleting projectile " + p.id);
+                continue;
+            }
+            else{
+                p.remainingLifetime--;
+            }
+
+            if(p.isMoving){
+              p.move();
+            }
+         }
+      
      
         server.getServer().sendToAllTCP(this.server.world);
     }

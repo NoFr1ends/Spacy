@@ -10,8 +10,8 @@ import de.kryptondev.spacy.share.Version;
 import java.util.ArrayList;
 
 public class SpacyServer extends Listener {
-
     public static SpacyServer instance;
+    public volatile long EntityCounter = 0;
     private int maxSlots = 32;
     private int port = 30300;    
     private final int broadcastPort = 54777;
@@ -80,29 +80,7 @@ public class SpacyServer extends Listener {
         }
         stdConstr();
     }
-/*
-    public static boolean isBadName(String playerName) {
-        ArrayList<String> badNames = new ArrayList<>(16);
-        badNames.add("*");
-        badNames.add("\\");
-        badNames.add("/");
-        badNames.add("admin");
-        badNames.add("\t");
-        badNames.add("\n");
-        badNames.add("'");
-        badNames.add("\"");
-        badNames.add("root");        
-        badNames.add("server");
 
-
-        for (String c : badNames) {
-            if (playerName.toLowerCase().contains(c.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
-    }
-*/
     public boolean start() {
         try {
             KryoRegisterer.registerAll(server.getKryo()); 
@@ -126,29 +104,8 @@ public class SpacyServer extends Listener {
         
         return true;
     }
+   
 
-    
-/*
-    public void broadcast(Object obj) {
-        for (GameClient gc : getClients()) {
-            gc.getConnection().sendTCP(obj);
-        }
-    }
-
-    public void broadcast(String message) {
-        for (GameClient gc : getClients()) {
-            gc.getConnection().sendTCP(new Chatmessage(message));
-        }
-    }
-
-    public void addToBanList(GameClient gc) {
-        this.bans.add(gc.getPlayerInfo().playerUID);
-    }
-
-    public void addToBanList(byte[] gc) {
-        this.bans.add(gc);
-    }
-*/
     public int getMaxSlots() {
         return maxSlots;
     }
@@ -198,13 +155,13 @@ public class SpacyServer extends Listener {
 
     @Override
     public void idle(Connection cnctn) {
-        super.idle(cnctn); //To change body of generated methods, choose Tools | Templates.
+        super.idle(cnctn);
     }
 
     @Override
     public void received(Connection cnctn, Object o) {
-        System.out.println("Server: Data was received!");
-        System.out.println(o.toString());
+        //System.out.println("Server: Data was received!");
+        //System.out.println(o.toString());
         GameClient.SGameClient gc = (GameClient.SGameClient)cnctn;
         gc.onRecv(o);          
     }

@@ -6,6 +6,7 @@ public class PlayerConnectionEvent {
         Connected,
         Disconnected
         //,Timeout
+        //,Join
     }
     public Type type;
 

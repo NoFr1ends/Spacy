@@ -3,17 +3,16 @@ package de.kryptondev.spacy;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
-import de.kryptondev.spacy.data.Ship;
-import de.kryptondev.spacy.data.World;
+
+import de.kryptondev.spacy.data.*;
+import de.kryptondev.spacy.share.*;
+
 import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.helper.UID;
+
 import de.kryptondev.spacy.screen.GameScreen;
 import de.kryptondev.spacy.screen.ScreenManager;
-import de.kryptondev.spacy.share.Chatmessage;
-import de.kryptondev.spacy.share.ConnectionAttemptResponse;
-import de.kryptondev.spacy.share.PlayerConnectionEvent;
-import de.kryptondev.spacy.share.PlayerInfo;
-import de.kryptondev.spacy.share.Version;
+
 
 public class SpacyClient extends Listener{
 
@@ -95,6 +94,9 @@ public class SpacyClient extends Listener{
             
         }
         
+        if(o instanceof Projectile){
+            this.world.projectiles.add((Projectile)o);
+        }
         
         
         if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
