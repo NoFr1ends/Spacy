@@ -18,7 +18,7 @@ public class SpacyClient extends Listener{
 
     private static SpacyClient instance;
     private Client client;
-    private int port = 30300;
+    private final int port = 30300;
     private int timeout = 2500;
     public static final Version clientVersion = new Version(1, 0, 0);
     private PlayerInfo info;

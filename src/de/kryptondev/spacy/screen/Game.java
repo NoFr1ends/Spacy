@@ -77,7 +77,7 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
         if(spacyClient.getWorld() == null)
             return;
         for(Ship ship : spacyClient.getWorld().ships){            
-            g.fillRect(ship.bounds.getX() + ship.position.getX(), ship.bounds.getY() + ship.position.getY(), ship.bounds.getWidth(), ship.bounds.getHeight());
+            g.fillRect(ship.bounds.x + ship.position.getX(), ship.bounds.y + ship.position.getY(), ship.bounds.width, ship.bounds.height);
         }
         
         

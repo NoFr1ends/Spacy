@@ -1,7 +1,6 @@
 package de.kryptondev.spacy.data;
 
 import de.kryptondev.spacy.share.Move;
-import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Vector2f;
 
 
@@ -12,7 +11,7 @@ public abstract class Entity {
     public float speed;
     public float acceleration; //nötig?
     public float maxSpeed;
-    public Rectangle bounds;
+    public Rect bounds;
     public long id;
     
     public String image;
