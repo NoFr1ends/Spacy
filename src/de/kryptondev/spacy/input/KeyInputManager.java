@@ -24,7 +24,9 @@ public class KeyInputManager {
         return instance;
     }
     
-    //TODO Remove Listener
+    public void clear() {
+        listeners.clear();
+    }
     
     public void registerListener(String name, int key, KeyListener listener) {
         if(!listeners.containsKey(key)) {
