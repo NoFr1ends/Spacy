@@ -11,12 +11,13 @@ import de.kryptondev.spacy.screen.GameScreen;
 import de.kryptondev.spacy.screen.ScreenManager;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
+import de.kryptondev.spacy.share.PlayerConnectionEvent;
 import de.kryptondev.spacy.share.PlayerInfo;
 import de.kryptondev.spacy.share.Version;
 
 public class SpacyClient extends Listener{
 
-    private static SpacyClient instance;
+    public static SpacyClient instance;
     private Client client;
     private final int port = 30300;
     private int timeout = 2500;
@@ -82,22 +83,17 @@ public class SpacyClient extends Listener{
         }      
         if(o instanceof World){
             this.world=(World) o;
-            for(Ship s : world.ships)
-                System.out.println(s.position.x);
             return;
         }
         if(o instanceof Ship){
-            Ship s = (Ship)o;
-            this.getWorld().ships.add(s);   
-            //ist es mein Schiff?
-            //todo: fix            
-            if(s.owner.playerUID.equals(info.playerUID)){
-                setShip(s);
-            }
+            Ship s = (Ship)o;           
+            setShip(s);
             return;
         }
         
-        
+        if(o instanceof PlayerConnectionEvent){
+            
+        }
         
         
         
@@ -164,6 +160,14 @@ public class SpacyClient extends Listener{
 
     public void setShip(Ship ship) {
         this.ship = ship;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
     
     

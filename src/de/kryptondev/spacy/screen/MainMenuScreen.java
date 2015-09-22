@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import org.lwjgl.util.Rectangle;
-import org.lwjgl.util.vector.Vector2f;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.TrueTypeFont;
+import org.newdawn.slick.geom.Vector2f;
 
 public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener, 
         MouseInputManager.MouseListener {

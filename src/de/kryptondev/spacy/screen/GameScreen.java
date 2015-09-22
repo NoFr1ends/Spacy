@@ -4,14 +4,18 @@ import de.kryptondev.spacy.SpacyClient;
 import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.input.KeyInputManager;
 import de.kryptondev.spacy.input.MouseInputManager;
+import de.kryptondev.spacy.share.Move;
+import de.kryptondev.spacy.share.PlayerRotate;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.input.MouseButton;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Vector2f;
 
 
 
@@ -20,11 +24,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     public static final org.newdawn.slick.Color BackgroundColor = new org.newdawn.slick.Color(8,8,64);
     private SpacyClient spacyClient;
     private Image background;
-   
+    private Vector2f lastMousePos;
+    
     public GameScreen(IScreen prevScreen, SpacyClient spacyClient) {
        //TODO Disable prevScreen
         this.spacyClient = spacyClient;
-        
+        this.lastMousePos = new Vector2f(0, 0);
     }
     
     @Override
@@ -109,22 +114,37 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     
     @Override
     public void onKeyPressed(int key) {
-        
+       
     }
 
     @Override
     public void onButtonDown(int button) {
-        System.out.println(button);
+        if(button == 1){
+            Vector2f pos = MouseInputManager.getInstance().getPosition();
+            if(lastMousePos != pos){
+                lastMousePos = pos;
+                //TODO Carls Vector shizzl :D
+                SpacyClient.getInstance().getClient().sendTCP(new PlayerRotate(SpacyClient.instance.getShip().direction));
+            }
+        }
     }
     
     @Override
     public void onButtonUp(int button) {
-        
+        if(button == 1){
+            SpacyClient.getInstance().getClient().sendTCP(new Move(true));
+            System.out.println("Stop moving");
+        }
     }
 
     @Override
     public void onButtonPressed(int button) {
-        System.out.println(button);
+        if(button == 1){
+            SpacyClient.getInstance().getClient().sendTCP(new Move(true));
+            System.out.println("Start moving");
+        }
+        
+        
     }
     
 }

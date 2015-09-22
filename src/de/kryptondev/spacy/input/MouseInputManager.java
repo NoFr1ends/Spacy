@@ -2,8 +2,9 @@ package de.kryptondev.spacy.input;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.lwjgl.util.vector.Vector2f;
+
 import org.newdawn.slick.Input;
+import org.newdawn.slick.geom.Vector2f;
 
 //TODO FIX Warum wird listeners zurückgesetzt?!
 public class MouseInputManager {

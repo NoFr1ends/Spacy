@@ -6,6 +6,7 @@ import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.PlayerInfo;
 import de.kryptondev.spacy.share.Move;
+import de.kryptondev.spacy.share.PlayerConnectionEvent;
 import de.kryptondev.spacy.share.PlayerRotate;
 import de.kryptondev.spacy.share.Version;
 
@@ -62,7 +63,9 @@ public class GameClient extends Listener {
             this.sendTCP(spacyServer.world);
             Ship s = this.addShip();
             s.owner = playerInfo;
-            this.spacyServer.getServer().sendToAllTCP(s);
+            this.myShip = s;
+            this.sendTCP(s);
+            this.spacyServer.getServer().sendToAllTCP(new PlayerConnectionEvent(PlayerConnectionEvent.Type.Connected));
         }
 
         @Override
@@ -94,14 +97,14 @@ public class GameClient extends Listener {
                 playerInfo = (PlayerInfo) data;
                 validateConnection();
                 return;
-            }
+            }            
             if (data instanceof Chatmessage) {
                 //spacyServer.broadcast(data);
                 return;
             }
             if(data instanceof Move){
                 Move move = (Move)data;                    
-                this.myShip.move = move;
+                this.myShip.isMoving = move.status;
                 return;
             }
             if(data instanceof PlayerRotate){

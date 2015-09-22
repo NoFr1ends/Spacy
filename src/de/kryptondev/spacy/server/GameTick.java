@@ -1,22 +1,25 @@
 package de.kryptondev.spacy.server;
 
 import de.kryptondev.spacy.data.Ship;
+import org.newdawn.slick.geom.Vector2f;
 
 
 public class GameTick implements Runnable{
-    public final int ticksPerSecond = 16;        
+    private GameTick instance;
+    public static final int ticksPerSecond = 16;        
     private SpacyServer server;
     public GameTick(SpacyServer server) {
         this.server = server;
     }
 
     private void onTick(){
-        for(Ship ship: server.world.ships)         
-            ship.position.x+=3;
+        for(Ship ship: server.world.ships) {            
+            if(ship.isMoving){
+                ship.move();
+            }            
+        }
         
-        //TODO: Handle Entity.move
-        //TODO: Move
-        
+     
         server.getServer().sendToAllTCP(this.server.world);
     }
 
@@ -32,4 +35,18 @@ public class GameTick implements Runnable{
             }
         }
     }
+
+    public GameTick getInstance() {
+        return instance;
+    }
+
+    public void setInstance(GameTick instance) {
+        this.instance = instance;
+    }
+
+    public SpacyServer getServer() {
+        return server;
+    }
+    
+    
 }

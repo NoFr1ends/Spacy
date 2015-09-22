@@ -38,6 +38,8 @@ public class KryoRegisterer {
         k.register(DamageType.class);
         k.register(PlayerRotate.class);        
         k.register(Move.class);
-        k.register(Move.Status.class);
+        k.register(PlayerConnectionEvent.class);
+        k.register(PlayerConnectionEvent.Type.class);
+
     }
 }

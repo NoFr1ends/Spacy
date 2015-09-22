@@ -5,10 +5,10 @@ import org.newdawn.slick.geom.Vector2f;
 
 
 public abstract class Entity {
-    public Move move;
+    public boolean isMoving;
     public Vector2f direction;
     public Vector2f position;
-    public float speed;
+    public float speed = 1;
     public float acceleration; //nötig?
     public float maxSpeed;
     public Rect bounds;
