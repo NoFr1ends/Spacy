@@ -132,7 +132,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     @Override
     public void onButtonUp(int button) {
         if(button == 1){
-            SpacyClient.getInstance().getClient().sendTCP(new Move(true));
+            SpacyClient.getInstance().getClient().sendTCP(new Move(false));
             System.out.println("Stop moving");
         }
     }

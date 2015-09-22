@@ -13,8 +13,10 @@ public class GameTick implements Runnable{
     }
 
     private void onTick(){
+        
         for(Ship ship: server.world.ships) {            
             if(ship.isMoving){
+                System.out.println("Moving...");
                 ship.move();
             }            
         }

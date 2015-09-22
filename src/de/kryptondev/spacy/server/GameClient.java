@@ -47,6 +47,9 @@ public class GameClient extends Listener {
             Ship s = new Ship();
             Random r = new Random();
             s.position = new Vector2f(r.nextFloat() * 600,r.nextFloat() * 600);
+            s.speed = 2f;
+            s.maxSpeed = 2f;
+            s.direction = new Vector2f(5,5);
             spacyServer.world.ships.add(s);
             return s;
         }
