@@ -29,6 +29,8 @@ public class Ship extends Entity implements IHittable{
         this.activeWeapon = new Weapon();
         this.image = "";
         this.shield = new Shield();
+        
+        SpacyMath.Acceleration
     }
 
     
