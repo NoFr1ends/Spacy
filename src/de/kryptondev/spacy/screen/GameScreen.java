@@ -16,12 +16,12 @@ import org.newdawn.slick.SlickException;
 
 
 
-public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputManager.MouseListener {
+public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseInputManager.MouseListener {
     public static final org.newdawn.slick.Color BackgroundColor = new org.newdawn.slick.Color(8,8,64);
     private SpacyClient spacyClient;
     private Image background;
    
-    public Game(IScreen prevScreen, SpacyClient spacyClient) {
+    public GameScreen(IScreen prevScreen, SpacyClient spacyClient) {
        //TODO Disable prevScreen
         this.spacyClient = spacyClient;
         
@@ -56,7 +56,7 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
             g.copyArea(background,0,0);
             
         } catch (SlickException ex) {
-            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GameScreen.class.getName()).log(Level.SEVERE, null, ex);
         }
         
       

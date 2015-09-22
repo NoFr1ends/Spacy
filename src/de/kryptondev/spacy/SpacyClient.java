@@ -7,7 +7,7 @@ import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.data.World;
 import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.helper.UID;
-import de.kryptondev.spacy.screen.Game;
+import de.kryptondev.spacy.screen.GameScreen;
 import de.kryptondev.spacy.screen.ScreenManager;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
@@ -68,8 +68,8 @@ public class SpacyClient extends Listener{
             //Antwort auswerten
             ConnectionAttemptResponse response = (ConnectionAttemptResponse) o;
             if (response.type == ConnectionAttemptResponse.Type.OK) {
-                   if(ScreenManager.getInstance().getCurrentScreen() instanceof Game){
-                        Game game = (Game)ScreenManager.getInstance().getCurrentScreen();
+                   if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
+                        GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
                         game.onConnected();
                     }
                 return;
@@ -101,8 +101,8 @@ public class SpacyClient extends Listener{
         
         
         
-        if(ScreenManager.getInstance().getCurrentScreen() instanceof Game){
-            Game game = (Game)ScreenManager.getInstance().getCurrentScreen();
+        if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
+            GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
             game.onRecv(o);
         }
     }
