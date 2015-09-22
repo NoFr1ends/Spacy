@@ -50,9 +50,14 @@ public abstract class Entity {
     public void rotateToMouse(Vector2f mouseposition) {
         //Ich weiß, das geht auch in einer Zeile, aber dann wird es unlesbar.
         Vector2f newDirection = new Vector2f();
-        newDirection.x = mouseposition.x - this.position.x;
-        newDirection.y = mouseposition.y - this.position.y;
+        newDirection.x = mouseposition.x - this.getCenter().x;
+        newDirection.y = mouseposition.y - this.getCenter().y;
 
         this.direction = newDirection.normalise(); //durch .normalise() erhält der Vector die Länge 1.
+    }
+    
+    public Vector2f getCenter(){
+        Vector2f v = new Vector2f((this.bounds.width + this.bounds.x) / 2, (this.bounds.height + this.bounds.y) / 2);
+        return new Vector2f(position).add(v);
     }
 }
