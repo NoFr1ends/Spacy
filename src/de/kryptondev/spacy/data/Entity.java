@@ -3,8 +3,8 @@ package de.kryptondev.spacy.data;
 import de.kryptondev.spacy.share.Move;
 import org.newdawn.slick.geom.Vector2f;
 
-
 public abstract class Entity {
+
     public boolean isMoving;
     public Vector2f direction;
     public Vector2f position;
@@ -13,7 +13,7 @@ public abstract class Entity {
     public float maxSpeed;
     public Rect bounds;
     public long id;
-    
+
     public String image;
     public boolean visible = true; //Vorbereitung für eventuelles PowerUp "Unsichtbarkeit"
 
@@ -21,10 +21,10 @@ public abstract class Entity {
     }
 
     public void move() {
-        if (speed<maxSpeed){
-        speed=speed * acceleration+1;
-        }else{
-            speed=maxSpeed;
+        if (speed < maxSpeed) {
+            speed = speed * acceleration + 1;
+        } else {
+            speed = maxSpeed;
         }
         Vector2f newPosition = new Vector2f();
         newPosition.x = position.x + (direction.x * speed);
@@ -38,5 +38,14 @@ public abstract class Entity {
             alpha += 360;
         }
         return alpha;
+    }
+
+    public void rotateToMouse(Vector2f mouseposition) {
+        //Ich weiß, das geht auch in einer Zeile, aber dann wird es unlesbar.
+        Vector2f newDirection = new Vector2f();
+        newDirection.x = mouseposition.x - this.position.x;
+        newDirection.y = mouseposition.y - this.position.y;
+
+        this.direction = newDirection.normalise(); //durch .normalise() erhält der Vector die Länge 1.
     }
 }
