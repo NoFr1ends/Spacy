@@ -82,6 +82,8 @@ public class SpacyClient extends Listener{
         }      
         if(o instanceof World){
             this.world=(World) o;
+            for(Ship s : world.ships)
+                System.out.println(s.position.x);
             return;
         }
         if(o instanceof Ship){
@@ -108,8 +110,7 @@ public class SpacyClient extends Listener{
     
     
     @Override
-    public void received(Connection cnctn, Object o) {
-        System.out.println("Package received!");
+    public void received(Connection cnctn, Object o) {        
         onRecv(cnctn, o);
     }
 
