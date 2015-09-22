@@ -1,5 +1,7 @@
 package de.kryptondev.spacy.screen;
 
+import de.kryptondev.spacy.input.KeyInputManager;
+import de.kryptondev.spacy.input.MouseInputManager;
 import java.awt.Font;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -42,6 +44,9 @@ public class ScreenManager {
     
     public void update(GameContainer gc, int delta) {
         if(newScreen != null) {
+            KeyInputManager.getInstance().clear();
+            MouseInputManager.getInstance().clear();
+            
             currentScreen = newScreen;
             currentScreen.init(gc);
             newScreen = null;

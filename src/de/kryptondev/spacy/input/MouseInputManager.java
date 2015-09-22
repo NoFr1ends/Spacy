@@ -12,8 +12,12 @@ public class MouseInputManager {
     
     private HashMap<Integer, HashMap<String, MouseListener>> listeners;
     private HashMap<Integer, Boolean> lastStates;
+    
+    private Vector2f position = new Vector2f();
+    
     public MouseInputManager() {
         listeners = new HashMap<>();
+        lastStates = new HashMap<>();
     }
     
     public static MouseInputManager getInstance() {
@@ -23,7 +27,7 @@ public class MouseInputManager {
     }
     
     public Vector2f getPosition() {
-        return new Vector2f(0, 0);
+        return position;
     }
     
     public void registerListener(String name, int button, MouseListener listener) {
@@ -47,6 +51,8 @@ public class MouseInputManager {
     }
     
     public void update(Input input) {
+        position = new Vector2f(input.getMouseX(), input.getMouseY());
+        
         if(listeners == null || listeners.isEmpty()){
             return;
         }
@@ -54,9 +60,7 @@ public class MouseInputManager {
                 listeners.entrySet()) {
             for(Map.Entry<String, MouseListener> events: 
                     mouseEvents.getValue().entrySet()) {
-                // Todo implement onmousedown
-                
-                 if(input.isKeyDown(mouseEvents.getKey())) {
+                if(input.isMouseButtonDown(mouseEvents.getKey())) {
                     events.getValue().onButtonDown(mouseEvents.getKey());
                     
                     if(!getLastState(mouseEvents.getKey())) {
@@ -65,8 +69,12 @@ public class MouseInputManager {
                 }           
             }
             
-            
+            setLastState(mouseEvents.getKey(), input.isMouseButtonDown(mouseEvents.getKey()));
         }
+    }
+
+    public void clear() {
+        listeners.clear();
     }
    
     

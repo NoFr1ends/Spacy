@@ -24,7 +24,7 @@ public class MainGame extends BasicGame {
     @Override
     public void init(GameContainer gc) throws SlickException {
         keyInputManager = KeyInputManager.getInstance();
-        mouseInputManager = new MouseInputManager();
+        mouseInputManager = MouseInputManager.getInstance();
         screenManager = ScreenManager.getInstance();
         
         screenManager.changeScreen(new MainMenuScreen());
