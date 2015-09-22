@@ -8,9 +8,10 @@ public class Projectile extends Entity {
     public Projectile() {
     }
 
-    public double damage;
+    public int damage;
     public int damagerange;
     public int lifetime;
+    public DamageType damagetype;
     public ArrayList<Effect> Effects;
     public Ship sender;
     

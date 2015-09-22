@@ -149,6 +149,11 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener,
     public void onKeyDown(int key) {
         
     }
+    
+    @Override
+    public void onKeyUp(int key) {
+        
+    }
 
     @Override
     public void onKeyPressed(int key) {
@@ -169,6 +174,10 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener,
 
     @Override
     public void onButtonDown(int button) {
+    }
+    
+    @Override
+    public void onButtonUp(int button) {   
     }
 
     @Override

@@ -164,6 +164,9 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener 
        
     }
 
-    
+    @Override
+    public void onKeyUp(int key) {
+        
+    }
     
 }
