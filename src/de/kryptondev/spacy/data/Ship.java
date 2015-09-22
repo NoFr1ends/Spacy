@@ -1,5 +1,6 @@
 package de.kryptondev.spacy.data;
 import de.kryptondev.spacy.share.PlayerInfo;
+import de.kryptondev.spacy.share.Move;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Vector2f;
 
@@ -10,7 +11,7 @@ public class Ship extends Entity implements IHittable{
     public Weapon activeWeapon;
     public String image;
     public Shield shield;
-   
+    
     public Ship(Vector2f position, Vector2f direction, float speed, Rectangle bounds, Weapon activeWeapon, String image, Shield shield) {
         this.position = position;
         this.direction = direction;

@@ -37,7 +37,7 @@ public class KryoRegisterer {
         k.register(Shield.class);
         k.register(DamageType.class);
         k.register(PlayerRotate.class);        
-        k.register(PlayerMove.class);
-        k.register(PlayerMove.Status.class);
+        k.register(Move.class);
+        k.register(Move.Status.class);
     }
 }

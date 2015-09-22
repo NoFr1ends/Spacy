@@ -5,7 +5,7 @@ import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.PlayerInfo;
-import de.kryptondev.spacy.share.PlayerMove;
+import de.kryptondev.spacy.share.Move;
 import de.kryptondev.spacy.share.PlayerRotate;
 import de.kryptondev.spacy.share.Version;
 
@@ -99,8 +99,9 @@ public class GameClient extends Listener {
                 //spacyServer.broadcast(data);
                 return;
             }
-            if(data instanceof PlayerMove){
-                //todo implement
+            if(data instanceof Move){
+                Move move = (Move)data;                    
+                this.myShip.move = move;
                 return;
             }
             if(data instanceof PlayerRotate){

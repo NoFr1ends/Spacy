@@ -14,6 +14,8 @@ public class GameTick implements Runnable{
         for(Ship ship: server.world.ships)         
             ship.position.x+=3;
         
+        //TODO: Handle Entity.move
+        //TODO: Move
         
         server.getServer().sendToAllTCP(this.server.world);
     }

@@ -1,17 +1,18 @@
 package de.kryptondev.spacy.share;
 
 
-public class PlayerMove {
+public class Move {
     public enum Status{
         Start,
-        Stop
+        Stop,
+        None
     }
     public Status status;
 
-    public PlayerMove() {
+    public Move() {
     }
 
-    public PlayerMove(Status status) {
+    public Move(Status status) {
         this.status = status;
     }
     
