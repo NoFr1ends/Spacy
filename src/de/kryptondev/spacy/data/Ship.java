@@ -1,16 +1,19 @@
 package de.kryptondev.spacy.data;
+
 import de.kryptondev.spacy.share.PlayerInfo;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Vector2f;
 
 
-public class Ship extends Entity implements IHittable{
+public class Ship extends Entity implements IHittable {
+
     public float turnspeed;
     public PlayerInfo owner;
     public Weapon activeWeapon;
-    public String image;
     public Shield shield;
-   
+    public int hp = 100;
+    public int maxHp = 100;
+
     public Ship(Vector2f position, Vector2f direction, float speed, Rectangle bounds, Weapon activeWeapon, String image, Shield shield) {
         this.position = position;
         this.direction = direction;
@@ -22,11 +25,11 @@ public class Ship extends Entity implements IHittable{
     }
 
     public Ship() {
-        this.position = new Vector2f(0,0);
-        this.direction = new Vector2f(0,0);
+        this.position = new Vector2f(0, 0);
+        this.direction = new Vector2f(0, 0);
         this.speed = 0;
-        this.maxSpeed=1;
-        this.bounds = new Rectangle(0,0,100,100);
+        this.maxSpeed = 1;
+        this.bounds = new Rectangle(0, 0, 100, 100);
         this.activeWeapon = new Weapon();
         this.image = "";
         this.shield = new Shield();
@@ -34,8 +37,22 @@ public class Ship extends Entity implements IHittable{
 
     @Override
     public void hit(Projectile hitting) {
-        //Was geschieht wenn das Projektil eintrifft. 
-        throw new UnsupportedOperationException("Not supported yet.");
+        /*Wenn das Projektil trifft, wird zunächst geprüft, ob das Schiff ein Schild hat.
+         Falls dieses Schild vom selben Schadenstyp ist wie die Waffe, werden Punkte von der Schildenergie abgezogen.
+         Falls nicht geht der Schaden aufs Leben des Schiffes
+         */
+        if (this.shield != null) {
+            if (this.shield.getResistance() == hitting.damagetype) {
+                if (this.shield.getLife() > hitting.damage) {
+                    this.shield.setLife(this.shield.getLife() - hitting.damage);
+                } else if (this.shield.getLife() == hitting.damage) {
+                    this.shield = null;
+                } else if (this.shield.getLife() < hitting.damage) {
+                     this.hp=this.hp-(hitting.damage-this.shield.getLife());
+                     this.shield = null;
+                }
+            }
+        }
     }
-    
+
 }
