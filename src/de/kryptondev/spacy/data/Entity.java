@@ -21,6 +21,11 @@ public abstract class Entity {
     }
 
     public void move() {
+        if (speed<maxSpeed){
+        speed=speed * acceleration+1;
+        }else{
+            speed=maxSpeed;
+        }
         Vector2f newPosition = new Vector2f();
         newPosition.x = position.x + (direction.x * speed);
         newPosition.y = position.y + (direction.y * speed);
