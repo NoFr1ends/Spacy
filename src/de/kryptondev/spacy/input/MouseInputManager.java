@@ -15,6 +15,8 @@ public class MouseInputManager {
     
     private Vector2f position = new Vector2f();
     
+    private boolean firstUpdate = true;
+    
     public MouseInputManager() {
         listeners = new HashMap<>();
         lastStates = new HashMap<>();
@@ -66,21 +68,27 @@ public class MouseInputManager {
                     if(!getLastState(mouseEvents.getKey())) {
                         events.getValue().onButtonPressed(mouseEvents.getKey());
                     }
-                }           
+                } else if (getLastState(mouseEvents.getKey()) && !firstUpdate) {
+                    events.getValue().onButtonUp(mouseEvents.getKey());
+                }       
             }
             
             setLastState(mouseEvents.getKey(), input.isMouseButtonDown(mouseEvents.getKey()));
         }
+        
+        firstUpdate = false;
     }
 
     public void clear() {
         listeners.clear();
+        firstUpdate = true;
     }
    
     
     
     public static interface MouseListener {
         public void onButtonDown(int button);
+        public void onButtonUp(int button);
         public void onButtonPressed(int button);
     }
     

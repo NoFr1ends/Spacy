@@ -103,6 +103,11 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
     }
 
     @Override
+    public void onKeyUp(int key) {
+        
+    }
+    
+    @Override
     public void onKeyPressed(int key) {
         
     }
@@ -111,12 +116,15 @@ public class Game implements IScreen, KeyInputManager.KeyListener, MouseInputMan
     public void onButtonDown(int button) {
         System.out.println(button);
     }
+    
+    @Override
+    public void onButtonUp(int button) {
+        
+    }
 
     @Override
     public void onButtonPressed(int button) {
         System.out.println(button);
     }
-
-
     
 }
