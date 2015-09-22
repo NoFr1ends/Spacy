@@ -1,15 +1,21 @@
 package de.kryptondev.spacy.server;
 
 import com.esotericsoftware.kryonet.*;
+import de.kryptondev.spacy.data.Projectile;
+import de.kryptondev.spacy.data.Rect;
 import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.PlayerInfo;
+import de.kryptondev.spacy.share.Move;
+import de.kryptondev.spacy.share.PlayerConnectionEvent;
+import de.kryptondev.spacy.share.PlayerRotate;
 import de.kryptondev.spacy.share.Version;
 
 import java.util.Date;
 import java.util.Random;
-import org.lwjgl.util.vector.Vector2f;
+import org.newdawn.slick.geom.Vector2f;
+
 
 
 public class GameClient extends Listener {
@@ -42,7 +48,8 @@ public class GameClient extends Listener {
         public Ship addShip(){
             Ship s = new Ship();
             Random r = new Random();
-            s.position = new Vector2f(r.nextFloat() * 600,r.nextFloat() * 600);
+            s.position = new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);
+            s.maxSpeed = 5f;
             spacyServer.world.ships.add(s);
             return s;
         }
@@ -58,8 +65,10 @@ public class GameClient extends Listener {
 
             this.sendTCP(spacyServer.world);
             Ship s = this.addShip();
-            s.owner = playerInfo;
-            this.spacyServer.getServer().sendToAllTCP(s);
+            
+            this.myShip = s;
+            this.sendTCP(s);
+            this.spacyServer.getServer().sendToAllTCP(new PlayerConnectionEvent(PlayerConnectionEvent.Type.Connected));
         }
 
         @Override
@@ -91,10 +100,35 @@ public class GameClient extends Listener {
                 playerInfo = (PlayerInfo) data;
                 validateConnection();
                 return;
-            }
+            }            
             if (data instanceof Chatmessage) {
                 //spacyServer.broadcast(data);
                 return;
+            }
+            if(data instanceof Move){
+                Move move = (Move)data;                    
+                this.myShip.isMoving = move.status;
+                return;
+            }
+            if(data instanceof PlayerRotate){
+                PlayerRotate rotation = (PlayerRotate)data;
+                this.myShip.direction = rotation.direction;
+                return;
+            }
+            if(data instanceof Projectile){               
+                //Fire
+                Projectile p = (Projectile)data;
+                p.setLifeTime(5);
+                p.isMoving = true;
+                p.acceleration = Float.POSITIVE_INFINITY;
+                p.maxSpeed = 30;
+                p.visible = true;
+                p.position = this.getMyShip().position;
+                p.direction = this.getMyShip().direction;
+                p.id = SpacyServer.instance.EntityCounter++;
+                p.bounds = new Rect(0,0,20,20);
+                SpacyServer.instance.world.projectiles.add(p);
+                SpacyServer.instance.getServer().sendToAllTCP(p);
             }
 
         }

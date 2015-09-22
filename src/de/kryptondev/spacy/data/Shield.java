@@ -7,5 +7,21 @@ public class Shield {
 
     public Shield() {
     }
+
+    public DamageType getResistance() {
+        return resistance;
+    }
+
+    public void setResistance(DamageType resistance) {
+        this.resistance = resistance;
+    }
+
+    public int getLife() {
+        return life;
+    }
+
+    public void setLife(int life) {
+        this.life = life;
+    }
     
 }

@@ -2,8 +2,9 @@ package de.kryptondev.spacy.input;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.lwjgl.util.vector.Vector2f;
+
 import org.newdawn.slick.Input;
+import org.newdawn.slick.geom.Vector2f;
 
 //TODO FIX Warum wird listeners zurückgesetzt?!
 public class MouseInputManager {
@@ -12,8 +13,14 @@ public class MouseInputManager {
     
     private HashMap<Integer, HashMap<String, MouseListener>> listeners;
     private HashMap<Integer, Boolean> lastStates;
+    
+    private Vector2f position = new Vector2f();
+    
+    private boolean firstUpdate = true;
+    
     public MouseInputManager() {
         listeners = new HashMap<>();
+        lastStates = new HashMap<>();
     }
     
     public static MouseInputManager getInstance() {
@@ -23,7 +30,7 @@ public class MouseInputManager {
     }
     
     public Vector2f getPosition() {
-        return new Vector2f(0, 0);
+        return position;
     }
     
     public void registerListener(String name, int button, MouseListener listener) {
@@ -47,6 +54,8 @@ public class MouseInputManager {
     }
     
     public void update(Input input) {
+        position = new Vector2f(input.getMouseX(), input.getMouseY());
+        
         if(listeners == null || listeners.isEmpty()){
             return;
         }
@@ -54,25 +63,33 @@ public class MouseInputManager {
                 listeners.entrySet()) {
             for(Map.Entry<String, MouseListener> events: 
                     mouseEvents.getValue().entrySet()) {
-                // Todo implement onmousedown
-                
-                 if(input.isKeyDown(mouseEvents.getKey())) {
+                if(input.isMouseButtonDown(mouseEvents.getKey())) {
                     events.getValue().onButtonDown(mouseEvents.getKey());
                     
                     if(!getLastState(mouseEvents.getKey())) {
                         events.getValue().onButtonPressed(mouseEvents.getKey());
                     }
-                }           
+                } else if (getLastState(mouseEvents.getKey()) && !firstUpdate) {
+                    events.getValue().onButtonUp(mouseEvents.getKey());
+                }       
             }
             
-            
+            setLastState(mouseEvents.getKey(), input.isMouseButtonDown(mouseEvents.getKey()));
         }
+        
+        firstUpdate = false;
+    }
+
+    public void clear() {
+        listeners.clear();
+        firstUpdate = true;
     }
    
     
     
     public static interface MouseListener {
         public void onButtonDown(int button);
+        public void onButtonUp(int button);
         public void onButtonPressed(int button);
     }
     

@@ -8,7 +8,6 @@ import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 public class MainGame extends BasicGame {
@@ -24,7 +23,7 @@ public class MainGame extends BasicGame {
     @Override
     public void init(GameContainer gc) throws SlickException {
         keyInputManager = KeyInputManager.getInstance();
-        mouseInputManager = new MouseInputManager();
+        mouseInputManager = MouseInputManager.getInstance();
         screenManager = ScreenManager.getInstance();
         
         screenManager.changeScreen(new MainMenuScreen());

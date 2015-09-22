@@ -3,22 +3,22 @@ package de.kryptondev.spacy;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
-import de.kryptondev.spacy.data.Ship;
-import de.kryptondev.spacy.data.World;
+
+import de.kryptondev.spacy.data.*;
+import de.kryptondev.spacy.share.*;
+
 import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.helper.UID;
-import de.kryptondev.spacy.screen.Game;
+
+import de.kryptondev.spacy.screen.GameScreen;
 import de.kryptondev.spacy.screen.ScreenManager;
-import de.kryptondev.spacy.share.Chatmessage;
-import de.kryptondev.spacy.share.ConnectionAttemptResponse;
-import de.kryptondev.spacy.share.PlayerInfo;
-import de.kryptondev.spacy.share.Version;
+
 
 public class SpacyClient extends Listener{
 
-    private static SpacyClient instance;
+    public static SpacyClient instance;
     private Client client;
-    private int port = 30300;
+    private final int port = 30300;
     private int timeout = 2500;
     public static final Version clientVersion = new Version(1, 0, 0);
     private PlayerInfo info;
@@ -68,8 +68,8 @@ public class SpacyClient extends Listener{
             //Antwort auswerten
             ConnectionAttemptResponse response = (ConnectionAttemptResponse) o;
             if (response.type == ConnectionAttemptResponse.Type.OK) {
-                   if(ScreenManager.getInstance().getCurrentScreen() instanceof Game){
-                        Game game = (Game)ScreenManager.getInstance().getCurrentScreen();
+                   if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
+                        GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
                         game.onConnected();
                     }
                 return;
@@ -85,22 +85,22 @@ public class SpacyClient extends Listener{
             return;
         }
         if(o instanceof Ship){
-            Ship s = (Ship)o;
-            this.getWorld().ships.add(s);   
-            //ist es mein Schiff?
-            //todo: fix            
-            if(s.owner.playerUID.equals(info.playerUID)){
-                setShip(s);
-            }
+            Ship s = (Ship)o;           
+            setShip(s);
             return;
         }
         
+        if(o instanceof PlayerConnectionEvent){
+            
+        }
+        
+        if(o instanceof Projectile){
+            this.world.projectiles.add((Projectile)o);
+        }
         
         
-        
-        
-        if(ScreenManager.getInstance().getCurrentScreen() instanceof Game){
-            Game game = (Game)ScreenManager.getInstance().getCurrentScreen();
+        if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
+            GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
             game.onRecv(o);
         }
     }
@@ -108,8 +108,7 @@ public class SpacyClient extends Listener{
     
     
     @Override
-    public void received(Connection cnctn, Object o) {
-        System.out.println("Package received!");
+    public void received(Connection cnctn, Object o) {        
         onRecv(cnctn, o);
     }
 
@@ -163,6 +162,14 @@ public class SpacyClient extends Listener{
 
     public void setShip(Ship ship) {
         this.ship = ship;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
     
     

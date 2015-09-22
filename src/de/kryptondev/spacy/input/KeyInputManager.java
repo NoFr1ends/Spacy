@@ -11,6 +11,8 @@ public class KeyInputManager {
     private HashMap<Integer, HashMap<String, KeyListener>> listeners;
     private HashMap<Integer, Boolean> lastStates;
     
+    private boolean firstUpdate = true;
+    
     public KeyInputManager() {
         listeners = new HashMap<>();
         lastStates = new HashMap<>();
@@ -24,7 +26,10 @@ public class KeyInputManager {
         return instance;
     }
     
-    //TODO Remove Listener
+    public void clear() {
+        listeners.clear();
+        firstUpdate = true;
+    }
     
     public void registerListener(String name, int key, KeyListener listener) {
         if(!listeners.containsKey(key)) {
@@ -48,11 +53,16 @@ public class KeyInputManager {
                     if(!getLastState(keyEvents.getKey())) {
                         events.getValue().onKeyPressed(keyEvents.getKey());
                     }
+                } else if(getLastState(keyEvents.getKey()) && !firstUpdate) {
+                    events.getValue().onKeyUp(keyEvents.getKey());
                 }
+                
             }
             
             setLastState(keyEvents.getKey(), input.isKeyDown(keyEvents.getKey()));
         }
+        
+        firstUpdate = false;
     }
     
     private boolean getLastState(int key) {
@@ -69,6 +79,7 @@ public class KeyInputManager {
     
     public static interface KeyListener {
         public void onKeyDown(int key);
+        public void onKeyUp(int key);
         public void onKeyPressed(int key);
     }
     
