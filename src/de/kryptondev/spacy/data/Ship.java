@@ -39,7 +39,9 @@ public class Ship extends Entity implements IHittable {
     public void hit(Projectile hitting) {
         /*Wenn das Projektil trifft, wird zunächst geprüft, ob das Schiff ein Schild hat.
          Falls dieses Schild vom selben Schadenstyp ist wie die Waffe, werden Punkte von der Schildenergie abgezogen.
-         Falls nicht geht der Schaden aufs Leben des Schiffes
+         Falls nicht geht der Schaden aufs Leben des Schiffes.
+        Sollte das Schild weniger Punkte haben als Schaden reinkommt, wird die Differenz vom Leben abgezogen.
+        Sollte das Schild augfebraucht werden, wird es auf null gesetzt.
          */
         if (this.shield != null) {
             if (this.shield.getResistance() == hitting.damagetype) {

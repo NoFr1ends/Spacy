@@ -3,7 +3,7 @@ package de.kryptondev.spacy.screen;
 import de.kryptondev.spacy.MainGame;
 import de.kryptondev.spacy.input.KeyInputManager;
 import de.kryptondev.spacy.input.MouseInputManager;
-import static de.kryptondev.spacy.screen.Game.BackgroundColor;
+import static de.kryptondev.spacy.screen.GameScreen.BackgroundColor;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.HashMap;

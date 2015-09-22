@@ -1,15 +1,18 @@
 package de.kryptondev.spacy.screen;
 
 import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Server;
 import de.kryptondev.spacy.SpacyClient;
 import de.kryptondev.spacy.input.KeyInputManager;
+import de.kryptondev.spacy.input.MouseInputManager;
 import de.kryptondev.spacy.server.SpacyServer;
 import java.awt.Font;
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.lwjgl.util.Rectangle;
+import org.lwjgl.util.vector.Vector2f;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -17,7 +20,10 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.TrueTypeFont;
 
 
-public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener {
+public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener, 
+        MouseInputManager.MouseListener {
+    
+    private HashMap<String, Rectangle> rectCache;
     private volatile List<String> menuEntries;
     private volatile boolean modifying = false;
     private TrueTypeFont font;
@@ -27,32 +33,52 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener 
     private SpacyServer testserver;
     private Client testclient = new Client();
     private IScreen prevScreen;
+    
     public ConnectMenuScreen(IScreen prevScreen) {
         menuEntries = new ArrayList<>();
         menuEntries.add("Create Server");        
         t = new Thread(new ScanThread()); 
         this.prevScreen = prevScreen;
     }
+
+    @Override
+    public void onButtonDown(int button) {
+        
+    }
+
+    @Override
+    public void onButtonUp(int button) {
+        
+    }
+
+    @Override
+    public void onButtonPressed(int button) {
+        String currentMenu = getMenuPointAtMouse();
+        if(currentMenu != null) {
+            onMenuPressed(currentMenu);
+        }
+    }
     
     class ScanThread implements Runnable {
-    @Override
-    public void run(){
-        do{
-            List<InetAddress> addrs = testclient.discoverHosts(54777, 2000);
-            modifying = true;
-            menuEntries.clear();
-            menuEntries.add("Create Server");
-            for(InetAddress addr : addrs){
-                if(addr.getHostAddress().endsWith(".1") && !addr.getHostAddress().equals("127.0.0.1") || menuEntries.contains(addr.getHostAddress()))
-                    continue;
-                
-                menuEntries.add(addr.getHostAddress());
-            }        
-            modifying = false;
+        @Override
+        public void run(){
+            do{
+                List<InetAddress> addrs = testclient.discoverHosts(54777, 2000);
+                modifying = true;
+                menuEntries.clear();
+                menuEntries.add("Create Server");
+                for(InetAddress addr : addrs){
+                    if(addr.getHostAddress().endsWith(".1") && !addr.getHostAddress().equals("127.0.0.1") || menuEntries.contains(addr.getHostAddress()))
+                        continue;
+
+                    menuEntries.add(addr.getHostAddress());
+                }
+                rectCache = null;
+                modifying = false;
+            }
+            while(!exit);
         }
-        while(!exit);
     }
-  }
     
     
     @Override
@@ -78,9 +104,15 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener 
                 this
         );
         
-         KeyInputManager.getInstance().registerListener(
+        KeyInputManager.getInstance().registerListener(
                 "ESC", 
                 Input.KEY_ESCAPE, 
+                this
+        );
+        
+        MouseInputManager.getInstance().registerListener(
+                "Left Button", 
+                Input.MOUSE_LEFT_BUTTON, 
                 this
         );
         
@@ -98,7 +130,7 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener 
                 //Connect to selected Entry
                 SpacyClient.setInstance(new SpacyClient());
                 SpacyClient.getInstance().connect(entry);
-                ScreenManager.getInstance().changeScreen(new Game(this,SpacyClient.getInstance()));
+                ScreenManager.getInstance().changeScreen(new GameScreen(this,SpacyClient.getInstance()));
         }
     }
 
@@ -125,10 +157,34 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener 
     
     @Override
     public void update(GameContainer gc, int delta) {
-       if(exit) 
-       {
-           
-       }
+        if(rectCache == null)
+            fillCache(gc);
+        
+        String menuEntry = getMenuPointAtMouse();
+        if(menuEntry != null) {
+            currentEntry = menuEntries.indexOf(menuEntry);
+        }
+    }
+    
+    public void fillCache(GameContainer gc) {
+        rectCache = new HashMap<>();
+        
+        int y = 100;
+        int i = 0;
+        for(String entry: menuEntries) {
+            int width = font.getWidth(entry);
+            int height = font.getHeight();
+            
+            Rectangle bounds = new Rectangle(
+                    (gc.getWidth() - width) / 2, 
+                    y, 
+                    width, 
+                    height
+            );
+            y += height + 10;
+            
+            rectCache.put(entry, bounds);
+        }
     }
 
     @Override
@@ -167,6 +223,18 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener 
     @Override
     public void onKeyUp(int key) {
         
+    }
+    
+    private String getMenuPointAtMouse() {
+        Vector2f mousePos = MouseInputManager.getInstance().getPosition();
+        
+        for(Map.Entry<String, Rectangle> cache: rectCache.entrySet()) {
+            if(cache.getValue().contains((int)mousePos.x, (int)mousePos.y)) {                
+                return cache.getKey();
+            }
+        }
+        
+        return null;
     }
     
 }
