@@ -175,7 +175,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
 
             Ship ship = SpacyClient.instance.getShip();          
             SpacyClient.getInstance().getClient().sendTCP(
-                    new Projectile(DamageType.balistic, ship.entityId, ship.direction, ship.position));
+                    new Projectile(DamageType.balistic, ship.id, ship.direction, ship.position));
         }
         
     }

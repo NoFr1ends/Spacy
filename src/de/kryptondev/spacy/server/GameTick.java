@@ -26,9 +26,10 @@ public class GameTick implements Runnable{
         for(Connection c : server.getServer().getConnections()) {            
             SGameClient gc = (SGameClient)c;
             Ship ship = gc.getMyShip();
-            if(ship.isMoving){
-                ship.move();
-            }            
+            if(ship != null)
+                if(ship.isMoving){
+                    ship.move();
+                }            
         }
         
         

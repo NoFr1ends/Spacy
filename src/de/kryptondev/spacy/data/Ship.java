@@ -13,7 +13,6 @@ public class Ship extends Entity implements IHittable {
     public Shield shield;
     public int hp = 100;
     public int maxHp = 100;
-    public long entityId;
 
     public Ship(Vector2f position, Vector2f direction, float speed, Rect bounds, Weapon activeWeapon, String image, Shield shield) {
         this.position = position;

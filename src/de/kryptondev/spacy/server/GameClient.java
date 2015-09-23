@@ -67,8 +67,8 @@ public class GameClient extends Listener {
 
             this.sendTCP(spacyServer.world);
             Ship s = this.addShip();
-            s.entityId = spacyServer.EntityCounter++;
-            this.shipId = s.entityId;
+            s.id = spacyServer.EntityCounter++;
+            this.shipId = s.id;
             this.sendTCP(s);
             this.spacyServer.getServer().sendToAllTCP(new PlayerConnectionEvent(PlayerConnectionEvent.Type.Connected));
         }
