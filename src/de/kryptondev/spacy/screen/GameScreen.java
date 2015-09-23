@@ -94,11 +94,13 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             return;
         CopyOnWriteArrayList<Ship> ships = new CopyOnWriteArrayList<>( spacyClient.getWorld().ships);
         for(Ship ship : ships){            
-            g.fillRect(ship.bounds.x + ship.position.getX(), ship.bounds.y + ship.position.getY(), ship.bounds.width, ship.bounds.height);
+            Vector2f renderpPosition =ship.getRenderPos();
+            g.fillRect(ship.bounds.x + renderpPosition.getX(), ship.bounds.y + renderpPosition.getY(), ship.bounds.width, ship.bounds.height);
         }
         CopyOnWriteArrayList<Projectile> pros = new CopyOnWriteArrayList<>( spacyClient.getWorld().projectiles);
         for(Projectile p : pros){
-            g.fillRect(p.position.x, p.position.y, p.bounds.width + p.bounds.x, p.bounds.height + p.bounds.x);
+            Vector2f renderPosition =p.getRenderPos();
+            g.fillRect(renderPosition.x, renderPosition.y, p.bounds.width + p.bounds.x, p.bounds.height + p.bounds.x);
         }
         
         
@@ -175,7 +177,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                     new Projectile(
                             ship, DamageType.balistic, 
                             ship.direction,
-                            ship.getCenter()
+                            ship.getRenderPos()
                             ));
         }
         

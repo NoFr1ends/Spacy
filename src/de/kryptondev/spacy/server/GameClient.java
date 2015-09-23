@@ -123,7 +123,7 @@ public class GameClient extends Listener {
                 p.acceleration = Float.POSITIVE_INFINITY;
                 p.maxSpeed = 30;
                 p.visible = true;
-                p.position = this.getMyShip().getCenter();
+                p.position = this.getMyShip().getRenderPos();
                 p.direction = this.getMyShip().direction;
                 p.id = SpacyServer.instance.EntityCounter++;
                 p.bounds = new Rect(0,0,20,20);
