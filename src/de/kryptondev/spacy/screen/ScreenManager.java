@@ -31,8 +31,8 @@ public class ScreenManager {
     
     public void draw(GameContainer gc, Graphics g) {
         if(currentScreen != null) {
-            currentScreen.draw(gc, g);
-            
+            currentScreen.draw(gc, g);            
+            g.resetTransform();
             String className = currentScreen.getClass().getSimpleName();
             font.drawString(
                     gc.getWidth() - font.getWidth(className), 
