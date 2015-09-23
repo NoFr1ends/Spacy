@@ -31,7 +31,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private Vector2f lastMousePos;
     private Vector2f viewPort;
     private SpriteSheet spriteSheet;
-
+    private Ship myShip;
+    
     public GameScreen(IScreen prevScreen, SpacyClient spacyClient) {
        //TODO Disable prevScreen
         this.spacyClient = spacyClient;
@@ -172,12 +173,28 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         //Fire
         if(button == 0){
             //TODO Implement Weapon Cooldown
-
-            Ship ship = SpacyClient.instance.getShip();          
+           
             SpacyClient.getInstance().getClient().sendTCP(
-                    new Projectile(DamageType.balistic, ship.id, ship.direction, ship.position));
+                    new Projectile(DamageType.balistic, myShip.id, myShip.direction, myShip.position));
         }
         
     }
+
+    public Vector2f getViewPort() {
+        return viewPort;
+    }
+
+    public void setViewPort(Vector2f viewPort) {
+        this.viewPort = viewPort;
+    }
+
+    public Ship getMyShip() {
+        return myShip;
+    }
+
+    public void setMyShip(Ship myShip) {
+        this.myShip = myShip;
+    }
+    
     
 }

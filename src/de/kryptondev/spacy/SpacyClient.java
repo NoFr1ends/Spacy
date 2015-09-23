@@ -84,6 +84,11 @@ public class SpacyClient extends Listener{
         }
         if(o instanceof Ship){
             Ship s = (Ship)o;
+              
+            if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
+                GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
+                game.setMyShip(s);
+            }
             //SPAWNED
             //setShip(s);
             return;
