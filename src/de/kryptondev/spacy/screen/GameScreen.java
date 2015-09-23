@@ -10,6 +10,7 @@ import de.kryptondev.spacy.input.MouseInputManager;
 
 
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.newdawn.slick.GameContainer;
@@ -91,11 +92,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         
         if(spacyClient.getWorld() == null)
             return;
-        for(Ship ship : spacyClient.getWorld().ships){            
+        CopyOnWriteArrayList<Ship> ships = new CopyOnWriteArrayList<>( spacyClient.getWorld().ships);
+        for(Ship ship : ships){            
             g.fillRect(ship.bounds.x + ship.position.getX(), ship.bounds.y + ship.position.getY(), ship.bounds.width, ship.bounds.height);
         }
-        
-        for(Projectile p : spacyClient.getWorld().projectiles){
+        CopyOnWriteArrayList<Projectile> pros = new CopyOnWriteArrayList<>( spacyClient.getWorld().projectiles);
+        for(Projectile p : pros){
             g.fillRect(p.position.x, p.position.y, p.bounds.width + p.bounds.x, p.bounds.height + p.bounds.x);
         }
         
@@ -173,7 +175,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                     new Projectile(
                             ship, DamageType.balistic, 
                             ship.direction,
-                            ship.position
+                            ship.getCenter()
                             ));
         }
         

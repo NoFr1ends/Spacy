@@ -34,7 +34,7 @@ public class Ship extends Entity implements IHittable {
         this.image = "";
         this.shield = new Shield();
         
-        SpacyMath.Acceleration
+        //SpacyMath.Acceleration
     }
 
     @Override

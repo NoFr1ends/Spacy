@@ -55,4 +55,8 @@ public abstract class Entity {
 
         this.direction = newDirection.normalise(); //durch .normalise() erhält der Vector die Länge 1.
     }
+    
+    public Vector2f getCenter(){
+        return new Vector2f(position).add(new Vector2f((bounds.x + bounds.width) / 2, (bounds.y + bounds.width) / 2));
+    }
 }
