@@ -23,9 +23,7 @@ public class SpacyClient extends Listener{
     public static final Version clientVersion = new Version(1, 0, 0);
     private PlayerInfo info;
     private World world;
-    private Ship ship;
-    
-
+    private long shipId;
     
     public SpacyClient() {
         this.info = new PlayerInfo();
@@ -85,8 +83,14 @@ public class SpacyClient extends Listener{
             return;
         }
         if(o instanceof Ship){
-            Ship s = (Ship)o;           
-            setShip(s);
+            Ship s = (Ship)o;
+              
+            if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
+                GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
+                game.setMyShip(s);
+            }
+            //SPAWNED
+            //setShip(s);
             return;
         }
         
@@ -157,11 +161,21 @@ public class SpacyClient extends Listener{
     }
 
     public Ship getShip() {
-        return ship;
+        for(Ship ship : world.ships){
+            if(ship.id == this.shipId){
+                return ship;
+            }
+        }
+        return null;
     }
 
+    @Deprecated
     public void setShip(Ship ship) {
-        this.ship = ship;
+         for(Ship wShip : world.ships){
+            if(wShip.id == this.shipId){
+                wShip = ship;
+            }
+        }
     }
 
     public Client getClient() {

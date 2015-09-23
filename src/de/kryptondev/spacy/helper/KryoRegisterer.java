@@ -13,6 +13,7 @@ public class KryoRegisterer {
     public static void registerAll(Kryo k){        
         k.register(boolean.class);  
         k.register(float.class);
+        k.register(long.class);
         k.register(int.class);
         k.register(byte[].class);
         k.register(float[].class);

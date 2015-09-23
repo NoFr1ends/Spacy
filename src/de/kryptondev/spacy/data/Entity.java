@@ -9,7 +9,7 @@ public abstract class Entity {
     public Vector2f direction;
     public Vector2f position;
     public float speed = 10f;
-    public float acceleration = 0f; //nötig?
+    public float acceleration = 1.5f; //nötig? Carl:Ja! aber mehr als 0 ;-)
     public float maxSpeed = 50f;
     public Rect bounds;
     public long id;
@@ -25,14 +25,34 @@ public abstract class Entity {
         this.position = position;
     }
 
-    public void move() {
-        //TODO: FIX!!!
-        /*if (speed < maxSpeed) {
-            speed *= (acceleration + 1);
+    public void accelerate() {
+        if ((this.acceleration * this.speed + 1) < this.maxSpeed) {
+            this.speed = (this.acceleration * this.speed + 1);//Lineare Beschleunigung, können aber auch was anderes nehmen.
         } else {
-            speed = maxSpeed;
+            this.speed = this.maxSpeed;
+           
         }
-        */
+
+    }
+    /*Der Abbremsvorgang. Mal sehen wo wir das einbauen*/
+    public void decelerate() {
+        if (((1/this.acceleration) * this.speed - 1) > 0) {
+            this.speed = ((1/this.acceleration) * this.speed - 1);//Lineare Bremskraft, können aber auch was anderes nehmen.
+        } else {
+            this.speed = 0;
+        
+        }
+
+    }
+    public void move() {
+        //Theoretisch kann die Verzweigung weggelassen werden.
+        //Die Frage ist ob eine Verzweigung performanter ist als ein unnötiger Methodenaufruf.
+        if (speed < maxSpeed & this.isMoving) {
+            this.accelerate();
+        }
+        if(speed > 0 & !this.isMoving){
+            this.decelerate();
+        }
         Vector2f newPosition = new Vector2f();
         newPosition.x = position.x + (direction.x * speed);
         newPosition.y = position.y + (direction.y * speed);
@@ -46,18 +66,17 @@ public abstract class Entity {
         }
         return alpha;
     }
-   
+
     public void rotateToMouse(Vector2f mouseposition) {
         //Ich weiß, das geht auch in einer Zeile, aber dann wird es unlesbar.
         Vector2f newDirection = new Vector2f();
-        newDirection.x = mouseposition.x - this.getCenter().x;
-        newDirection.y = mouseposition.y - this.getCenter().y;
+        newDirection.x = mouseposition.x - this.position.x;
+        newDirection.y = mouseposition.y - this.position.y;
 
         this.direction = newDirection.normalise(); //durch .normalise() erhält der Vector die Länge 1.
     }
-    
-    public Vector2f getCenter(){
-        Vector2f v = new Vector2f((this.bounds.width + this.bounds.x) / 2, (this.bounds.height + this.bounds.y) / 2);
-        return new Vector2f(position).add(v);
+
+    public Vector2f getRenderPos() {
+        return new Vector2f(position).sub(new Vector2f((bounds.width) / 2, (bounds.width) / 2));
     }
 }

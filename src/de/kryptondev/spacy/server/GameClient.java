@@ -31,12 +31,13 @@ public class GameClient extends Listener {
         private PlayerInfo playerInfo;
         private SpacyServer spacyServer;
         private GameClient gameClient;
-        private Ship myShip;
+        private long shipId;
         
         public SGameClient(SpacyServer server, GameClient gc) {
             this.gameClient = gc;
             this.spacyServer = server;
-            this.connectionTimeStamp = new Date();          
+            this.connectionTimeStamp = new Date();     
+            
         }
         
         
@@ -49,6 +50,7 @@ public class GameClient extends Listener {
             Ship s = new Ship();
             Random r = new Random();
             s.position = new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);
+            s.acceleration = 2f;
             s.maxSpeed = 5f;
             spacyServer.world.ships.add(s);
             return s;
@@ -65,8 +67,8 @@ public class GameClient extends Listener {
 
             this.sendTCP(spacyServer.world);
             Ship s = this.addShip();
-            
-            this.myShip = s;
+            s.id = spacyServer.EntityCounter++;
+            this.shipId = s.id;
             this.sendTCP(s);
             this.spacyServer.getServer().sendToAllTCP(new PlayerConnectionEvent(PlayerConnectionEvent.Type.Connected));
         }
@@ -107,23 +109,23 @@ public class GameClient extends Listener {
             }
             if(data instanceof Move){
                 Move move = (Move)data;                    
-                this.myShip.isMoving = move.status;
+                this.getMyShip().isMoving = move.status;
                 return;
             }
             if(data instanceof PlayerRotate){
                 PlayerRotate rotation = (PlayerRotate)data;
-                this.myShip.direction = rotation.direction;
+                this.getMyShip().direction = rotation.direction;
                 return;
             }
             if(data instanceof Projectile){               
                 //Fire
                 Projectile p = (Projectile)data;
-                p.setLifeTime(5);
+                p.setLifeTime(3.0f);
                 p.isMoving = true;
                 p.acceleration = Float.POSITIVE_INFINITY;
                 p.maxSpeed = 50;
                 p.visible = true;
-                p.position = this.getMyShip().getCenter();
+                p.position = this.getMyShip().position;
                 p.direction = this.getMyShip().direction;
                 p.id = SpacyServer.instance.EntityCounter++;
                 p.bounds = new Rect(0,0,20,20);
@@ -166,14 +168,13 @@ public class GameClient extends Listener {
         }
 
         public Ship getMyShip() {
-            return myShip;
+            for(Ship ship : spacyServer.world.ships){
+                if(ship.id == this.shipId)
+                    return ship;
+            }
+            return null;
         }
-
-        public void setMyShip(Ship myShip) {
-            this.myShip = myShip;
-        }
-
-
-
+            
+        
     }
 }
