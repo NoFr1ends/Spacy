@@ -6,7 +6,8 @@ import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.server.GameClient.SGameClient;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import org.lwjgl.util.glu.Project;
 import org.newdawn.slick.geom.Vector2f;
 
 
@@ -20,21 +21,16 @@ public class GameTick implements Runnable{
 
     private void onTick(){       
         //TODO: Check for collisions
-        
-        
-        
-        for(Connection c : server.getServer().getConnections()) {            
-            SGameClient gc = (SGameClient)c;
-            Ship ship = gc.getMyShip();
+                
+        for(Ship ship : server.world.ships) {           
             if(ship != null)
                 if(ship.isMoving){
                     ship.move();
                 }            
         }
-        
-        
-        List<Projectile> projectiles = server.world.projectiles;
-        Iterator<Projectile> i= projectiles.iterator();
+
+                       
+        Iterator<Projectile> i= server.world.projectiles.iterator();
         while (i.hasNext()) {
             Projectile p = i.next();
             if(p.remainingLifetime <= 0){

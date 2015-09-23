@@ -29,7 +29,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private SpacyClient spacyClient;
     private Image background;
     private Vector2f lastMousePos;
-    private Vector2f viewPort;
+    private Rect viewPort;
     private SpriteSheet spriteSheet;
     private Ship myShip;
     
@@ -45,12 +45,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         MouseInputManager.getInstance().registerListener("Throttle", Input.MOUSE_RIGHT_BUTTON, this);
         KeyInputManager.getInstance().registerListener("Throttle", Input.KEY_SPACE, this);
         Random r = new Random();
-        
+        gc.setAlwaysRender(true);
         try {
             
-            int width = gc.getWidth();
-            int height = gc.getHeight();      
-           
+            int width = gc.getWidth() * 2;
+            int height = gc.getHeight() * 2;      
+            
 
             Graphics g = new Graphics(width, height);
             g.clear();
@@ -164,11 +164,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         //Rotate
         Vector2f pos = MouseInputManager.getInstance().getPosition();
         SpacyClient.getInstance().getShip().rotateToMouse(pos);
-        SpacyClient.getInstance().getClient().sendTCP(new PlayerRotate(SpacyClient.instance.getShip().direction));
+        SpacyClient.getInstance().getClient().sendTCP(new PlayerRotate(SpacyClient.instance.getShip().direction));      
         //Move
         if(button == 1){
             SpacyClient.getInstance().getClient().sendTCP(new Move(true));
             System.out.println("Start moving");
+          
         }
         //Fire
         if(button == 0){
@@ -180,11 +181,11 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         
     }
 
-    public Vector2f getViewPort() {
+    public Rect getViewPort() {
         return viewPort;
     }
 
-    public void setViewPort(Vector2f viewPort) {
+    public void setViewPort(Rect viewPort) {
         this.viewPort = viewPort;
     }
 

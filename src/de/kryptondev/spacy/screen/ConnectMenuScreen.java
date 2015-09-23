@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.lwjgl.util.Rectangle;
 import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.Color;
@@ -194,7 +195,7 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener,
       try{
         if(exit ||modifying || menuEntries.size() < 1)
             return;
-        List<String> buffer = menuEntries;
+        CopyOnWriteArrayList<String> buffer = new CopyOnWriteArrayList(menuEntries);
         for (String entry : buffer) {
             Color color = Color.white;
             if(currentEntry == i) {
