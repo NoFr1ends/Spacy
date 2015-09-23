@@ -83,7 +83,7 @@ public class SpacyServer extends Listener {
 
     public boolean start() {
         try {
-            KryoRegisterer.registerAll(server.getKryo()); 
+            KryoRegisterer.registerAll(server.getKryo());
             server.addListener(this);
             server.bind(port,broadcastPort);
             new Thread(server).start();       

@@ -31,12 +31,13 @@ public class GameClient extends Listener {
         private PlayerInfo playerInfo;
         private SpacyServer spacyServer;
         private GameClient gameClient;
-        private Ship myShip;
+        private long shipId;
         
         public SGameClient(SpacyServer server, GameClient gc) {
             this.gameClient = gc;
             this.spacyServer = server;
-            this.connectionTimeStamp = new Date();          
+            this.connectionTimeStamp = new Date();     
+            
         }
         
         
@@ -66,8 +67,8 @@ public class GameClient extends Listener {
 
             this.sendTCP(spacyServer.world);
             Ship s = this.addShip();
-            
-            this.myShip = s;
+            s.entityId = spacyServer.EntityCounter++;
+            this.shipId = s.entityId;
             this.sendTCP(s);
             this.spacyServer.getServer().sendToAllTCP(new PlayerConnectionEvent(PlayerConnectionEvent.Type.Connected));
         }
@@ -108,12 +109,12 @@ public class GameClient extends Listener {
             }
             if(data instanceof Move){
                 Move move = (Move)data;                    
-                this.myShip.isMoving = move.status;
+                this.getMyShip().isMoving = move.status;
                 return;
             }
             if(data instanceof PlayerRotate){
                 PlayerRotate rotation = (PlayerRotate)data;
-                this.myShip.direction = rotation.direction;
+                this.getMyShip().direction = rotation.direction;
                 return;
             }
             if(data instanceof Projectile){               
@@ -167,14 +168,13 @@ public class GameClient extends Listener {
         }
 
         public Ship getMyShip() {
-            return myShip;
+            for(Ship ship : spacyServer.world.ships){
+                if(ship.id == this.shipId)
+                    return ship;
+            }
+            return null;
         }
-
-        public void setMyShip(Ship myShip) {
-            this.myShip = myShip;
-        }
-
-
-
+            
+        
     }
 }
