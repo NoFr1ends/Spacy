@@ -4,12 +4,12 @@ import de.kryptondev.spacy.share.Move;
 import org.newdawn.slick.geom.Vector2f;
 
 public abstract class Entity {
-
+//public Movestatus movestatus;
     public boolean isMoving;
     public Vector2f direction;
     public Vector2f position;
     public float speed = 10f;
-    public float acceleration = 1.2f; //nötig?
+    public float acceleration = 0f; //nötig? Carl:Ja!
     public float maxSpeed = 50f;
     public Rect bounds;
     public long id;
@@ -30,16 +30,17 @@ public abstract class Entity {
             this.speed = (this.acceleration * this.speed + 1);//Lineare Beschleunigung, können aber auch was anderes nehmen.
         } else {
             this.speed = this.maxSpeed;
+            //movestatus=fullSpeed;
         }
 
     }
     /*Der Abbremsvorgang. Mal sehen wo wir das einbauen*/
-    public void decelerate() {
-        //TODO: Fix If
-        if ((this.acceleration * this.speed + 1) < this.maxSpeed) {
+public void decelerate() {
+        if (((1/this.acceleration) * this.speed - 1) > 0) {
             this.speed = ((1/this.acceleration) * this.speed - 1);//Lineare Bremskraft, können aber auch was anderes nehmen.
         } else {
-            this.speed = this.maxSpeed;
+            this.speed = 0;
+        //movestatus=stopped;
         }
 
     }
