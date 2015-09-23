@@ -76,9 +76,9 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
 
     @Override
     public void update(GameContainer gc, int delta) {
-        Vector2f shipPos = this.spacyClient.getShip().position;
+        /*Vector2f shipPos = this.spacyClient.getShip().position;
         Rect shipBound = this.spacyClient.getShip().bounds;
-        
+        */
         
         
         //TODO: Positioning for "ViewPort"
