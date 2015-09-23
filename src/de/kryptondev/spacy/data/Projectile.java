@@ -24,6 +24,11 @@ public class Projectile extends Entity {
         this.damagetype = damagetype;
         this.sender = sender;
     }
+
+    public Projectile(Ship ship, DamageType damageType) {
+       this.sender = ship;
+       this.damagetype = damageType;
+    }
     
     public void setLifeTime(int seconds){
         this.lifetime = seconds * GameTick.ticksPerSecond;

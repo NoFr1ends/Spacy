@@ -1,7 +1,9 @@
 package de.kryptondev.spacy.server;
 
+import com.esotericsoftware.kryonet.Connection;
 import de.kryptondev.spacy.data.Projectile;
 import de.kryptondev.spacy.data.Ship;
+import de.kryptondev.spacy.server.GameClient.SGameClient;
 import java.util.Iterator;
 import java.util.List;
 import org.newdawn.slick.geom.Vector2f;
@@ -16,10 +18,13 @@ public class GameTick implements Runnable{
     }
 
     private void onTick(){        
-        for(Ship ship: server.world.ships) {            
+        for(Connection c : server.getServer().getConnections()) {            
+            SGameClient gc = (SGameClient)c;
+            Ship ship = gc.getMyShip();
             if(ship.isMoving){
                 ship.move();
             }
+            gc.sendTCP(ship);
         }
         
         

@@ -76,8 +76,11 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
 
     @Override
     public void update(GameContainer gc, int delta) {
-        Vector2f pos = this.spacyClient.getShip().position;
-        Rect bound = this.spacyClient.getShip().bounds;
+        Vector2f shipPos = this.spacyClient.getShip().position;
+        Rect shipBound = this.spacyClient.getShip().bounds;
+        
+        
+        
         //TODO: Positioning for "ViewPort"
         
         //TODO: Edit local "smooth" movements
@@ -94,13 +97,13 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             return;
         CopyOnWriteArrayList<Ship> ships = new CopyOnWriteArrayList<>( spacyClient.getWorld().ships);
         for(Ship ship : ships){            
-            Vector2f renderpPosition =ship.getRenderPos();
-            g.fillRect(ship.bounds.x + renderpPosition.getX(), ship.bounds.y + renderpPosition.getY(), ship.bounds.width, ship.bounds.height);
+            Vector2f renderPosition =ship.getRenderPos();
+            g.fillRect(renderPosition.x, renderPosition.y, ship.bounds.width, ship.bounds.height);
         }
         CopyOnWriteArrayList<Projectile> pros = new CopyOnWriteArrayList<>( spacyClient.getWorld().projectiles);
         for(Projectile p : pros){
-            Vector2f renderPosition =p.getRenderPos();
-            g.fillRect(renderPosition.x, renderPosition.y, p.bounds.width + p.bounds.x, p.bounds.height + p.bounds.x);
+            Vector2f renderPosition = p.getRenderPos();
+            g.fillRect(renderPosition.x, renderPosition.y, p.bounds.width, p.bounds.height);
         }
         
         
@@ -138,12 +141,10 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     @Override
     public void onButtonDown(int button) {
         if(button == 1){
-            Vector2f pos = MouseInputManager.getInstance().getPosition();
-            if(lastMousePos != pos){
-                lastMousePos = pos;
-                SpacyClient.getInstance().getShip().rotateToMouse(pos);
-                SpacyClient.getInstance().getClient().sendTCP(new PlayerRotate(SpacyClient.instance.getShip().direction));
-            }
+            Vector2f pos = MouseInputManager.getInstance().getPosition();          
+            SpacyClient.getInstance().getShip().rotateToMouse(pos);
+            SpacyClient.getInstance().getClient().sendTCP(new PlayerRotate(SpacyClient.instance.getShip().direction));
+
         }
         
     }
@@ -175,10 +176,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             Ship ship = SpacyClient.instance.getShip();          
             SpacyClient.getInstance().getClient().sendTCP(
                     new Projectile(
-                            ship, DamageType.balistic, 
-                            ship.direction,
-                            ship.getRenderPos()
-                            ));
+                            ship, DamageType.balistic));
         }
         
     }

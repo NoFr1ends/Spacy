@@ -49,6 +49,7 @@ public class GameClient extends Listener {
             Ship s = new Ship();
             Random r = new Random();
             s.position = new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);
+            s.acceleration = 2f;
             s.maxSpeed = 5f;
             spacyServer.world.ships.add(s);
             return s;
@@ -123,7 +124,7 @@ public class GameClient extends Listener {
                 p.acceleration = Float.POSITIVE_INFINITY;
                 p.maxSpeed = 30;
                 p.visible = true;
-                p.position = this.getMyShip().getRenderPos();
+                p.position = this.getMyShip().position;
                 p.direction = this.getMyShip().direction;
                 p.id = SpacyServer.instance.EntityCounter++;
                 p.bounds = new Rect(0,0,20,20);

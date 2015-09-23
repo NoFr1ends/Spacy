@@ -9,7 +9,7 @@ public abstract class Entity {
     public Vector2f direction;
     public Vector2f position;
     public float speed = 10f;
-    public float acceleration = 0f; //nötig?
+    public float acceleration = 1.2f; //nötig?
     public float maxSpeed = 50f;
     public Rect bounds;
     public long id;
@@ -34,7 +34,8 @@ public abstract class Entity {
 
     }
     /*Der Abbremsvorgang. Mal sehen wo wir das einbauen*/
-public void decelerate() {
+    public void decelerate() {
+        //TODO: Fix If
         if ((this.acceleration * this.speed + 1) < this.maxSpeed) {
             this.speed = ((1/this.acceleration) * this.speed - 1);//Lineare Bremskraft, können aber auch was anderes nehmen.
         } else {
@@ -45,10 +46,12 @@ public void decelerate() {
     public void move() {
         //Theoretisch kann die Verzweigung weggelassen werden.
         //Die Frage ist ob eine Verzweigung performanter ist als ein unnötiger Methodenaufruf.
-        if (speed < maxSpeed) {
+        if (speed < maxSpeed & this.isMoving) {
             this.accelerate();
         }
-
+        if(speed > 0 & !this.isMoving){
+            this.decelerate();
+        }
         Vector2f newPosition = new Vector2f();
         newPosition.x = position.x + (direction.x * speed);
         newPosition.y = position.y + (direction.y * speed);
@@ -73,6 +76,6 @@ public void decelerate() {
     }
 
     public Vector2f getRenderPos() {
-        return new Vector2f(position).sub(new Vector2f((bounds.x + bounds.width) / 2, (bounds.y + bounds.width) / 2));
+        return new Vector2f(position).sub(new Vector2f((bounds.width) / 2, (bounds.width) / 2));
     }
 }
