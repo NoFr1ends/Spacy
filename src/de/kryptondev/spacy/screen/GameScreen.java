@@ -203,7 +203,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     public void onButtonDown(int button) {
         if(button == 1){
             Vector2f pos = MouseInputManager.getInstance().getPosition();//.scale(zoom);          
-            SpacyClient.getInstance().getShip().rotateToMouse(pos);
+            SpacyClient.getInstance().getShip().direction = new Vector2f(pos).sub(new Vector2f(viewPort.width / 2, viewPort.height / 2)).normalise();
             SpacyClient.getInstance().getClient().sendTCP(new PlayerRotate(SpacyClient.instance.getShip().direction));
         }
         
@@ -222,7 +222,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     public void onButtonPressed(int button) {
         //Rotate
         Vector2f pos = MouseInputManager.getInstance().getPosition();
-        SpacyClient.getInstance().getShip().rotateToMouse(pos);
+        SpacyClient.getInstance().getShip().direction = new Vector2f(pos).sub(new Vector2f(viewPort.width / 2, viewPort.height / 2)).normalise();
         SpacyClient.getInstance().getClient().sendTCP(new PlayerRotate(SpacyClient.instance.getShip().direction));
         //Move
         if(button == 1){

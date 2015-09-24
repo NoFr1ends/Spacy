@@ -9,8 +9,8 @@ public abstract class Entity {
     public Vector2f direction;
     public Vector2f position;
     public float speed = 10f;
-    public float acceleration = 1.5f; //nötig? Carl:Ja! aber mehr als 0 ;-)
-    public float maxSpeed = 50f;
+    public float acceleration = 2f; //nötig? Carl:Ja! aber mehr als 0 ;-)
+    public float maxSpeed = 100f;
     public Rect bounds;
     public long id;
 
@@ -26,18 +26,23 @@ public abstract class Entity {
     }
 
     public void accelerate() {
-        if ((this.acceleration * this.speed + 1) < this.maxSpeed) {
-            this.speed = (this.acceleration * this.speed + 1);//Lineare Beschleunigung, können aber auch was anderes nehmen.
+        if (this.speed==0){
+        this.speed=1;
+        return;
+        }
+        if ((this.acceleration * this.speed) < this.maxSpeed) {
+            this.speed = (this.acceleration * this.speed);//Lineare Beschleunigung, können aber auch was anderes nehmen.
+            return;
         } else {
             this.speed = this.maxSpeed;
-           
+           return;
         }
 
     }
     /*Der Abbremsvorgang. Mal sehen wo wir das einbauen*/
     public void decelerate() {
-        if (((1/this.acceleration) * this.speed - 1) > 0) {
-            this.speed = ((1/this.acceleration) * this.speed - 1);//Lineare Bremskraft, können aber auch was anderes nehmen.
+        if (((1/this.acceleration) * this.speed) > 1) {
+            this.speed = ((1/this.acceleration) * this.speed);//Lineare Bremskraft, können aber auch was anderes nehmen.
         } else {
             this.speed = 0;
         
