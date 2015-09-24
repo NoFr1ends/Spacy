@@ -31,5 +31,10 @@ public class Rect {
     public Rectangle toRectangle(){
         return new Rectangle(x, y, width, height);
     }
+
+    @Override
+    public String toString() {
+        return "Rect: " + this.x + ", " + this.y + " size: " + this.width + "x" + this.height;
+    }
     
 }

@@ -115,6 +115,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             this.viewPortCenter = shipPos;
             this.viewPort.x = viewPortCenter.x - (this.viewPort.width / 2);
             this.viewPort.y = viewPortCenter.y - (this.viewPort.height / 2);
+            
+            
         }
         
         //TODO: Edit local "smooth" movements
@@ -126,16 +128,16 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     }
     
     @Override
-    public void draw(GameContainer gc, Graphics g) {
-        
-        g.translate((-viewPort.x) / this.backgroundMoveFactor, (-viewPort.y) / this.backgroundMoveFactor);
+    public void draw(GameContainer gc, Graphics g) {        
+        g.translate((-viewPort.x) / this.backgroundMoveFactor , 
+                (-viewPort.y) / this.backgroundMoveFactor);
         g.scale(zoom, zoom);
         g.setColor(Color.white);        
         g.setBackground(BackgroundColor);
         g.drawImage(background, 0, 0);
         g.resetTransform();
         g.scale(zoom, zoom);
-        g.translate(-viewPort.x, -viewPort.y);
+        g.translate((-viewPort.x * zoom), (-viewPort.y * zoom));
         //spriteSheet.draw("cockpitBlue_0.png" , 0, 0);
         if(spacyClient.getWorld() == null)
             return;
@@ -189,14 +191,19 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
            this.zoom *= 1 + zoomStep;
            this.viewPort.height *= 1 + zoomStep;
            this.viewPort.width *= 1 + zoomStep;
+           System.out.println(viewPort.toString());
+           
        }
        if(key == Input.KEY_SUBTRACT){
            this.zoom *= 1 - zoomStep;
            this.viewPort.height *= 1 - zoomStep;
            this.viewPort.width *= 1 - zoomStep;
+           System.out.println(viewPort.toString());
        }
     }
-
+    private void print(String id, Vector2f vec){
+        System.out.println(id+  "@ " + vec.x + ", " + vec.y);
+    }
     @Override
     public void onButtonDown(int button) {
         if(button == 1){
