@@ -43,5 +43,6 @@ public class KryoRegisterer {
         k.register(Move.class);
         k.register(PlayerConnectionEvent.class);
         k.register(PlayerConnectionEvent.Type.class);
+        k.register(DeleteEntity.class);
     }
 }

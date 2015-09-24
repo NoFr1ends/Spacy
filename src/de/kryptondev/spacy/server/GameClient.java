@@ -63,7 +63,7 @@ public class GameClient extends Listener {
                 return;
             }
             //GameClient.this.spacyServer.broadcast(new Chatmessage(GameClient.this.getPlayerInfo().playerName + " joined the party!"));
-            GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.toString() + " connected right now!");
+            //GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.toString() + " connected right now!");
             this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.OK));
 
             this.sendTCP(spacyServer.world);
