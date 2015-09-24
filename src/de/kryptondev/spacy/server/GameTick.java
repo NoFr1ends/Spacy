@@ -5,10 +5,10 @@ import de.kryptondev.spacy.data.EMoving;
 import de.kryptondev.spacy.data.Projectile;
 import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.server.GameClient.SGameClient;
+import de.kryptondev.spacy.share.DeleteEntity;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.newdawn.slick.geom.Vector2f;
 
 
 public class GameTick implements Runnable{
@@ -21,9 +21,6 @@ public class GameTick implements Runnable{
 
     private void onTick(){       
         //TODO: Check for collisions
-        
-        
-        
         for(Connection c : server.getServer().getConnections()) {            
             SGameClient gc = (SGameClient)c;
             Ship ship = gc.getMyShip();
@@ -33,12 +30,15 @@ public class GameTick implements Runnable{
         }
         
         
-        List<Projectile> projectiles = server.world.projectiles;
+        List<Projectile> projectiles = new ArrayList<>();
+        projectiles.addAll(server.world.projectiles);
+        //server.world.projectiles;
         Iterator<Projectile> i= projectiles.iterator();
         while (i.hasNext()) {
             Projectile p = i.next();
             if(p.remainingLifetime <= 0){
-                i.remove();
+                server.world.projectiles.remove(p);
+                server.getServer().sendToAllTCP(new DeleteEntity(p.id));
                 System.out.println("Deleting projectile " + p.id);
                 continue;
             }
@@ -50,9 +50,6 @@ public class GameTick implements Runnable{
               p.move();
             }
          }
-      
-        //TODO Move to GameMasterTick
-        server.getServer().sendToAllTCP(this.server.world);
     }
 
     @Override

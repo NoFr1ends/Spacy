@@ -53,6 +53,7 @@ public class GameClient extends Listener {
             s.position = new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);
             s.maxSpeed = 80f;
             s.acceleration = 1.2f;
+            s.image = "playerShip1_blue.png"; // todo change for teams etc
             spacyServer.world.ships.add(s);
             return s;
         }
@@ -63,7 +64,7 @@ public class GameClient extends Listener {
                 return;
             }
             //GameClient.this.spacyServer.broadcast(new Chatmessage(GameClient.this.getPlayerInfo().playerName + " joined the party!"));
-            GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.toString() + " connected right now!");
+            //GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.toString() + " connected right now!");
             this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.OK));
 
             this.sendTCP(spacyServer.world);

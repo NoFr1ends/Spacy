@@ -12,6 +12,7 @@ import de.kryptondev.spacy.helper.UID;
 
 import de.kryptondev.spacy.screen.GameScreen;
 import de.kryptondev.spacy.screen.ScreenManager;
+import java.lang.reflect.Field;
 
 
 public class SpacyClient extends Listener{
@@ -61,7 +62,23 @@ public class SpacyClient extends Listener{
         this.client.sendTCP(msg);
     }
 
+    private void logPacket(Object o) {
+        System.out.print("Recv: " + o.getClass().getSimpleName() + "(");
+        
+        for(Field f: o.getClass().getFields()) {
+            try {
+                System.out.print(f.getName() + "=" + f.get(o) + " ");
+            } catch(Exception e) {
+                System.out.print(f.getName() + "=error ");
+            }
+        }
+        
+        System.out.println(")");
+    }
+    
     private void onRecv(Connection cnctn, Object o) {
+        logPacket(o);
+        
         if (o instanceof ConnectionAttemptResponse) {
             //Antwort auswerten
             ConnectionAttemptResponse response = (ConnectionAttemptResponse) o;
@@ -88,7 +105,10 @@ public class SpacyClient extends Listener{
             if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
                 GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
                 game.setMyShip(s);
+                shipId = s.id;
             }
+            
+            world.ships.add(s);
             //SPAWNED
             //setShip(s);
             return;
