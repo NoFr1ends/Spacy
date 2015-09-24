@@ -1,6 +1,7 @@
 package de.kryptondev.spacy.screen;
 
 import de.kryptondev.spacy.MainGame;
+import de.kryptondev.spacy.SpriteSheet;
 import de.kryptondev.spacy.input.KeyInputManager;
 import de.kryptondev.spacy.input.MouseInputManager;
 import static de.kryptondev.spacy.screen.GameScreen.BackgroundColor;
@@ -107,6 +108,8 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener,
             
             i++;
         }
+        
+        //sheet.draw("playerShip1_blue.png", 0, 0);
     }
     
     private void fillCache(GameContainer gc) {

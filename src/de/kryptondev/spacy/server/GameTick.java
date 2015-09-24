@@ -33,7 +33,9 @@ public class GameTick implements Runnable{
         }
         
         
-        List<Projectile> projectiles = server.world.projectiles;
+        List<Projectile> projectiles = new ArrayList<>();
+        projectiles.addAll(server.world.projectiles);
+        //server.world.projectiles;
         Iterator<Projectile> i= projectiles.iterator();
         while (i.hasNext()) {
             Projectile p = i.next();

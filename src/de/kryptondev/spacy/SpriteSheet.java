@@ -67,13 +67,17 @@ public class SpriteSheet {
     }
     
     public void draw(String name, float x, float y) {
-        if(!subTextures.containsKey(name))
+        if(!subTextures.containsKey(name)) {
+            System.out.println("Failed to find texture " + name);
             return;
+        }
         
         Rectangle bounds = subTextures.get(name);
         
         i.draw(x, y, x + bounds.getWidth(), y + bounds.getHeight(), 
-                bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
+                bounds.getX(), bounds.getY(), 
+                bounds.getX() + bounds.getWidth(), 
+                bounds.getY() + bounds.getHeight());
     }
     
     private class SubTexture {
