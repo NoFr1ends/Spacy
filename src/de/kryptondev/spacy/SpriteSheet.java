@@ -5,6 +5,7 @@ import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.lwjgl.util.Rectangle;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -79,7 +80,7 @@ public class SpriteSheet {
                 bounds.getX() + bounds.getWidth(), 
                 bounds.getY() + bounds.getHeight());
     }
-    
+
     private class SubTexture {
         
         private String name;

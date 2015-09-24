@@ -42,7 +42,7 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener,
     }
     
     @Override
-    public void init(GameContainer gc) {
+    public void init(GameContainer gc) {     
         Font awtFont = new Font("Arial", Font.BOLD, 20);
         font = new TrueTypeFont(awtFont, true);
         

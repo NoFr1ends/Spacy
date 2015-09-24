@@ -152,6 +152,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             }
             g.fillRect(renderPosition.x, renderPosition.y, ship.bounds.width, ship.bounds.height);*/
             //ship.image
+            
             sheet.draw(ship.image, renderPosition.x, renderPosition.y);
         }
         g.setColor(Color.yellow);
