@@ -92,8 +92,6 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             background = new Image(width, height);
             g.copyArea(background,0,0);                
             g.destroy();
-
-            System.out.println("Done.");
             
         } catch (SlickException ex) {
             Logger.getLogger(GameScreen.class.getName()).log(Level.SEVERE, null, ex);
@@ -115,6 +113,10 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             this.viewPortCenter = shipPos;
             this.viewPort.x = viewPortCenter.x - (this.viewPort.width / 2);
             this.viewPort.y = viewPortCenter.y - (this.viewPort.height / 2);
+        }
+        
+        for(Projectile p: spacyClient.getWorld().projectiles) {
+            p.move();
         }
         
         //TODO: Edit local "smooth" movements
@@ -203,7 +205,6 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             Vector2f pos = MouseInputManager.getInstance().getPosition();//.scale(zoom);          
             SpacyClient.getInstance().getShip().rotateToMouse(pos);
             SpacyClient.getInstance().getClient().sendTCP(new PlayerRotate(SpacyClient.instance.getShip().direction));
-
         }
         
     }
