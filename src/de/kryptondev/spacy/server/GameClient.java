@@ -52,6 +52,7 @@ public class GameClient extends Listener {
             s.position = new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);
             s.acceleration = 2f;
             s.maxSpeed = 5f;
+            s.image = "playerShip1_blue.png"; // todo change for teams etc
             spacyServer.world.ships.add(s);
             return s;
         }

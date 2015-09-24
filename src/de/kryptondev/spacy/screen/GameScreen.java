@@ -41,6 +41,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private final Random rand;
     private final int maxBackgroundLayers = 3;
     
+    private SpriteSheet sheet;
+    
     public GameScreen(IScreen prevScreen, SpacyClient spacyClient) {
        //TODO Disable prevScreen
         this.spacyClient = spacyClient;
@@ -63,6 +65,9 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         gc.setAlwaysRender(true);
         //DEBUG!!!
         gc.setVSync(true);
+        
+        // Load main sprite sheet
+        sheet = new SpriteSheet("data/sheet.xml");
         
         try {
             
@@ -138,10 +143,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         for(Ship ship : ships){            
             Vector2f renderPosition = ship.getRenderPos();
             
-            if(ship.id == this.myShip.id){
+            /*if(ship.id == this.myShip.id){
                g.setColor(Color.green);
             }
-            g.fillRect(renderPosition.x, renderPosition.y, ship.bounds.width, ship.bounds.height);
+            g.fillRect(renderPosition.x, renderPosition.y, ship.bounds.width, ship.bounds.height);*/
+            //ship.image
+            sheet.draw(ship.image, renderPosition.x, renderPosition.y);
         }
         g.setColor(Color.yellow);
         CopyOnWriteArrayList<Projectile> pros = new CopyOnWriteArrayList<>( spacyClient.getWorld().projectiles);
