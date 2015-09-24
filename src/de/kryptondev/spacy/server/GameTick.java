@@ -1,6 +1,7 @@
 package de.kryptondev.spacy.server;
 
 import com.esotericsoftware.kryonet.Connection;
+import de.kryptondev.spacy.data.EMoving;
 import de.kryptondev.spacy.data.Projectile;
 import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.server.GameClient.SGameClient;
@@ -27,9 +28,8 @@ public class GameTick implements Runnable{
             SGameClient gc = (SGameClient)c;
             Ship ship = gc.getMyShip();
             if(ship != null)
-                if(ship.isMoving){
+                if(ship.moving != EMoving.Stopped)
                     ship.move();
-                }            
         }
         
         

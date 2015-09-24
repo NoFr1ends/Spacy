@@ -6,6 +6,7 @@ import org.newdawn.slick.geom.Vector2f;
 public abstract class Entity {
 
     public boolean isMoving;
+    public EMoving moving;
     public Vector2f direction;
     public Vector2f position;
     public float speed = 10f;
@@ -30,9 +31,8 @@ public abstract class Entity {
             this.speed = (this.acceleration * this.speed + 1);//Lineare Beschleunigung, können aber auch was anderes nehmen.
         } else {
             this.speed = this.maxSpeed;
-           
+            moving = EMoving.FullSpeed;
         }
-
     }
     /*Der Abbremsvorgang. Mal sehen wo wir das einbauen*/
     public void decelerate() {
@@ -40,17 +40,19 @@ public abstract class Entity {
             this.speed = ((1/this.acceleration) * this.speed - 1);//Lineare Bremskraft, können aber auch was anderes nehmen.
         } else {
             this.speed = 0;
-        
+            moving = EMoving.Stopped;
         }
 
     }
     public void move() {
         //Theoretisch kann die Verzweigung weggelassen werden.
         //Die Frage ist ob eine Verzweigung performanter ist als ein unnötiger Methodenaufruf.
-        if (speed < maxSpeed & this.isMoving) {
+        System.out.println(Float.toString(speed) + "-" + Float.toString(maxSpeed));
+        
+        if (moving == EMoving.Accelerating) {
             this.accelerate();
         }
-        if(speed > 0 & !this.isMoving){
+        if(moving == EMoving.Deccelerating){
             this.decelerate();
         }
         Vector2f newPosition = new Vector2f();

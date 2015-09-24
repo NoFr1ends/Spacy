@@ -1,6 +1,7 @@
 package de.kryptondev.spacy.server;
 
 import com.esotericsoftware.kryonet.*;
+import de.kryptondev.spacy.data.EMoving;
 import de.kryptondev.spacy.data.Projectile;
 import de.kryptondev.spacy.data.Rect;
 import de.kryptondev.spacy.data.Ship;
@@ -50,8 +51,8 @@ public class GameClient extends Listener {
             Ship s = new Ship();
             Random r = new Random();
             s.position = new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);
-            s.acceleration = 2f;
-            s.maxSpeed = 5f;
+            s.maxSpeed = 80f;
+            s.acceleration = 1.2f;
             spacyServer.world.ships.add(s);
             return s;
         }
@@ -108,8 +109,11 @@ public class GameClient extends Listener {
                 return;
             }
             if(data instanceof Move){
-                Move move = (Move)data;                    
-                this.getMyShip().isMoving = move.status;
+                Move move = (Move)data;
+                if(move.status)
+                    this.getMyShip().moving = EMoving.Accelerating;
+                else
+                    this.getMyShip().moving = EMoving.Deccelerating;
                 return;
             }
             if(data instanceof PlayerRotate){

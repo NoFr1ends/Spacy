@@ -22,6 +22,7 @@ public class KryoRegisterer {
         k.register(HashMap.class); 
         k.register(java.util.ArrayList.class);
         k.register(CopyOnWriteArrayList.class);
+        k.register(EMoving.class);
         
         k.register(Rect.class);
         k.register(Vector2f.class);         
