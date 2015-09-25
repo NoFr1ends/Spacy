@@ -59,9 +59,10 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         MouseInputManager.getInstance().registerListener("Fire", Input.MOUSE_LEFT_BUTTON, this);       
         MouseInputManager.getInstance().registerListener("Throttle", Input.MOUSE_RIGHT_BUTTON, this);
         KeyInputManager.getInstance().registerListener("Throttle", Input.KEY_SPACE, this);
-        KeyInputManager.getInstance().registerListener("Zoom In", Input.KEY_ADD, this);
-        KeyInputManager.getInstance().registerListener("Zoom Out", Input.KEY_SUBTRACT, this);
-       
+
+        Random r = new Random();
+        gc.setAlwaysRender(true);
+
         gc.setAlwaysRender(true);
         //DEBUG!!!
         gc.setVSync(true);
@@ -75,6 +76,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             int height = gc.getHeight();      
            
             viewPort = new Rect(0, 0, width, height);
+
             
 
             Graphics g = new Graphics(width, height);
@@ -230,12 +232,15 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     public void onButtonPressed(int button) {
         //Rotate
         Vector2f pos = MouseInputManager.getInstance().getPosition();
+
         SpacyClient.getInstance().getShip().direction = new Vector2f(pos).sub(new Vector2f(viewPort.width / 2, viewPort.height / 2)).normalise();
         SpacyClient.getInstance().getClient().sendTCP(new PlayerRotate(SpacyClient.instance.getShip().direction));
+
         //Move
         if(button == 1){
             SpacyClient.getInstance().getClient().sendTCP(new Move(true));
             System.out.println("Start moving");
+          
         }
         //Fire
         if(button == 0){
@@ -247,7 +252,15 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         
     }
 
-   
+
+    public Rect getViewPort() {
+        return viewPort;
+    }
+
+    public void setViewPort(Rect viewPort) {
+        this.viewPort = viewPort;
+    }
+
 
     public Ship getMyShip() {
         return myShip;
