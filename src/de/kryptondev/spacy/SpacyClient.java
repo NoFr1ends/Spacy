@@ -23,7 +23,7 @@ public class SpacyClient extends Listener{
     private int timeout = 2500;
     public static final Version clientVersion = new Version(1, 0, 0);
     private PlayerInfo info;
-    private World world;
+    private World world = new World();
     private long shipId;
     
     public SpacyClient() {
