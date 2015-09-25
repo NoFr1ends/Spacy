@@ -7,6 +7,7 @@ import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.server.GameClient.SGameClient;
 import de.kryptondev.spacy.share.DeleteEntity;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -55,9 +56,16 @@ public class GameTick implements Runnable{
     @Override
     public void run() {
         while(true){
-            try {               
+            try {        
+                long start = new Date().getTime();
                 onTick();
-                Thread.sleep(1000 / ticksPerSecond);             
+                long end = new Date().getTime();
+                long time = end - start;
+                if(time > 1000 / ticksPerSecond){
+                    System.err.println("Server can't keep up! Are you running on slow device?");
+                    continue;
+                }
+                Thread.sleep((1000 / ticksPerSecond) - time);             
           
             } catch (InterruptedException ex) {
                 return;
