@@ -12,6 +12,7 @@ import de.kryptondev.spacy.helper.UID;
 
 import de.kryptondev.spacy.screen.GameScreen;
 import de.kryptondev.spacy.screen.ScreenManager;
+import java.lang.reflect.Field;
 
 
 public class SpacyClient extends Listener{
@@ -22,7 +23,7 @@ public class SpacyClient extends Listener{
     private int timeout = 2500;
     public static final Version clientVersion = new Version(1, 0, 0);
     private PlayerInfo info;
-    private World world;
+    private World world = new World();
     private long shipId;
     
     public SpacyClient() {
@@ -61,7 +62,23 @@ public class SpacyClient extends Listener{
         this.client.sendTCP(msg);
     }
 
+    private void logPacket(Object o) {
+        System.out.print("Recv: " + o.getClass().getSimpleName() + "(");
+        
+        for(Field f: o.getClass().getFields()) {
+            try {
+                System.out.print(f.getName() + "=" + f.get(o) + " ");
+            } catch(Exception e) {
+                System.out.print(f.getName() + "=error ");
+            }
+        }
+        
+        System.out.println(")");
+    }
+    
     private void onRecv(Connection cnctn, Object o) {
+        logPacket(o);
+        
         if (o instanceof ConnectionAttemptResponse) {
             //Antwort auswerten
             ConnectionAttemptResponse response = (ConnectionAttemptResponse) o;
@@ -77,18 +94,30 @@ public class SpacyClient extends Listener{
                 return;
             }
 
-        }      
-        if(o instanceof World){
-            this.world=(World) o;
-            return;
+        }     
+        
+        if(o instanceof ChunkedShip){
+            this.world.ships.addAll(((ChunkedShip)o).ships);         
         }
+        
+        if(o instanceof ChunkedEntity){
+            this.world.entities.addAll(((ChunkedEntity)o).entities);         
+        }
+        
+         if(o instanceof ChunkedProjectiles){
+            this.world.projectiles.addAll(((ChunkedProjectiles)o).projectiles);         
+        }
+         
         if(o instanceof Ship){
             Ship s = (Ship)o;
               
             if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
                 GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
                 game.setMyShip(s);
+                shipId = s.id;
             }
+            
+            world.ships.add(s);
             //SPAWNED
             //setShip(s);
             return;

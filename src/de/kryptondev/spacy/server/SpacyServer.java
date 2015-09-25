@@ -1,12 +1,16 @@
 package de.kryptondev.spacy.server;
 
+import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import de.kryptondev.spacy.data.Entity;
+import de.kryptondev.spacy.data.Projectile;
+import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.data.World;
 import de.kryptondev.spacy.helper.KryoRegisterer;
-import de.kryptondev.spacy.share.ConnectionAttemptResponse;
-import de.kryptondev.spacy.share.Version;
+import de.kryptondev.spacy.server.GameClient.SGameClient;
+import de.kryptondev.spacy.share.*;
 import java.util.ArrayList;
 
 public class SpacyServer extends Listener {
@@ -56,6 +60,46 @@ public class SpacyServer extends Listener {
     public SpacyServer() {
         stdConstr();
     }
+    
+    public void sendWorld(SGameClient client){
+        int splitSize= 8;
+        int count = 0;
+        ArrayList<Ship> tmpShip = new ArrayList<>(8);
+        for(Ship ship : (ArrayList<Ship>)this.world.ships.clone()){
+            tmpShip.add(ship);
+            count++;
+            if(count > splitSize){
+                client.sendTCP(new ChunkedShip(tmpShip));
+                tmpShip.clear();
+                count = 0;
+            }
+            
+        }
+        
+       ArrayList<Projectile> tmpProjectiles = new ArrayList<>(8);
+        for(Projectile p : (ArrayList<Projectile>)this.world.projectiles.clone()){
+            tmpProjectiles.add(p);
+            count++;
+            if(count > splitSize){
+                client.sendTCP(new ChunkedProjectiles(tmpProjectiles));
+                tmpProjectiles.clear();
+                count = 0;
+            }
+            
+        }
+        
+        ArrayList<Entity> tmpEntity = new ArrayList<>(8);
+        for(Entity e : (ArrayList<Entity>)this.world.entities.clone()){
+            tmpEntity.add(e);
+            count++;
+            if(count > splitSize){
+                client.sendTCP(new ChunkedEntity(tmpEntity));
+                tmpEntity.clear();
+                count = 0;
+            }
+            
+        }
+    }
 
     public SpacyServer(int maxSlots) {
         if (maxSlots > 0) {
@@ -83,7 +127,7 @@ public class SpacyServer extends Listener {
 
     public boolean start() {
         try {
-            KryoRegisterer.registerAll(server.getKryo());
+            KryoRegisterer.registerAll(server.getKryo()); 
             server.addListener(this);
             server.bind(port,broadcastPort);
             new Thread(server).start();       

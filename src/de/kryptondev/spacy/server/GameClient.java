@@ -1,6 +1,7 @@
 package de.kryptondev.spacy.server;
 
 import com.esotericsoftware.kryonet.*;
+import de.kryptondev.spacy.data.EMoving;
 import de.kryptondev.spacy.data.Projectile;
 import de.kryptondev.spacy.data.Rect;
 import de.kryptondev.spacy.data.Ship;
@@ -42,6 +43,7 @@ public class GameClient extends Listener {
         
         
         
+        
         /**
         * Neues Schiff mit Standartwerten erstellen und zur Welt hinzufügen.
         * @return das neue Schiff
@@ -50,8 +52,9 @@ public class GameClient extends Listener {
             Ship s = new Ship();
             Random r = new Random();
             s.position = new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);
-            s.acceleration = 2f;
-            s.maxSpeed = 5f;
+            s.maxSpeed = 80f;
+            s.acceleration = 1.2f;
+            s.image = "playerShip1_blue.png"; // todo change for teams etc
             spacyServer.world.ships.add(s);
             return s;
         }
@@ -62,10 +65,10 @@ public class GameClient extends Listener {
                 return;
             }
             //GameClient.this.spacyServer.broadcast(new Chatmessage(GameClient.this.getPlayerInfo().playerName + " joined the party!"));
-            GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.toString() + " connected right now!");
+            //GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.toString() + " connected right now!");
             this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.OK));
 
-            this.sendTCP(spacyServer.world);
+            this.spacyServer.sendWorld(this);
             Ship s = this.addShip();
             s.id = spacyServer.EntityCounter++;
             this.shipId = s.id;
@@ -108,8 +111,11 @@ public class GameClient extends Listener {
                 return;
             }
             if(data instanceof Move){
-                Move move = (Move)data;                    
-                this.getMyShip().isMoving = move.status;
+                Move move = (Move)data;
+                if(move.status)
+                    this.getMyShip().moving = EMoving.Accelerating;
+                else
+                    this.getMyShip().moving = EMoving.Deccelerating;
                 return;
             }
             if(data instanceof PlayerRotate){
@@ -120,10 +126,10 @@ public class GameClient extends Listener {
             if(data instanceof Projectile){               
                 //Fire
                 Projectile p = (Projectile)data;
-                p.setLifeTime(5);
+                p.setLifeTime(3.0f);
                 p.isMoving = true;
                 p.acceleration = Float.POSITIVE_INFINITY;
-                p.maxSpeed = 30;
+                p.maxSpeed = 50;
                 p.visible = true;
                 p.position = this.getMyShip().position;
                 p.direction = this.getMyShip().direction;

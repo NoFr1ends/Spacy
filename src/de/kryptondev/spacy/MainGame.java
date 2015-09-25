@@ -49,6 +49,8 @@ public class MainGame extends BasicGame {
             
             AppGameContainer gc = new AppGameContainer(new MainGame());
             gc.setDisplayMode(800, 600, false);
+            //gc.setDisplayMode(1366, 768, true);
+
             gc.start();
         } catch (Exception e) {
             e.printStackTrace();
