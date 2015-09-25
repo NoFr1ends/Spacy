@@ -1,9 +1,10 @@
 package de.kryptondev.spacy.data;
 
+import de.kryptondev.spacy.share.NetworkPackage;
 import org.newdawn.slick.geom.Rectangle;
 
 
-public class Rect {
+public class Rect extends NetworkPackage{
     public float x;
     public float y;
     public float width;

@@ -1,6 +1,9 @@
 
 package de.kryptondev.spacy.data;
-public class Effect {
+
+import de.kryptondev.spacy.share.NetworkPackage;
+
+public class Effect extends NetworkPackage{
     public String modifiedValue;
     public float modifier;
     public int duration;

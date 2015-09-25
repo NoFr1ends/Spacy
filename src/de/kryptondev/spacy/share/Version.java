@@ -1,7 +1,7 @@
 package de.kryptondev.spacy.share;
 
 
-public class Version {
+public class Version extends NetworkPackage {
 
     public Version(int major, int minor, int bugfix) {
         this.major = major;

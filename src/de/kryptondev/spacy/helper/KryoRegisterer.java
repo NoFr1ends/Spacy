@@ -26,6 +26,8 @@ public class KryoRegisterer {
         k.register(CopyOnWriteArrayList.class);
         k.register(EMoving.class);
         
+        k.register(NetworkPackage.class);
+        
         k.register(ChunkedEntity.class);        
         k.register(ChunkedShip.class);        
         k.register(ChunkedProjectiles.class);        

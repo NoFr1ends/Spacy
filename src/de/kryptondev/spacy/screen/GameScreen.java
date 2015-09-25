@@ -162,6 +162,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             g.fillRect(renderPosition.x, renderPosition.y, p.bounds.width, p.bounds.height);
         }        
         
+        g.resetTransform();
+        g.drawString("Ping: " + spacyClient.getTimeOffset() * 10, 0, 100);
         
         
     }

@@ -1,7 +1,7 @@
 package de.kryptondev.spacy.share;
 
 
-public class Move {  
+public class Move  extends NetworkPackage {  
     public boolean status;
 
     public Move() {

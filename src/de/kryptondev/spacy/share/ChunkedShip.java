@@ -4,7 +4,7 @@ import de.kryptondev.spacy.data.Ship;
 import java.util.ArrayList;
 
 
-public class ChunkedShip {
+public class ChunkedShip  extends NetworkPackage {
     public ArrayList<Ship> ships;
 
     public ChunkedShip() {

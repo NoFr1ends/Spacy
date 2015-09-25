@@ -13,6 +13,7 @@ import de.kryptondev.spacy.helper.UID;
 import de.kryptondev.spacy.screen.GameScreen;
 import de.kryptondev.spacy.screen.ScreenManager;
 import java.lang.reflect.Field;
+import java.util.Date;
 
 
 public class SpacyClient extends Listener{
@@ -25,6 +26,7 @@ public class SpacyClient extends Listener{
     private PlayerInfo info;
     private World world = new World();
     private long shipId;
+    private volatile long timeOffset = -1;
     
     public SpacyClient() {
         this.info = new PlayerInfo();
@@ -78,12 +80,14 @@ public class SpacyClient extends Listener{
     
     private void onRecv(Connection cnctn, Object o) {
         logPacket(o);
+        this.timeOffset = System.currentTimeMillis() - ((NetworkPackage)o).time;
         
         if (o instanceof ConnectionAttemptResponse) {
             //Antwort auswerten
             ConnectionAttemptResponse response = (ConnectionAttemptResponse) o;
             if (response.type == ConnectionAttemptResponse.Type.OK) {
-                   if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
+                    
+                    if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
                         GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
                         game.onConnected();
                     }
@@ -214,6 +218,19 @@ public class SpacyClient extends Listener{
     public void setClient(Client client) {
         this.client = client;
     }
+
+    public int getPort() {
+        return port;
+    }
+
+    public long getShipId() {
+        return shipId;
+    }
+
+    public long getTimeOffset() {
+        return timeOffset;
+    }
+    
     
     
 }

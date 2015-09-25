@@ -1,7 +1,7 @@
 package de.kryptondev.spacy.share;
 
 
-public class ConnectionAttemptResponse {
+public class ConnectionAttemptResponse extends NetworkPackage  {
 
     public ConnectionAttemptResponse() {
     }

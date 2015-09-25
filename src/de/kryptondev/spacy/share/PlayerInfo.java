@@ -1,6 +1,6 @@
 package de.kryptondev.spacy.share;
 
-public class PlayerInfo {
+public class PlayerInfo extends NetworkPackage {
     public String OS;
     public String playerName;   
     public byte[] playerUID;

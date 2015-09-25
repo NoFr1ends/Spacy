@@ -1,6 +1,6 @@
 package de.kryptondev.spacy.share;
 
-public class DeleteEntity {
+public class DeleteEntity extends NetworkPackage  {
 
     public long vid;
 

@@ -4,7 +4,7 @@ import de.kryptondev.spacy.data.Entity;
 import java.util.ArrayList;
 
 
-public class ChunkedEntity {
+public class ChunkedEntity  extends NetworkPackage {
     public ArrayList<Entity> entities;
 
     public ChunkedEntity() {

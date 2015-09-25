@@ -1,7 +1,9 @@
 package de.kryptondev.spacy.share;
 
-
-public class PlayerConnectionEvent {
+/**
+ * Client referenziert auf die "time" in NetworkPackage 
+ */
+public class PlayerConnectionEvent extends NetworkPackage  {
     public enum Type{
         Connected,
         Disconnected

@@ -1,9 +1,10 @@
 package de.kryptondev.spacy.data;
 
 import de.kryptondev.spacy.share.Move;
+import de.kryptondev.spacy.share.NetworkPackage;
 import org.newdawn.slick.geom.Vector2f;
 
-public abstract class Entity {
+public abstract class Entity extends NetworkPackage {
 
     public boolean isMoving;
     public EMoving moving;

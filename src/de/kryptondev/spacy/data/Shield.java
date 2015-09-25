@@ -1,7 +1,9 @@
 package de.kryptondev.spacy.data;
 
+import de.kryptondev.spacy.share.NetworkPackage;
 
-public class Shield {
+
+public class Shield extends NetworkPackage{
     private DamageType resistance;
     private int life;
 
