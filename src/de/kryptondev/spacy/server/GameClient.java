@@ -43,6 +43,7 @@ public class GameClient extends Listener {
         
         
         
+        
         /**
         * Neues Schiff mit Standartwerten erstellen und zur Welt hinzufügen.
         * @return das neue Schiff
@@ -67,7 +68,7 @@ public class GameClient extends Listener {
             //GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.toString() + " connected right now!");
             this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.OK));
 
-            this.sendTCP(spacyServer.world);
+            this.spacyServer.sendWorld(this);
             Ship s = this.addShip();
             s.id = spacyServer.EntityCounter++;
             this.shipId = s.id;

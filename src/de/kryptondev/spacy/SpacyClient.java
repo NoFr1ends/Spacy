@@ -94,11 +94,20 @@ public class SpacyClient extends Listener{
                 return;
             }
 
-        }      
-        if(o instanceof World){
-            this.world=(World) o;
-            return;
+        }     
+        
+        if(o instanceof ChunkedShip){
+            this.world.ships.addAll(((ChunkedShip)o).ships);         
         }
+        
+        if(o instanceof ChunkedEntity){
+            this.world.entities.addAll(((ChunkedEntity)o).entities);         
+        }
+        
+         if(o instanceof ChunkedProjectiles){
+            this.world.projectiles.addAll(((ChunkedProjectiles)o).projectiles);         
+        }
+         
         if(o instanceof Ship){
             Ship s = (Ship)o;
               
