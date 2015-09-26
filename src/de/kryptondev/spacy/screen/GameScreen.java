@@ -41,7 +41,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private final Random rand;
     private final int maxBackgroundLayers = 3;
     
+    //Der letzte Zeitpunkt, andem das PlayerRotate-Paket gesendet wurde.
+    private long timeLastPlayerRotate = 0;
+    //Zeit (Ticks) die gewartet wird, bis das nächste PlayerRotate-Paket gesendet wird. 
+    private long sendFreq = 100;
     private SpriteSheet sheet;
+    private boolean moving;
     
     public GameScreen(IScreen prevScreen, SpacyClient spacyClient) {
        //TODO Disable prevScreen
@@ -217,9 +222,11 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     @Override
     public void onButtonDown(int button) {
         if(button == 1){
-            Vector2f pos = MouseInputManager.getInstance().getPosition();//.scale(zoom);          
-            SpacyClient.getInstance().getShip().direction = new Vector2f(pos).sub(new Vector2f(viewPort.width / 2, viewPort.height / 2)).normalise();
-            SpacyClient.getInstance().getClient().sendTCP(new PlayerRotate(SpacyClient.instance.getShip().direction));
+            if(timeLastPlayerRotate + sendFreq >= System.currentTimeMillis()){
+                Vector2f pos = MouseInputManager.getInstance().getPosition();
+                SpacyClient.getInstance().getShip().direction = new Vector2f(pos).sub(new Vector2f(viewPort.width / 2, viewPort.height / 2)).normalise();            
+                SpacyClient.getInstance().getClient().sendTCP(new PlayerRotate(SpacyClient.instance.getShip().direction));
+            }
         }
         
     }
@@ -230,6 +237,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         if(button == 1){
             SpacyClient.getInstance().getClient().sendTCP(new Move(false));
             System.out.println("Stop moving");
+            moving = false;
         }
     }
 
@@ -245,7 +253,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         if(button == 1){
             SpacyClient.getInstance().getClient().sendTCP(new Move(true));
             System.out.println("Start moving");
-          
+            moving = true;
         }
         //Fire
         if(button == 0){
