@@ -67,10 +67,6 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
 
         Random r = new Random();
         gc.setAlwaysRender(true);
-
-        gc.setAlwaysRender(true);
-        //DEBUG!!!
-        gc.setVSync(true);
         
         // Load main sprite sheet
         sheet = new SpriteSheet("data/sheet.xml");

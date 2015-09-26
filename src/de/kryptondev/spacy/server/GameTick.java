@@ -55,7 +55,7 @@ public class GameTick implements Runnable{
                 System.out.println("Projectile @ " + p.position.x + ", " + p.position.y);
                 System.out.println("Ship @ " + ship.position.x + ", " + ship.position.y);
                 */
-                if( ship.id != p.senderId && p.position.distance(ship.position) - ship.boundsRadius - p.boundsRadius <= 0){
+                if( ship.id != p.senderId && p.position.distance(ship.position) - ship.boundsRadius - p.boundsRadius - p.damagerange <= 0){
                     ship.hit(p);
                     server.getServer().sendToAllTCP(new OnHit(ship.id, p.senderId, p.id));
                     //Zu wenig HP + Shield?
