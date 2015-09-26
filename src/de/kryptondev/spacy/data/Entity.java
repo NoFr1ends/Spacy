@@ -49,7 +49,7 @@ public abstract class Entity {
         }
 
     }
-    public void move() {
+    public void move(int delta) {
         //Theoretisch kann die Verzweigung weggelassen werden.
         //Die Frage ist ob eine Verzweigung performanter ist als ein unnötiger Methodenaufruf.
         //System.out.println(Float.toString(speed) + "-" + Float.toString(maxSpeed));
@@ -61,8 +61,8 @@ public abstract class Entity {
             this.decelerate();
         }
         Vector2f newPosition = new Vector2f();
-        newPosition.x = position.x + (direction.x * speed);
-        newPosition.y = position.y + (direction.y * speed);
+        newPosition.x = position.x + (direction.x * speed) * (delta / 16f);
+        newPosition.y = position.y + (direction.y * speed) * (delta / 16f);
         position = newPosition;
     }
 

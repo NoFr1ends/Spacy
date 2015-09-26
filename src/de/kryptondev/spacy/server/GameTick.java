@@ -21,13 +21,13 @@ public class GameTick implements Runnable{
         this.server = server;
     }
 
-    private void onTick(){       
+    private void onTick(int delta){       
         for(Connection c : (Connection[])server.getServer().getConnections().clone()) {            
             SGameClient gc = (SGameClient)c;
             Ship ship = gc.getMyShip();
             if(ship != null)
                 if(ship.moving != EMoving.Stopped)
-                    ship.move();
+                    ship.move(delta);
         }
   
         
@@ -47,7 +47,7 @@ public class GameTick implements Runnable{
                 p.remainingLifetime--;
             }
             
-            p.move();
+            p.move(delta);
             for(Connection c : (Connection[])server.getServer().getConnections().clone()) { 
                 SGameClient gc = (SGameClient)c;
                 Ship ship = gc.getMyShip();
@@ -77,18 +77,22 @@ public class GameTick implements Runnable{
 
     @Override
     public void run() {
+        int delta = 0;
         while(true){
             try {        
                 long start = new Date().getTime();
-                onTick();
+                onTick(delta);
                 long end = new Date().getTime();
-                long time = end - start;
+                int time = (int)(end - start);                
                 if(time > 1000 / ticksPerSecond){
                     System.err.println("Server can't keep up! Are you running on slow device?");
                     continue;
                 }
-                Thread.sleep((1000 / ticksPerSecond) - time);             
-          
+                Thread.sleep((1000 / ticksPerSecond) - time);           
+                long finalEnd = new Date().getTime();
+                
+                delta = (int)(finalEnd - start);
+                System.out.println("Tickdelta is: " + delta);
             } catch (InterruptedException ex) {
                 return;
             }

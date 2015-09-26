@@ -108,7 +108,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         
         
         for(Entity e: (ArrayList<Entity>)spacyClient.getWorld().getAllEntities()) {
-            e.move();
+            e.move(delta);
         }
        
         
