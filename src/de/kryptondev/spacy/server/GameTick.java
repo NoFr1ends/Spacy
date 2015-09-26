@@ -24,19 +24,18 @@ public class GameTick implements Runnable{
     }
 
     private void onTick(){       
-        //TODO: Check for collisions
-        for(Connection c : server.getServer().getConnections()) {            
+        for(Connection c : (Connection[])server.getServer().getConnections().clone()) {            
             SGameClient gc = (SGameClient)c;
             Ship ship = gc.getMyShip();
             if(ship != null)
                 if(ship.moving != EMoving.Stopped)
                     ship.move();
         }
+  
         
         
         List<Projectile> projectiles = new ArrayList<>();
         projectiles.addAll(server.world.projectiles);
-        //server.world.projectiles;
         Iterator<Projectile> i= projectiles.iterator();
         while (i.hasNext()) {
             Projectile p = i.next();
@@ -49,9 +48,15 @@ public class GameTick implements Runnable{
             else{
                 p.remainingLifetime--;
             }
+            
+            for(Ship ship : server.world.ships){
+                if(p.position.distance(ship.position) - ship.boundsRadius - p.boundsRadius <= 0){
+                    ship.hit(p);
+                }
+            }
 
             if(p.isMoving){
-              p.move();
+                p.move();
             }
          }
     }

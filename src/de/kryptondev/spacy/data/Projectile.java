@@ -15,6 +15,7 @@ public class Projectile extends Entity {
     public long senderId;
     
     public Projectile() {
+        
     }
 
     public Projectile(long senderId, Vector2f direction, Vector2f position) {

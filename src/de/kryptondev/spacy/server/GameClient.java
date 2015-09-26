@@ -55,6 +55,7 @@ public class GameClient extends Listener {
             s.maxSpeed = 80f;
             s.acceleration = 1.2f;
             s.image = "playerShip1_blue.png"; // todo change for teams etc
+            s.boundsRadius = 10f;
             spacyServer.world.ships.add(s);
             return s;
         }
@@ -134,7 +135,7 @@ public class GameClient extends Listener {
                 p.position = this.getMyShip().position;
                 p.direction = this.getMyShip().direction;
                 p.id = SpacyServer.instance.EntityCounter++;
-                p.bounds = new Rect(0,0,20,20);
+                p.boundsRadius = 10f;
                 SpacyServer.instance.world.projectiles.add(p);
                 SpacyServer.instance.getServer().sendToAllTCP(p);
             }

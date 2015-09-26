@@ -12,7 +12,11 @@ public abstract class Entity {
     public float speed = 10f;
     public float acceleration = 2f; //nötig? Carl:Ja! aber mehr als 0 ;-)
     public float maxSpeed = 100f;
+    public float boundsRadius = 0f;
+    
+    @Deprecated
     public Rect bounds;
+    
     public long id;
 
     public String image;

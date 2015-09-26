@@ -1,7 +1,6 @@
 package de.kryptondev.spacy.data;
 
 import de.kryptondev.spacy.share.PlayerInfo;
-import de.kryptondev.spacy.share.Move;
 import org.newdawn.slick.geom.Vector2f;
 
 
@@ -14,27 +13,15 @@ public class Ship extends Entity implements IHittable {
     public int hp = 100;
     public int maxHp = 100;
 
-    public Ship(Vector2f position, Vector2f direction, float speed, Rect bounds, Weapon activeWeapon, String image, Shield shield) {
-        this.position = position;
-        this.direction = direction;
-        this.speed = speed;
-        this.bounds = bounds;
-        this.activeWeapon = activeWeapon;
-        this.image = image;
-        this.shield = shield;
-    }
-
     public Ship() {
         this.position = new Vector2f(0, 0);
         this.direction = new Vector2f(0, 0);
         this.speed = 0;
-        this.maxSpeed = 20;
-        this.bounds = new Rect(0, 0, 99, 75);
+        this.maxSpeed = 20;           
+        this.boundsRadius = 43.5f;
         this.activeWeapon = new Weapon();
         this.image = "";
         this.shield = new Shield();
-        
-        //SpacyMath.Acceleration
     }
 
     @Override
