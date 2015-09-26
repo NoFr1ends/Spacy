@@ -83,7 +83,7 @@ public abstract class Entity {
         this.direction = newDirection.normalise(); //durch .normalise() erhält der Vector die Länge 1.
     }
 
-    public Vector2f getRenderPos() {
+    public Vector2f getCenteredRenderPos() {
         if(textureBounds == null){
             float r = boundsRadius;
             return new Vector2f(position).sub(new Vector2f(r,r));
@@ -93,6 +93,17 @@ public abstract class Entity {
             return new Vector2f(position).sub(new Vector2f((textureBounds.x) / 2, (textureBounds.y) / 2));
         }
         
+    }
+    
+    public Vector2f getBulletRenderPos(){
+        if(textureBounds == null){
+            float r = boundsRadius;
+            return new Vector2f(position).sub(new Vector2f(r,0));
+        }
+        else
+        {
+            return new Vector2f(position).sub(new Vector2f((textureBounds.x) / 2, 0));
+        }
     }
     
     public Vector2f getBounds(){

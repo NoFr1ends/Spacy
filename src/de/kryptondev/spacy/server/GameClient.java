@@ -32,7 +32,6 @@ public class GameClient extends Listener {
         private SpacyServer spacyServer;
         private GameClient gameClient;
         private long shipId;
-        
         public SGameClient(SpacyServer server, GameClient gc) {
             this.gameClient = gc;
             this.spacyServer = server;
@@ -127,16 +126,18 @@ public class GameClient extends Listener {
             if(data instanceof Projectile){               
                 //Fire
                 Projectile p = (Projectile)data;
-                p.setLifeTime(3.0f);
+                p.setLifeTime(2.5f);
                 p.acceleration = Float.POSITIVE_INFINITY;
                 p.maxSpeed = 50;
                 p.visible = true;
                 p.position = this.getMyShip().position;
                 p.direction = this.getMyShip().direction;
                 p.id = SpacyServer.instance.EntityCounter++;
-                p.boundsRadius = 10f;
+                p.boundsRadius = 4.5f;
                 p.damage = 100;
                 p.moving = EMoving.FullSpeed;
+                p.texture ="laserRed01.png";
+                System.out.println(p.texture);
                 SpacyServer.instance.world.projectiles.add(p);
                 SpacyServer.instance.getServer().sendToAllTCP(p);
             }
