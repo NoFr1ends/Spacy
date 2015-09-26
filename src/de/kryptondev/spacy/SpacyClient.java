@@ -86,6 +86,7 @@ public class SpacyClient extends Listener{
             if(this.world.ships.containsKey(r.ship)){
                 Ship s = this.world.ships.get(r.ship);
                 s.direction = r.direction;
+                this.world.ships.replace(shipId, s);
             }
         }
         
@@ -144,6 +145,19 @@ public class SpacyClient extends Listener{
             DebugTickDelta delta = ((DebugTickDelta)o);
             this.serverTickDelta = delta.tickDelta;
             this.serverTicksPerSecond = delta.ticksPerSecond;
+        }
+        
+        if(o instanceof DeleteEntity){
+            DeleteEntity entity = (DeleteEntity)o;
+            if(world.projectiles.containsKey(entity.vid)) {
+                world.projectiles.remove(entity.vid);
+            }
+            else if(world.ships.containsKey(entity.vid)) {
+                world.ships.remove(entity.vid);
+            }
+            else if(world.entities.containsKey(entity.vid)) {
+                world.entities.remove(entity.vid);
+            }
         }
         
         if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){

@@ -7,6 +7,8 @@ import de.kryptondev.spacy.SpacyClient;
 import de.kryptondev.spacy.SpriteSheet;
 import de.kryptondev.spacy.input.KeyInputManager;
 import de.kryptondev.spacy.input.MouseInputManager;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import java.util.Random;
@@ -28,7 +30,7 @@ import org.newdawn.slick.geom.Vector2f;
 
 public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseInputManager.MouseListener {
     public static final org.newdawn.slick.Color BackgroundColor = new org.newdawn.slick.Color(8,8,64);
-    private SpacyClient spacyClient;
+    private SpacyClient client;
     private Image background;
     private Rect viewPort;
     private SpriteSheet spriteSheet;
@@ -41,14 +43,14 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private boolean debug = false;
     
     //Der letzte Zeitpunkt, andem das PlayerRotate-Paket gesendet wurde.
-    private long timeLastPlayerRotate = 0;
+    //private long timeLastPlayerRotate = 0;
     //Zeit (Ticks) die gewartet wird, bis das nächste PlayerRotate-Paket gesendet wird. 
-    private final long sendFreq = 100;
+    //private final long sendFreq = 100;
     private SpriteSheet sheet;
     private boolean moving;
     
     public GameScreen(IScreen prevScreen, SpacyClient spacyClient) {
-        this.spacyClient = spacyClient;
+        this.client = spacyClient;
         rand = new Random();      
     }
     
@@ -71,7 +73,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         try {       
             viewPort = new Rect(0, 0, gc.getWidth(), gc.getHeight());
                 
-            int width = this.spacyClient.getWorld().worldSize;
+            int width = this.client.getWorld().worldSize;
             int height = width;      
 
             Graphics g = new Graphics(width, height);
@@ -97,39 +99,39 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
 
     @Override
     public void update(GameContainer gc, int delta) {
-        /*for(Entity e: (ArrayList<Entity>)spacyClient.getWorld().getAllEntities()) {
-            e.move(delta);
+        try{
+            ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<>(client.getWorld().ships);
+            for(Ship ship : ships.values()){
+                ship.move(delta);
+            }
+
+
+            ConcurrentHashMap<Long, Projectile> projectiles = new ConcurrentHashMap<>(client.getWorld().projectiles);
+            for(Projectile p : projectiles.values()){
+                p.move(delta);
+            }
+
+            ConcurrentHashMap<Long, Entity> entities = new ConcurrentHashMap<>(client.getWorld().entities);
+            for(Entity e : entities.values()){
+                e.move(delta);
+            }
+
+            if(this.client.getShip() == null){
+                //Last death point?
+                //viewPortCenter = lastDeath;
+                System.err.println("MyShip is NULL");
+            }
+            else
+            {
+                Vector2f shipPos = this.client.getShip().getCenteredRenderPos();
+                //System.out.println("MyShip @ " + shipPos.x + ", " + shipPos.y);
+                this.viewPortCenter = shipPos;
+                this.viewPort.x = viewPortCenter.x - (this.viewPort.width / 2);
+                this.viewPort.y = viewPortCenter.y - (this.viewPort.height / 2);
+            }
         }
-       */
-        ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<>(spacyClient.getWorld().ships);
-        for(Ship ship : ships.values()){
-            
-            ship.move(delta);
-        }
-        
-        
-        ConcurrentHashMap<Long, Projectile> projectiles = new ConcurrentHashMap<>(spacyClient.getWorld().projectiles);
-        for(Projectile p : projectiles.values()){
-            p.move(delta);
-        }
-        
-        ConcurrentHashMap<Long, Entity> entities = new ConcurrentHashMap<>(spacyClient.getWorld().entities);
-        for(Entity e : entities.values()){
-            e.move(delta);
-        }
-        
-        if(this.spacyClient.getShip() == null){
-            //Last death point?
-            //viewPortCenter = lastDeath;
-            System.err.println("MyShip is NULL");
-        }
-        else
-        {
-            Vector2f shipPos = this.spacyClient.getShip().getCenteredRenderPos();
-            System.out.println("MyShip @ " + shipPos.x + ", " + shipPos.y);
-            this.viewPortCenter = shipPos;
-            this.viewPort.x = viewPortCenter.x - (this.viewPort.width / 2);
-            this.viewPort.y = viewPortCenter.y - (this.viewPort.height / 2);
+        catch(Exception ex){
+            ex.printStackTrace();
         }
     }
     
@@ -147,20 +149,25 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         
         g.drawImage(background, 0, 0);
         
-        if(spacyClient.getWorld() == null)
+        if(client.getWorld() == null)
             return;
-        CopyOnWriteArrayList<Ship> ships = new CopyOnWriteArrayList<>( spacyClient.getWorld().ships.values());
-        for(Ship ship : ships){            
-            Vector2f renderPosition = ship.getCenteredRenderPos();            
-            sheet.draw(ship.texture, renderPosition.x, renderPosition.y);
-        }
-        g.setColor(Color.yellow);
-        CopyOnWriteArrayList<Projectile> pros = new CopyOnWriteArrayList<>( spacyClient.getWorld().projectiles.values());
-        for(Projectile p : pros){
-            Vector2f renderPosition = p.getBulletRenderPos();
-            sheet.draw(p.texture, renderPosition.x, renderPosition.y);           
-        }        
         
+        
+        try{
+            ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<>(client.getWorld().ships);
+            for(ConcurrentHashMap.Entry<Long, Ship> ship : ships.entrySet()){                 
+                Vector2f renderPosition = (ship).getValue().getCenteredRenderPos();            
+                sheet.draw((ship).getValue().texture, renderPosition.x, renderPosition.y);
+            }        
+            ConcurrentHashMap<Long, Projectile> projectiles = new ConcurrentHashMap<>(client.getWorld().projectiles);
+            for(ConcurrentHashMap.Entry<Long, Projectile> p : projectiles.entrySet()){
+                Vector2f renderPosition = (p).getValue().getBulletRenderPos();
+                sheet.draw(p.getValue().texture, renderPosition.x, renderPosition.y);           
+            }        
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
         
         
         /*
@@ -169,8 +176,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         if(this.debug){
             g.resetTransform();
             g.setColor(Color.white);
-            g.drawString("Serverdelta:     " + spacyClient.getServerTickDelta() + "ms", 8, 30);
-            g.drawString("Ticks/s:         " + spacyClient.getServerTicksPerSecond(), 8, 50);            
+            g.drawString("Serverdelta:     " + client.getServerTickDelta() + "ms", 8, 30);
+            g.drawString("Ticks/s:         " + client.getServerTicksPerSecond(), 8, 50);            
         }
         
     }
@@ -223,12 +230,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     @Override
     public void onButtonDown(int button) {
         if(button == 1){
-            if(timeLastPlayerRotate + sendFreq >= System.currentTimeMillis()){
+            //if(timeLastPlayerRotate + sendFreq >= System.currentTimeMillis()){
                 Vector2f pos = MouseInputManager.getInstance().getPosition();
                 SpacyClient.getInstance().getShip().direction = new Vector2f(pos).sub(new Vector2f(viewPort.width / 2, viewPort.height / 2)).normalise();            
                 SpacyClient.getInstance().getClient().sendTCP(new PlayerRotate(SpacyClient.instance.getShip().direction));
-                timeLastPlayerRotate = System.currentTimeMillis();
-            }
+            //    timeLastPlayerRotate = System.currentTimeMillis();
+            //}
         }
         
     }
