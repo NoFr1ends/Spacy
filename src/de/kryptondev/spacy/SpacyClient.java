@@ -81,10 +81,19 @@ public class SpacyClient extends Listener{
     private void onRecv(Connection cnctn, Object o) {
         logPacket(o);
         
+        if(o instanceof PlayerRotate){
+            PlayerRotate r = (PlayerRotate)o;
+            if(this.world.ships.containsKey(r.ship)){
+                Ship s = this.world.ships.get(r.ship);
+                s.direction = r.direction;
+            }
+        }
+        
         if (o instanceof ConnectionAttemptResponse) {
             //Antwort auswerten
             ConnectionAttemptResponse response = (ConnectionAttemptResponse) o;
             if (response.type == ConnectionAttemptResponse.Type.OK) {
+                this.world.worldSize = response.worldSize;
                    if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
                         GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
                         game.onConnected();
@@ -99,35 +108,36 @@ public class SpacyClient extends Listener{
         }     
         
         if(o instanceof ChunkedShip){
-            this.world.ships.addAll(((ChunkedShip)o).ships);         
+            this.world.ships.putAll(((ChunkedShip)o).ships);         
         }
         
         if(o instanceof ChunkedEntity){
-            this.world.entities.addAll(((ChunkedEntity)o).entities);         
+            this.world.entities.putAll(((ChunkedEntity)o).entities);         
         }
         
          if(o instanceof ChunkedProjectiles){
-            this.world.projectiles.addAll(((ChunkedProjectiles)o).projectiles);         
+            this.world.projectiles.putAll(((ChunkedProjectiles)o).projectiles);         
         }
          
         if(o instanceof Ship){
             Ship s = (Ship)o;
-              
+            //SPAWNED
+            
             if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
                 GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
                 game.setMyShip(s);
                 shipId = s.id;
             }
             
-            world.ships.add(s);
-            //SPAWNED
-            //setShip(s);
+            world.ships.put(s.id ,s);
+            
             return;
         }
         
         
         if(o instanceof Projectile){
-            this.world.projectiles.add((Projectile)o);
+            Projectile p = (Projectile)o;
+            this.world.projectiles.put(p.id, p);
         }
         
         if(o instanceof DebugTickDelta){
@@ -194,21 +204,7 @@ public class SpacyClient extends Listener{
     }
 
     public Ship getShip() {
-        for(Ship ship : world.ships){
-            if(ship.id == this.shipId){
-                return ship;
-            }
-        }
-        return null;
-    }
-
-    @Deprecated
-    public void setShip(Ship ship) {
-         for(Ship wShip : world.ships){
-            if(wShip.id == this.shipId){
-                wShip = ship;
-            }
-        }
+        return this.world.ships.getOrDefault(this.shipId, null);
     }
 
     public Client getClient() {

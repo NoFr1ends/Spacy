@@ -1,15 +1,16 @@
 package de.kryptondev.spacy.data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class World {
     
-    public volatile ArrayList<Ship> ships;
-    public volatile ArrayList<Projectile> projectiles;
-    public volatile ArrayList<Entity> entities;  //alles was nicht in einer der anderen Listen steht
+    public volatile HashMap<Long, Ship> ships;
+    public volatile HashMap<Long, Projectile> projectiles;
+    public volatile HashMap<Long, Entity> entities;  //alles was nicht in einer der anderen Listen steht
     //Worldsize in Pixeln
-    public int worldSize = 600;
+    public int worldSize = 4096 * 2;
             
     
     public ArrayList<Entity> getAllEntities(){
@@ -21,9 +22,9 @@ public class World {
     }
     
     public World() {
-        ships = new ArrayList<>(2);
-        projectiles = new ArrayList<>(64);
-        entities = new ArrayList<>(0);
+        ships = new HashMap<>(2);
+        projectiles = new HashMap<>(64);
+        entities = new HashMap<>(0);
     }
     
 }

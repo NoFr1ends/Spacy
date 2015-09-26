@@ -29,12 +29,12 @@ public class GameClient extends Listener {
         private Version version;
         private final Date connectionTimeStamp;
         private PlayerInfo playerInfo;
-        private SpacyServer spacyServer;
+        private SpacyServer server;
         private GameClient gameClient;
         private long shipId;
         public SGameClient(SpacyServer server, GameClient gc) {
             this.gameClient = gc;
-            this.spacyServer = server;
+            this.server = server;
             this.connectionTimeStamp = new Date();     
             
         }
@@ -52,17 +52,17 @@ public class GameClient extends Listener {
             s.position = new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);
             s.maxSpeed = 80f;
             s.acceleration = 1.2f;
-            s.texture = "playerShip1_blue.png"; // todo change for teams etc
+            s.texture = "playerShip" + (r.nextInt(2) + 1) + "_blue.png"; // todo change for teams etc
             s.boundsRadius = 10f;
             
-            s.id = spacyServer.EntityCounter++;
+            s.id = server.EntityCounter++;
             this.shipId = s.id;
-            spacyServer.world.ships.add(s);
+            server.world.ships.put(s.id,s);
             return s;
         }
         
         private void validateConnection() {       
-            if (spacyServer.isPlayerBanned(playerInfo.playerUID)) {
+            if (server.isPlayerBanned(playerInfo.playerUID)) {
                 this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.Banned));
                 return;
             }
@@ -70,10 +70,10 @@ public class GameClient extends Listener {
             //GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.toString() + " connected right now!");
             this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.OK));
 
-            this.spacyServer.sendWorld(this);
+            this.server.sendWorld(this);
             Ship s = this.addShip();
             this.sendTCP(s);            
-            this.sendTCP(new DebugTickDelta(spacyServer.getServerTick().getDelta(), GameTick.ticksPerSecond));
+            this.sendTCP(new DebugTickDelta(server.getServerTick().getDelta(), GameTick.ticksPerSecond));
         }
 
         @Override
@@ -121,6 +121,8 @@ public class GameClient extends Listener {
             if(data instanceof PlayerRotate){
                 PlayerRotate rotation = (PlayerRotate)data;
                 this.getMyShip().direction = rotation.direction;
+                rotation.ship = this.getMyShip().id;
+                this.server.getServer().sendToAllTCP(rotation);
                 return;
             }
             if(data instanceof Projectile){               
@@ -138,7 +140,7 @@ public class GameClient extends Listener {
                 p.moving = EMoving.FullSpeed;
                 p.texture ="laserRed01.png";
                 System.out.println(p.texture);
-                SpacyServer.instance.world.projectiles.add(p);
+                SpacyServer.instance.world.projectiles.put(p.id, p);
                 SpacyServer.instance.getServer().sendToAllTCP(p);
             }
 
@@ -157,11 +159,11 @@ public class GameClient extends Listener {
         }
 
         public SpacyServer getSpacyServer() {
-            return spacyServer;
+            return server;
         }
 
         public boolean isAdmin() {
-            return spacyServer.isPlayerAdmin(this.playerInfo.playerUID);
+            return server.isPlayerAdmin(this.playerInfo.playerUID);
         }
 
         public void setPlayerInfo(PlayerInfo playerInfo) {
@@ -177,11 +179,7 @@ public class GameClient extends Listener {
         }
 
         public Ship getMyShip() {
-            for(Ship ship : spacyServer.world.ships){
-                if(ship.id == this.shipId)
-                    return ship;
-            }
-            return null;
+            return server.world.ships.getOrDefault(this.shipId, null);
         }
             
         

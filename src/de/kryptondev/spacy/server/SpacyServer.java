@@ -11,6 +11,7 @@ import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.server.GameClient.SGameClient;
 import de.kryptondev.spacy.share.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SpacyServer extends Listener {
     public static SpacyServer instance;
@@ -61,13 +62,12 @@ public class SpacyServer extends Listener {
     }
     
     public void sendWorld(SGameClient client){
-        int splitSize= 8;
         int count = 0;
-        ArrayList<Ship> tmpShip = new ArrayList<>(8);
-        for(Ship ship : (ArrayList<Ship>)this.world.ships.clone()){
-            tmpShip.add(ship);
+        HashMap<Long, Ship> tmpShip = new HashMap<>(8);
+        for(Ship ship : tmpShip.values()){
+            tmpShip.put(ship.id, ship);
             count++;
-            if(count > splitSize){
+            if(count > 8){
                 client.sendTCP(new ChunkedShip(tmpShip));
                 tmpShip.clear();
                 count = 0;
@@ -75,11 +75,11 @@ public class SpacyServer extends Listener {
             
         }
         
-       ArrayList<Projectile> tmpProjectiles = new ArrayList<>(8);
-        for(Projectile p : (ArrayList<Projectile>)this.world.projectiles.clone()){
-            tmpProjectiles.add(p);
+       HashMap<Long, Projectile> tmpProjectiles = new HashMap<>(32);
+        for(Projectile p : tmpProjectiles.values()){
+            tmpProjectiles.put(p.id, p);
             count++;
-            if(count > splitSize){
+            if(count > 32){
                 client.sendTCP(new ChunkedProjectiles(tmpProjectiles));
                 tmpProjectiles.clear();
                 count = 0;
@@ -87,17 +87,18 @@ public class SpacyServer extends Listener {
             
         }
         
-        ArrayList<Entity> tmpEntity = new ArrayList<>(8);
-        for(Entity e : (ArrayList<Entity>)this.world.entities.clone()){
-            tmpEntity.add(e);
+        HashMap<Long, Entity> tmpEntity = new HashMap<>(8);
+        for(Entity e : tmpEntity.values()){
+            tmpEntity.put(e.id, e);
             count++;
-            if(count > splitSize){
+            if(count > 8){
                 client.sendTCP(new ChunkedEntity(tmpEntity));
                 tmpEntity.clear();
                 count = 0;
             }
             
         }
+        
     }
 
     public SpacyServer(int maxSlots) {

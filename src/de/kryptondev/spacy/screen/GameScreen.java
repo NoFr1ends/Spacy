@@ -7,10 +7,10 @@ import de.kryptondev.spacy.SpacyClient;
 import de.kryptondev.spacy.SpriteSheet;
 import de.kryptondev.spacy.input.KeyInputManager;
 import de.kryptondev.spacy.input.MouseInputManager;
-import java.util.ArrayList;
-
+import java.util.Map;
 
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +30,6 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     public static final org.newdawn.slick.Color BackgroundColor = new org.newdawn.slick.Color(8,8,64);
     private SpacyClient spacyClient;
     private Image background;
-    private Vector2f lastMousePos;
     private Rect viewPort;
     private SpriteSheet spriteSheet;
     private Ship myShip;
@@ -39,20 +38,17 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private float zoom = 1.0f;
     private final float zoomStep = 0.2f;
     private final Random rand;
-    private final int maxBackgroundLayers = 3;
     private boolean debug = false;
     
     //Der letzte Zeitpunkt, andem das PlayerRotate-Paket gesendet wurde.
     private long timeLastPlayerRotate = 0;
     //Zeit (Ticks) die gewartet wird, bis das nächste PlayerRotate-Paket gesendet wird. 
-    private long sendFreq = 100;
+    private final long sendFreq = 100;
     private SpriteSheet sheet;
     private boolean moving;
     
     public GameScreen(IScreen prevScreen, SpacyClient spacyClient) {
-       //TODO Disable prevScreen
         this.spacyClient = spacyClient;
-        this.lastMousePos = new Vector2f(0, 0);
         rand = new Random();      
     }
     
@@ -72,14 +68,11 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         // Load main sprite sheet
         sheet = new SpriteSheet("data/sheet.xml");
         
-        try {
-            
-            int width = gc.getWidth();
-            int height = gc.getHeight();      
-           
-            viewPort = new Rect(0, 0, width, height);
-
-            
+        try {       
+            viewPort = new Rect(0, 0, gc.getWidth(), gc.getHeight());
+                
+            int width = this.spacyClient.getWorld().worldSize;
+            int height = width;      
 
             Graphics g = new Graphics(width, height);
             g.clear();
@@ -92,32 +85,48 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             }
 
             g.flush();
-
-            background = new Image(width, height);
+            background = new Image(800, 600);
             g.copyArea(background,0,0);                
             g.destroy();
             
         } catch (SlickException ex) {
             Logger.getLogger(GameScreen.class.getName()).log(Level.SEVERE, null, ex);
         }
-        spriteSheet = new SpriteSheet("data/sheet.xml");        
       
     }
 
     @Override
     public void update(GameContainer gc, int delta) {
-        for(Entity e: (ArrayList<Entity>)spacyClient.getWorld().getAllEntities()) {
+        /*for(Entity e: (ArrayList<Entity>)spacyClient.getWorld().getAllEntities()) {
             e.move(delta);
         }
-       
+       */
+        ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<>(spacyClient.getWorld().ships);
+        for(Ship ship : ships.values()){
+            
+            ship.move(delta);
+        }
+        
+        
+        ConcurrentHashMap<Long, Projectile> projectiles = new ConcurrentHashMap<>(spacyClient.getWorld().projectiles);
+        for(Projectile p : projectiles.values()){
+            p.move(delta);
+        }
+        
+        ConcurrentHashMap<Long, Entity> entities = new ConcurrentHashMap<>(spacyClient.getWorld().entities);
+        for(Entity e : entities.values()){
+            e.move(delta);
+        }
         
         if(this.spacyClient.getShip() == null){
             //Last death point?
             //viewPortCenter = lastDeath;
+            System.err.println("MyShip is NULL");
         }
         else
         {
-            Vector2f shipPos = this.spacyClient.getShip().position;
+            Vector2f shipPos = this.spacyClient.getShip().getCenteredRenderPos();
+            System.out.println("MyShip @ " + shipPos.x + ", " + shipPos.y);
             this.viewPortCenter = shipPos;
             this.viewPort.x = viewPortCenter.x - (this.viewPort.width / 2);
             this.viewPort.y = viewPortCenter.y - (this.viewPort.height / 2);
@@ -135,22 +144,21 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         g.resetTransform();
         g.scale(zoom, zoom);
         g.translate((-viewPort.x * zoom), (-viewPort.y * zoom));
-        //spriteSheet.draw("cockpitBlue_0.png" , 0, 0);
+        
+        g.drawImage(background, 0, 0);
+        
         if(spacyClient.getWorld() == null)
             return;
-        CopyOnWriteArrayList<Ship> ships = new CopyOnWriteArrayList<>( spacyClient.getWorld().ships);
+        CopyOnWriteArrayList<Ship> ships = new CopyOnWriteArrayList<>( spacyClient.getWorld().ships.values());
         for(Ship ship : ships){            
-            Vector2f renderPosition = ship.getCenteredRenderPos();
-            
+            Vector2f renderPosition = ship.getCenteredRenderPos();            
             sheet.draw(ship.texture, renderPosition.x, renderPosition.y);
         }
         g.setColor(Color.yellow);
-        CopyOnWriteArrayList<Projectile> pros = new CopyOnWriteArrayList<>( spacyClient.getWorld().projectiles);
+        CopyOnWriteArrayList<Projectile> pros = new CopyOnWriteArrayList<>( spacyClient.getWorld().projectiles.values());
         for(Projectile p : pros){
             Vector2f renderPosition = p.getBulletRenderPos();
-            sheet.draw(p.texture, renderPosition.x, renderPosition.y);
-            //Vector2f bounds = p.getBounds();
-            //g.fillRect(renderPosition.x, renderPosition.y, bounds.x, bounds.y);
+            sheet.draw(p.texture, renderPosition.x, renderPosition.y);           
         }        
         
         
@@ -219,6 +227,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                 Vector2f pos = MouseInputManager.getInstance().getPosition();
                 SpacyClient.getInstance().getShip().direction = new Vector2f(pos).sub(new Vector2f(viewPort.width / 2, viewPort.height / 2)).normalise();            
                 SpacyClient.getInstance().getClient().sendTCP(new PlayerRotate(SpacyClient.instance.getShip().direction));
+                timeLastPlayerRotate = System.currentTimeMillis();
             }
         }
         

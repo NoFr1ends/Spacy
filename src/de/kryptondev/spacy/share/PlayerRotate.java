@@ -5,7 +5,7 @@ import org.newdawn.slick.geom.Vector2f;
 
 public class PlayerRotate {
     public Vector2f direction;
-
+    public long ship;
     public PlayerRotate() {
     }
 

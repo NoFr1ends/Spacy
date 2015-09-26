@@ -10,8 +10,10 @@ import de.kryptondev.spacy.share.DeleteEntity;
 import de.kryptondev.spacy.share.playerEvents.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 
 public class GameTick implements Runnable{
@@ -31,16 +33,13 @@ public class GameTick implements Runnable{
                 if(ship.moving != EMoving.Stopped)
                     ship.move(delta);
         }
-  
-        
-        
-        List<Projectile> projectiles = new ArrayList<>();
-        projectiles.addAll(server.world.projectiles);
-        Iterator<Projectile> i= projectiles.iterator();
-        while (i.hasNext()) {
-            Projectile p = i.next();
+        HashMap<Long, Projectile> projs = server.world.projectiles;
+        long pos = projs.size();
+        while(projs.containsKey(pos)){
+            Projectile p = projs.get(pos--);
+                    
             if(p.remainingLifetime <= 0){
-                server.world.projectiles.remove(p);
+                server.world.projectiles.remove(pos + 1);
                 server.getServer().sendToAllTCP(new DeleteEntity(p.id));
                 System.out.println("Deleting projectile " + p.id);
                 continue;
@@ -67,7 +66,7 @@ public class GameTick implements Runnable{
                         //TODO Client neues Schiff zuweisen & altes Schiff löschen!
                     }
                     if(p.destroyOnCollision){
-                        server.world.projectiles.remove(p);
+                        server.world.projectiles.remove(pos + 1);
                         server.getServer().sendToAllTCP(new DeleteEntity(p.id));
                         System.out.println("Deleting projectile " + p.id);
                         continue;
