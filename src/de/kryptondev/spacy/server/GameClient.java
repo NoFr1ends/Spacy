@@ -3,13 +3,11 @@ package de.kryptondev.spacy.server;
 import com.esotericsoftware.kryonet.*;
 import de.kryptondev.spacy.data.EMoving;
 import de.kryptondev.spacy.data.Projectile;
-import de.kryptondev.spacy.data.Rect;
 import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.PlayerInfo;
 import de.kryptondev.spacy.share.Move;
-import de.kryptondev.spacy.share.PlayerConnectionEvent;
 import de.kryptondev.spacy.share.PlayerRotate;
 import de.kryptondev.spacy.share.Version;
 
@@ -54,8 +52,11 @@ public class GameClient extends Listener {
             s.position = new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);
             s.maxSpeed = 80f;
             s.acceleration = 1.2f;
-            s.image = "playerShip1_blue.png"; // todo change for teams etc
+            s.texture = "playerShip1_blue.png"; // todo change for teams etc
             s.boundsRadius = 10f;
+            
+            s.id = spacyServer.EntityCounter++;
+            this.shipId = s.id;
             spacyServer.world.ships.add(s);
             return s;
         }
@@ -71,10 +72,9 @@ public class GameClient extends Listener {
 
             this.spacyServer.sendWorld(this);
             Ship s = this.addShip();
-            s.id = spacyServer.EntityCounter++;
-            this.shipId = s.id;
-            this.sendTCP(s);
-            this.spacyServer.getServer().sendToAllTCP(new PlayerConnectionEvent(PlayerConnectionEvent.Type.Connected));
+           
+            
+            this.sendTCP(s);            
         }
 
         @Override
@@ -128,7 +128,6 @@ public class GameClient extends Listener {
                 //Fire
                 Projectile p = (Projectile)data;
                 p.setLifeTime(3.0f);
-                p.isMoving = true;
                 p.acceleration = Float.POSITIVE_INFINITY;
                 p.maxSpeed = 50;
                 p.visible = true;
@@ -136,6 +135,8 @@ public class GameClient extends Listener {
                 p.direction = this.getMyShip().direction;
                 p.id = SpacyServer.instance.EntityCounter++;
                 p.boundsRadius = 10f;
+                p.damage = 100;
+                p.moving = EMoving.FullSpeed;
                 SpacyServer.instance.world.projectiles.add(p);
                 SpacyServer.instance.getServer().sendToAllTCP(p);
             }

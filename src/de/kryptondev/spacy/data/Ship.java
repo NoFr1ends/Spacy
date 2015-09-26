@@ -19,9 +19,7 @@ public class Ship extends Entity implements IHittable {
         this.speed = 0;
         this.maxSpeed = 20;           
         this.boundsRadius = 43.5f;
-        this.activeWeapon = new Weapon();
-        this.image = "";
-        this.shield = new Shield();
+        this.texture = "";
     }
 
     @Override
@@ -33,16 +31,20 @@ public class Ship extends Entity implements IHittable {
         Sollte das Schild augfebraucht werden, wird es auf null gesetzt.
          */
         if (this.shield != null) {
-            if (this.shield.getResistance() == hitting.damagetype) {
-                if (this.shield.getLife() > hitting.damage) {
-                    this.shield.setLife(this.shield.getLife() - hitting.damage);
-                } else if (this.shield.getLife() == hitting.damage) {
+            if (this.shield.resistance == hitting.damagetype) {
+                if (this.shield.life > hitting.damage) {
+                    this.shield.life = (this.shield.life - hitting.damage);
+                } else if (this.shield.life == hitting.damage) {
                     this.shield = null;
-                } else if (this.shield.getLife() < hitting.damage) {
-                     this.hp=this.hp-(hitting.damage-this.shield.getLife());
+                } else if (this.shield.life < hitting.damage) {
+                     this.hp=this.hp-(hitting.damage-this.shield.life);
                      this.shield = null;
                 }
             }
+        }
+        else
+        {
+            this.hp -= hitting.damage;
         }
     }
 

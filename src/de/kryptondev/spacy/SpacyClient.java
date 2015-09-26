@@ -123,9 +123,6 @@ public class SpacyClient extends Listener{
             return;
         }
         
-        if(o instanceof PlayerConnectionEvent){
-            
-        }
         
         if(o instanceof Projectile){
             this.world.projectiles.add((Projectile)o);

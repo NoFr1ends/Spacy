@@ -3,6 +3,7 @@ package de.kryptondev.spacy.helper;
 import com.esotericsoftware.kryo.Kryo;
 import de.kryptondev.spacy.data.*;
 import de.kryptondev.spacy.share.*;
+import de.kryptondev.spacy.share.playerEvents.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -48,8 +49,10 @@ public class KryoRegisterer {
         k.register(DamageType.class);
         k.register(PlayerRotate.class);        
         k.register(Move.class);
-        k.register(PlayerConnectionEvent.class);
-        k.register(PlayerConnectionEvent.Type.class);
         k.register(DeleteEntity.class);
+        
+        k.register(OnDeath.class);
+        k.register(OnHit.class);
+        k.register(OnKill.class);
     }
 }

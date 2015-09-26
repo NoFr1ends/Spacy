@@ -2,26 +2,14 @@ package de.kryptondev.spacy.data;
 
 
 public class Shield {
-    private DamageType resistance;
-    private int life;
+    public DamageType resistance;
+    public int life;
 
     public Shield() {
     }
 
-    public DamageType getResistance() {
-        return resistance;
-    }
-
-    public void setResistance(DamageType resistance) {
+    public Shield(DamageType resistance, int life) {
         this.resistance = resistance;
-    }
-
-    public int getLife() {
-        return life;
-    }
-
-    public void setLife(int life) {
         this.life = life;
     }
-    
 }

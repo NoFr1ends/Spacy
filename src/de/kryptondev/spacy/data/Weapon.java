@@ -2,9 +2,10 @@ package de.kryptondev.spacy.data;
 
 
 public class Weapon {
- private Projectile ammo;
- private String name;
- private void fire(){}
+    
+    public Projectile ammo;
+    public String name;
+    public void fire(){}
 
     public Weapon() {
     }

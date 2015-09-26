@@ -123,7 +123,6 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         else
         {
             Vector2f shipPos = this.spacyClient.getShip().position;
-            Rect shipBound = this.spacyClient.getShip().bounds;
             this.viewPortCenter = shipPos;
             this.viewPort.x = viewPortCenter.x - (this.viewPort.width / 2);
             this.viewPort.y = viewPortCenter.y - (this.viewPort.height / 2);
@@ -165,13 +164,14 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             g.fillRect(renderPosition.x, renderPosition.y, ship.bounds.width, ship.bounds.height);*/
             //ship.image
             
-            sheet.draw(ship.image, renderPosition.x, renderPosition.y);
+            sheet.draw(ship.texture, renderPosition.x, renderPosition.y);
         }
         g.setColor(Color.yellow);
         CopyOnWriteArrayList<Projectile> pros = new CopyOnWriteArrayList<>( spacyClient.getWorld().projectiles);
         for(Projectile p : pros){
             Vector2f renderPosition = p.getRenderPos();
-            g.fillRect(renderPosition.x, renderPosition.y, p.bounds.width, p.bounds.height);
+            Vector2f bounds = p.getBounds();
+            g.fillRect(renderPosition.x, renderPosition.y, bounds.x, bounds.y);
         }        
         
         

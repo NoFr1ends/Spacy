@@ -13,7 +13,8 @@ public class Projectile extends Entity {
     public DamageType damagetype;
     public ArrayList<Effect> Effects;
     public long senderId;
-    
+    public boolean destroyOnCollision = true;
+            
     public Projectile() {
         
     }
