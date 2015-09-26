@@ -40,6 +40,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private final float zoomStep = 0.2f;
     private final Random rand;
     private final int maxBackgroundLayers = 3;
+    private boolean debug = false;
     
     //Der letzte Zeitpunkt, andem das PlayerRotate-Paket gesendet wurde.
     private long timeLastPlayerRotate = 0;
@@ -63,7 +64,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     public void init(GameContainer gc) {    
         MouseInputManager.getInstance().registerListener("Fire", Input.MOUSE_LEFT_BUTTON, this);       
         MouseInputManager.getInstance().registerListener("Throttle", Input.MOUSE_RIGHT_BUTTON, this);
-        KeyInputManager.getInstance().registerListener("Throttle", Input.KEY_SPACE, this);
+        KeyInputManager.getInstance().registerListener("Debug", Input.KEY_F12, this);
 
         Random r = new Random();
         gc.setAlwaysRender(true);
@@ -105,8 +106,6 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
 
     @Override
     public void update(GameContainer gc, int delta) {
-        
-        
         for(Entity e: (ArrayList<Entity>)spacyClient.getWorld().getAllEntities()) {
             e.move(delta);
         }
@@ -122,18 +121,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             this.viewPortCenter = shipPos;
             this.viewPort.x = viewPortCenter.x - (this.viewPort.width / 2);
             this.viewPort.y = viewPortCenter.y - (this.viewPort.height / 2);
-            
-            
         }
-        
-        
-        
-        //TODO: Edit local "smooth" movements
-        
-        /*Create an dedicated List of Ships/Bullets just for loacal rendering, 
-          because the World data gets overwritten every tick for now! 
-         (in the future like every 10th tick. Need to figure out!) 
-        */
     }
     
     @Override
@@ -154,12 +142,6 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         for(Ship ship : ships){            
             Vector2f renderPosition = ship.getRenderPos();
             
-            /*if(ship.id == this.myShip.id){
-               g.setColor(Color.green);
-            }
-            g.fillRect(renderPosition.x, renderPosition.y, ship.bounds.width, ship.bounds.height);*/
-            //ship.image
-            
             sheet.draw(ship.texture, renderPosition.x, renderPosition.y);
         }
         g.setColor(Color.yellow);
@@ -171,6 +153,16 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         }        
         
         
+        
+        /*
+        DEBUG SECTION
+        */
+        if(this.debug){
+            g.resetTransform();
+            g.setColor(Color.white);
+            g.drawString("Serverdelta:     " + spacyClient.getServerTickDelta() + "ms", 8, 30);
+            g.drawString("Ticks/s:         " + spacyClient.getServerTicksPerSecond(), 8, 50);            
+        }
         
     }
     
@@ -210,6 +202,10 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
            this.viewPort.height *= 1 - zoomStep;
            this.viewPort.width *= 1 - zoomStep;
            System.out.println(viewPort.toString());
+       }
+       //Toggle debug
+       if(key == Input.KEY_F12){
+           debug = !debug;
        }
     }
     private void print(String id, Vector2f vec){

@@ -1,6 +1,7 @@
 package de.kryptondev.spacy.server;
 
 import com.esotericsoftware.kryonet.Connection;
+import de.kryptondev.spacy.data.DebugTickDelta;
 import de.kryptondev.spacy.data.EMoving;
 import de.kryptondev.spacy.data.Projectile;
 import de.kryptondev.spacy.data.Ship;
@@ -14,8 +15,9 @@ import java.util.List;
 
 
 public class GameTick implements Runnable{
+    private int delta = 0;
     private GameTick instance;
-    public static final int ticksPerSecond = 16;        
+    public static final int ticksPerSecond = 64 * 2;        
     private SpacyServer server;    
     public GameTick(SpacyServer server) {
         this.server = server;
@@ -77,7 +79,7 @@ public class GameTick implements Runnable{
 
     @Override
     public void run() {
-        int delta = 0;
+        int lastDelta = delta;
         while(true){
             try {        
                 long start = new Date().getTime();
@@ -92,7 +94,12 @@ public class GameTick implements Runnable{
                 long finalEnd = new Date().getTime();
                 
                 delta = (int)(finalEnd - start);
-                System.out.println("Tickdelta is: " + delta);
+                if(delta != lastDelta){
+                    System.out.println("Tickdelta is: " + delta);
+                    server.getServer().sendToAllTCP(new DebugTickDelta(delta, ticksPerSecond));
+                    lastDelta = delta;
+                }
+                
             } catch (InterruptedException ex) {
                 return;
             }
@@ -109,6 +116,10 @@ public class GameTick implements Runnable{
 
     public SpacyServer getServer() {
         return server;
+    }
+
+    public int getDelta() {
+        return delta;
     }
     
     

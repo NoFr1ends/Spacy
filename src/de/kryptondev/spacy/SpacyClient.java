@@ -25,6 +25,8 @@ public class SpacyClient extends Listener{
     private PlayerInfo info;
     private World world = new World();
     private long shipId;
+    private int serverTickDelta;
+    private int serverTicksPerSecond;
     
     public SpacyClient() {
         this.info = new PlayerInfo();
@@ -128,6 +130,11 @@ public class SpacyClient extends Listener{
             this.world.projectiles.add((Projectile)o);
         }
         
+        if(o instanceof DebugTickDelta){
+            DebugTickDelta delta = ((DebugTickDelta)o);
+            this.serverTickDelta = delta.tickDelta;
+            this.serverTicksPerSecond = delta.ticksPerSecond;
+        }
         
         if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
             GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
@@ -211,6 +218,23 @@ public class SpacyClient extends Listener{
     public void setClient(Client client) {
         this.client = client;
     }
+
+    public int getPort() {
+        return port;
+    }
+
+    public long getShipId() {
+        return shipId;
+    }
+
+    public int getServerTickDelta() {
+        return serverTickDelta;
+    }
+
+    public int getServerTicksPerSecond() {
+        return serverTicksPerSecond;
+    }
+    
     
     
 }

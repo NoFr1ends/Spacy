@@ -12,6 +12,7 @@ import org.newdawn.slick.geom.Vector2f;
 
 public class KryoRegisterer {
     public static void registerAll(Kryo k){     
+        k.register(DebugTickDelta.class);
         
         k.register(Object.class);
         k.register(boolean.class);  

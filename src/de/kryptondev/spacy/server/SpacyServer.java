@@ -23,7 +23,7 @@ public class SpacyServer extends Listener {
     private ArrayList<byte[]> bans;
     private ArrayList<byte[]> admins;
     public volatile World world;
-    private GameTick tick;
+    private GameTick serverTick;
     
     public void writeWarning(String s) {
         System.out.println(s);
@@ -130,8 +130,8 @@ public class SpacyServer extends Listener {
             server.addListener(this);
             server.bind(port,broadcastPort);
             new Thread(server).start();       
-            tick = new GameTick(this);
-            Thread t = new Thread(tick);
+            serverTick = new GameTick(this);
+            Thread t = new Thread(serverTick);
             t.setName("Tick");
             t.start();
             
@@ -219,7 +219,11 @@ public class SpacyServer extends Listener {
         System.out.println("Server: Client is connected!");
         cnctn.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.OK));        
     }
-    
-    
 
+    public GameTick getServerTick() {
+        return serverTick;
+    }
+    
+    
+    
 }

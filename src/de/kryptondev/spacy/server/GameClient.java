@@ -1,6 +1,7 @@
 package de.kryptondev.spacy.server;
 
 import com.esotericsoftware.kryonet.*;
+import de.kryptondev.spacy.data.DebugTickDelta;
 import de.kryptondev.spacy.data.EMoving;
 import de.kryptondev.spacy.data.Projectile;
 import de.kryptondev.spacy.data.Ship;
@@ -72,9 +73,8 @@ public class GameClient extends Listener {
 
             this.spacyServer.sendWorld(this);
             Ship s = this.addShip();
-           
-            
             this.sendTCP(s);            
+            this.sendTCP(new DebugTickDelta(spacyServer.getServerTick().getDelta(), GameTick.ticksPerSecond));
         }
 
         @Override
