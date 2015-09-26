@@ -104,6 +104,13 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
 
     @Override
     public void update(GameContainer gc, int delta) {
+        
+        
+        for(Entity e: (ArrayList<Entity>)spacyClient.getWorld().getAllEntities()) {
+            e.move();
+        }
+       
+        
         if(this.spacyClient.getShip() == null){
             //Last death point?
             //viewPortCenter = lastDeath;
@@ -119,9 +126,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             
         }
         
-        for(Projectile p: spacyClient.getWorld().projectiles) {
-            p.move();
-        }
+        
         
         //TODO: Edit local "smooth" movements
         
