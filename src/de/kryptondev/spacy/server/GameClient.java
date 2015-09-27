@@ -11,6 +11,7 @@ import de.kryptondev.spacy.share.PlayerInfo;
 import de.kryptondev.spacy.share.Move;
 import de.kryptondev.spacy.share.PlayerRotate;
 import de.kryptondev.spacy.share.Version;
+import de.kryptondev.spacy.share.playerEvents.OnJoin;
 
 import java.util.Date;
 import java.util.Random;
@@ -49,26 +50,28 @@ public class GameClient extends Listener {
         public Ship addShip(){
             Ship s = new Ship();
             Random r = new Random();
-            s.position = new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);
+            s.position = /*new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);*/ 
+                    new Vector2f(r.nextFloat() * 200, r.nextFloat() * 200);
             s.maxSpeed = 80f;
             s.acceleration = 1.2f;
-            s.texture = "playerShip" + (r.nextInt(2) + 1) + "_blue.png"; // todo change for teams etc
-            s.boundsRadius = 10f;
-            
+            s.texture = "playerShip2_orange.png"; // todo change for teams etc
+            s.boundsRadius = 87f;
+            s.textureBounds = new Vector2f(99f, 75f);
             s.id = server.EntityCounter++;
             this.shipId = s.id;
             server.world.ships.put(s.id,s);
+            server.getServer().sendToAllTCP(new OnJoin(s));
             return s;
         }
         
         private void validateConnection() {       
             if (server.isPlayerBanned(playerInfo.playerUID)) {
-                this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.Banned));
+                this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.Banned, 0));
                 return;
             }
             //GameClient.this.spacyServer.broadcast(new Chatmessage(GameClient.this.getPlayerInfo().playerName + " joined the party!"));
             //GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.toString() + " connected right now!");
-            this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.OK));
+          
 
             this.server.sendWorld(this);
             Ship s = this.addShip();
@@ -96,7 +99,7 @@ public class GameClient extends Listener {
             if (data instanceof Version) {
                 this.version = (Version)data;
                 if(versionMismatch(this.version)){
-                    this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.VersionMismatch));
+                    this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.VersionMismatch, 0));
                     this.close();
                     return;
                 }

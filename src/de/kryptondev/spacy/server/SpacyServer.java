@@ -218,7 +218,7 @@ public class SpacyServer extends Listener {
     @Override
     public void connected(Connection cnctn) {        
         System.out.println("Server: Client is connected!");
-        cnctn.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.OK));        
+        cnctn.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.OK, this.world.worldSize));        
     }
 
     public GameTick getServerTick() {

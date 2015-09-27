@@ -1,5 +1,7 @@
 package de.kryptondev.spacy.data;
 
+import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Vector2f;
 
 public abstract class Entity {
@@ -49,6 +51,18 @@ public abstract class Entity {
         }
 
     }
+    
+    public void drawRotation(Graphics g){
+        float size = 35f;
+        g.setColor(Color.yellow);
+        g.drawLine(this.position.x, this.position.y,this.position.x + this.direction.x * size,this.position.y+ this.direction.y * size);
+    }
+    
+    public void drawBounds(Graphics g){
+        g.setColor(Color.magenta);
+        g.drawOval(this.position.x - this.boundsRadius / 2, this.position.y - this.boundsRadius / 2, this.boundsRadius, this.boundsRadius);
+    }
+    
     public void move(int delta) {
         //Theoretisch kann die Verzweigung weggelassen werden.
         //Die Frage ist ob eine Verzweigung performanter ist als ein unnötiger Methodenaufruf.
@@ -86,7 +100,7 @@ public abstract class Entity {
     public Vector2f getCenteredRenderPos() {
         if(textureBounds == null){
             float r = boundsRadius;
-            return new Vector2f(position).sub(new Vector2f(r,r));
+            return new Vector2f(position).sub(new Vector2f(r,r));            
         }
         else
         {

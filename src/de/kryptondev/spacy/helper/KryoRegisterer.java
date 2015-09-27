@@ -55,5 +55,6 @@ public class KryoRegisterer {
         k.register(OnDeath.class);
         k.register(OnHit.class);
         k.register(OnKill.class);
+        k.register(OnJoin.class);
     }
 }

@@ -7,13 +7,8 @@ import de.kryptondev.spacy.SpacyClient;
 import de.kryptondev.spacy.SpriteSheet;
 import de.kryptondev.spacy.input.KeyInputManager;
 import de.kryptondev.spacy.input.MouseInputManager;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.newdawn.slick.Color;
@@ -32,13 +27,14 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     public static final org.newdawn.slick.Color BackgroundColor = new org.newdawn.slick.Color(8,8,64);
     private SpacyClient client;
     private Image background;
-    private Rect viewPort;
+    private Rect viewPort;    
+    private Rect viewPortOriginal;
     private SpriteSheet spriteSheet;
     private Ship myShip;
     private final int backgroundMoveFactor = 2;
-    private Vector2f viewPortCenter;
+    private Vector2f viewPortCenter = new Vector2f(0f, 0f);
     private float zoom = 1.0f;
-    private final float zoomStep = 0.2f;
+    private final float zoomStep = 0.5f;
     private final Random rand;
     private boolean debug = false;
     
@@ -62,7 +58,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     public void init(GameContainer gc) {    
         MouseInputManager.getInstance().registerListener("Fire", Input.MOUSE_LEFT_BUTTON, this);       
         MouseInputManager.getInstance().registerListener("Throttle", Input.MOUSE_RIGHT_BUTTON, this);
+        
         KeyInputManager.getInstance().registerListener("Debug", Input.KEY_F12, this);
+        
+        KeyInputManager.getInstance().registerListener("Zoom In", Input.KEY_ADD, this);        
+        KeyInputManager.getInstance().registerListener("Zoom Out", Input.KEY_SUBTRACT, this);
+         KeyInputManager.getInstance().registerListener("Zoom Reset", Input.KEY_NUMPAD0, this);
 
         Random r = new Random();
         gc.setAlwaysRender(true);
@@ -72,7 +73,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         
         try {       
             viewPort = new Rect(0, 0, gc.getWidth(), gc.getHeight());
-                
+        
+            
             int width = this.client.getWorld().worldSize;
             int height = width;      
 
@@ -87,7 +89,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             }
 
             g.flush();
-            background = new Image(800, 600);
+            background = new Image(width, height);
             g.copyArea(background,0,0);                
             g.destroy();
             
@@ -105,64 +107,97 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                 ship.move(delta);
             }
 
-
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+        try{
             ConcurrentHashMap<Long, Projectile> projectiles = new ConcurrentHashMap<>(client.getWorld().projectiles);
             for(Projectile p : projectiles.values()){
                 p.move(delta);
-            }
-
-            ConcurrentHashMap<Long, Entity> entities = new ConcurrentHashMap<>(client.getWorld().entities);
-            for(Entity e : entities.values()){
-                e.move(delta);
-            }
-
-            if(this.client.getShip() == null){
-                //Last death point?
-                //viewPortCenter = lastDeath;
-                System.err.println("MyShip is NULL");
-            }
-            else
-            {
-                Vector2f shipPos = this.client.getShip().getCenteredRenderPos();
-                //System.out.println("MyShip @ " + shipPos.x + ", " + shipPos.y);
-                this.viewPortCenter = shipPos;
-                this.viewPort.x = viewPortCenter.x - (this.viewPort.width / 2);
-                this.viewPort.y = viewPortCenter.y - (this.viewPort.height / 2);
             }
         }
         catch(Exception ex){
             ex.printStackTrace();
         }
+        try{
+            
+        
+            ConcurrentHashMap<Long, Entity> entities = new ConcurrentHashMap<>(client.getWorld().entities);
+            for(Entity e : entities.values()){
+                e.move(delta);
+            }
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+ 
+        if(this.client.getShip() == null){
+            //Last death point?
+            //viewPortCenter = lastDeath;
+            System.err.println("MyShip is NULL");
+        }
+        else
+        {
+            Vector2f shipPos = myShip.position;
+            this.viewPortCenter = shipPos;
+            //this.viewPortCenter = new Vector2f(0,0);
+            this.viewPort.x = (viewPortCenter.x - (this.viewPort.width / 2));
+            this.viewPort.y = (viewPortCenter.y - (this.viewPort.height / 2));
+            
+        }
+      
+    }
+    
+    public void drawCross(Vector2f pos, Graphics g){
+      
+        float size = 50f;
+        g.setColor(Color.magenta);
+        g.drawLine(pos.x - size / 2, pos.y, pos.x + size / 2, pos.y);
+        g.drawLine(pos.x, pos.y - size/ 2, pos.x, pos.y +  size / 2);
+        g.setColor(Color.white);
+        g.drawString(pos.x + " | " + pos.y , pos.x + 10, pos.y - 10);        
+    }
+    
+    public void drawCross(float x, float y, Graphics g){
+        drawCross(new Vector2f(x,y),g);
     }
     
     @Override
-    public void draw(GameContainer gc, Graphics g) {        
+    public void draw(GameContainer gc, Graphics g) {    
+        //g.setWorldClip(0, 0, client.getWorld().worldSize, client.getWorld().worldSize);
+        g.drawImage(background, 0, 0);
+        g.scale(zoom, zoom);
         g.translate((-viewPort.x) / this.backgroundMoveFactor , 
                 (-viewPort.y) / this.backgroundMoveFactor);
-        g.scale(zoom, zoom);
-        g.setColor(Color.white);        
         g.setBackground(BackgroundColor);
-        g.drawImage(background, 0, 0);
+        //g.drawImage(background, 0, 0);
         g.resetTransform();
         g.scale(zoom, zoom);
-        g.translate((-viewPort.x * zoom), (-viewPort.y * zoom));
+        g.translate((-viewPort.x) , (-viewPort.y));
         
-        g.drawImage(background, 0, 0);
         
         if(client.getWorld() == null)
             return;
         
-        
+        //sheet.draw("meteorBrown_big1.png", viewPortCenter.x - 101 / 2, viewPortCenter.y-84/2);
+//        drawCross(viewPortCenter.x, viewPortCenter.y, g);
         try{
             ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<>(client.getWorld().ships);
             for(ConcurrentHashMap.Entry<Long, Ship> ship : ships.entrySet()){                 
-                Vector2f renderPosition = (ship).getValue().getCenteredRenderPos();            
-                sheet.draw((ship).getValue().texture, renderPosition.x, renderPosition.y);
+                Vector2f renderPosition = ship.getValue().getCenteredRenderPos();            
+                sheet.draw(ship.getValue().texture, renderPosition.x, renderPosition.y);
+                drawCross(ship.getValue().position.x, ship.getValue().position.y, g);
+                ship.getValue().drawRotation(g);
+                ship.getValue().drawBounds(g);
             }        
             ConcurrentHashMap<Long, Projectile> projectiles = new ConcurrentHashMap<>(client.getWorld().projectiles);
             for(ConcurrentHashMap.Entry<Long, Projectile> p : projectiles.entrySet()){
+                p.getValue().drawBounds(g);
                 Vector2f renderPosition = (p).getValue().getBulletRenderPos();
-                sheet.draw(p.getValue().texture, renderPosition.x, renderPosition.y);           
+                sheet.draw(p.getValue().texture, renderPosition.x, renderPosition.y);  
+                drawCross(p.getValue().position.x, p.getValue().position.y, g);
+                p.getValue().drawRotation(g);
             }        
         }
         catch(Exception ex){
@@ -178,7 +213,15 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             g.setColor(Color.white);
             g.drawString("Serverdelta:     " + client.getServerTickDelta() + "ms", 8, 30);
             g.drawString("Ticks/s:         " + client.getServerTicksPerSecond(), 8, 50);            
+            g.drawString("Viewport Pos:    " + this.viewPort.x + " | " + this.viewPort.y, 8, 70);
+            g.drawString("Ship Pos:        " + this.viewPortCenter.x + " | " + this.viewPortCenter.y, 8, 90);
+            g.drawString("Zoom:            " + this.zoom, 8, 110);
+            g.drawString("Viewport Size:   " + this.viewPort.width + "x" + this.viewPort.height, 8, 130);
         }
+        //g.setClip((int)viewPort.x, (int)viewPort.y, (int)(viewPort.width * zoom), (int)(viewPort.height* zoom));
+        
+        
+      
         
     }
     
@@ -208,16 +251,19 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     public void onKeyPressed(int key) {
        if(key == Input.KEY_ADD){
            this.zoom *= 1 + zoomStep;
-           this.viewPort.height *= 1 + zoomStep;
-           this.viewPort.width *= 1 + zoomStep;
+//           this.viewPort.height *= 1 - zoomStep;
+//           this.viewPort.width *= 1 - zoomStep;
            System.out.println(viewPort.toString());
            
        }
        if(key == Input.KEY_SUBTRACT){
            this.zoom *= 1 - zoomStep;
-           this.viewPort.height *= 1 - zoomStep;
-           this.viewPort.width *= 1 - zoomStep;
+//           this.viewPort.height *= 1 + zoomStep;
+//           this.viewPort.width *= 1 + zoomStep;
            System.out.println(viewPort.toString());
+       }
+       if(key == Input.KEY_NUMPAD0){
+           
        }
        //Toggle debug
        if(key == Input.KEY_F12){

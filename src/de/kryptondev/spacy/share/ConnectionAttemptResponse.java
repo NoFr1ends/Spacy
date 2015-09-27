@@ -1,18 +1,16 @@
 package de.kryptondev.spacy.share;
 
-import de.kryptondev.spacy.server.SpacyServer;
-
-
 public class ConnectionAttemptResponse {
 
     public ConnectionAttemptResponse() {
     }
     
-    public ConnectionAttemptResponse(Type type) {
+    public ConnectionAttemptResponse(Type type, int worldSize) {
+        this.worldSize = worldSize;
         this.type = type;
     }
     
-    public int worldSize = SpacyServer.instance.world.worldSize;
+    public int worldSize;
     
     public Type type;
     public enum Type{
