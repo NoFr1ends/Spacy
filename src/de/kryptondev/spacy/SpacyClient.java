@@ -91,7 +91,7 @@ public class SpacyClient extends Listener{
             if(this.world.ships.containsKey(r.ship)){
                 Ship s = this.world.ships.get(r.ship);
                 s.direction = r.direction;
-                this.world.ships.replace(shipId, s);
+                this.world.ships.put(shipId, s);
             }
         }
         
@@ -100,7 +100,7 @@ public class SpacyClient extends Listener{
             Ship ship = this.world.ships.get(move.id);
             if(this.world.ships.containsKey(move.id)){
                 ship.moving = move.status;
-                this.world.ships.replace(shipId, ship);
+                this.world.ships.put(shipId, ship);
             }
             else{
                 System.err.println("Ship " + move.id + " not found!");
@@ -244,12 +244,12 @@ public class SpacyClient extends Listener{
     }
 
     public Ship getShip() {
-        return this.world.ships.getOrDefault(this.shipId, null);
+        return this.world.ships.get(this.shipId);
     }
     
     public void setShip(Ship ship){
         if(this.world.ships.containsKey(ship.id)){
-            this.world.ships.replace(ship.id, ship);
+            this.world.ships.put(ship.id, ship);
         }
     }
 
@@ -283,7 +283,7 @@ public class SpacyClient extends Listener{
     
     public void replaceShip(Ship ship){
         if(this.world.ships.containsKey(ship.id)){
-            this.world.ships.replace(ship.id, ship);
+            this.world.ships.put(ship.id, ship);
         }
     }
     

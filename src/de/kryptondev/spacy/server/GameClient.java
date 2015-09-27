@@ -120,7 +120,7 @@ public class GameClient extends Listener {
                 Ship ship = this.getMyShip();
                 ship.moving = move.status;
                 if(this.server.world.ships.containsKey(this.shipId))
-                    this.server.world.ships.replace(shipId, ship);
+                    this.server.world.ships.put(shipId, ship);
                 
                 move.id = this.shipId;
                 server.getServer().sendToAllTCP(move);
@@ -186,7 +186,7 @@ public class GameClient extends Listener {
         }
 
         public Ship getMyShip() {
-            return server.world.ships.getOrDefault(this.shipId, null);
+            return server.world.ships.get(this.shipId);
         }
             
         
