@@ -52,6 +52,7 @@ public class GameClient extends Listener {
             Random r = new Random();
             s.position = /*new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);*/ 
                     new Vector2f(r.nextFloat() * 200, r.nextFloat() * 200);
+            s.moving = EMoving.Stopped;
             s.maxSpeed = 80f;
             s.acceleration = 1.2f;
             s.texture = "playerShip2_orange.png"; // todo change for teams etc
@@ -61,6 +62,7 @@ public class GameClient extends Listener {
             this.shipId = s.id;
             server.world.ships.put(s.id,s);
             server.getServer().sendToAllTCP(new OnJoin(s));
+            
             return s;
         }
         
@@ -72,11 +74,10 @@ public class GameClient extends Listener {
             //GameClient.this.spacyServer.broadcast(new Chatmessage(GameClient.this.getPlayerInfo().playerName + " joined the party!"));
             //GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.toString() + " connected right now!");
           
-
-            this.server.sendWorld(this);
             Ship s = this.addShip();
             this.sendTCP(s);            
             this.sendTCP(new DebugTickDelta(server.getServerTick().getDelta(), GameTick.ticksPerSecond));
+            server.sendWorld(this);
         }
 
         @Override
@@ -116,7 +117,11 @@ public class GameClient extends Listener {
             }
             if(data instanceof Move){
                 Move move = (Move)data;
-                this.getMyShip().moving = move.status;
+                Ship ship = this.getMyShip();
+                ship.moving = move.status;
+                if(this.server.world.ships.containsKey(this.shipId))
+                    this.server.world.ships.replace(shipId, ship);
+                
                 move.id = this.shipId;
                 server.getServer().sendToAllTCP(move);
                 return;
@@ -132,6 +137,7 @@ public class GameClient extends Listener {
                 Projectile p = (Projectile)data;
                 p.setLifeTime(2.5f);                
                 p.maxSpeed = 50;
+                p.speed = p.maxSpeed;
                 p.visible = true;
                 p.position = this.getMyShip().position;
                 p.direction = this.getMyShip().direction;
@@ -143,6 +149,7 @@ public class GameClient extends Listener {
                 SpacyServer.instance.world.projectiles.put(p.id, p);
                 SpacyServer.instance.getServer().sendToAllTCP(p);
             }
+           
 
         }
         

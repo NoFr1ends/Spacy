@@ -19,7 +19,7 @@ import java.util.Map;
 public class GameTick implements Runnable{
     private int delta = 0;
     private GameTick instance;
-    public static final int ticksPerSecond = 64 * 2;        
+    public static final int ticksPerSecond = 100;        
     private SpacyServer server;    
     public GameTick(SpacyServer server) {
         this.server = server;
@@ -30,8 +30,10 @@ public class GameTick implements Runnable{
             SGameClient gc = (SGameClient)c;
             Ship ship = gc.getMyShip();
             if(ship != null)
-                if(ship.moving != EMoving.Stopped)
+                if(ship.moving != EMoving.Stopped){                        
                     ship.move(delta);
+                    System.out.println("Server: Ship " + ship.id + " is moving!" + ship.position.x);                    
+                }
         }
         HashMap<Long, Projectile> projs = server.world.projectiles;
         long pos = projs.size();
@@ -49,6 +51,8 @@ public class GameTick implements Runnable{
             }
             
             p.move(delta);
+            System.out.println("Server: Projectile " + p.id + " is moving!" + p.position.x);
+            
             for(Connection c : (Connection[])server.getServer().getConnections().clone()) { 
                 SGameClient gc = (SGameClient)c;
                 Ship ship = gc.getMyShip();
@@ -94,7 +98,7 @@ public class GameTick implements Runnable{
                 
                 delta = (int)(finalEnd - start);
                 if(delta != lastDelta){
-                    System.out.println("Tickdelta is: " + delta);
+                    //System.out.println("Tickdelta is: " + delta);
                     server.getServer().sendToAllTCP(new DebugTickDelta(delta, ticksPerSecond));
                     lastDelta = delta;
                 }

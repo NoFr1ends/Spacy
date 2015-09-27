@@ -62,6 +62,8 @@ public class SpacyServer extends Listener {
     }
     
     public void sendWorld(SGameClient client){
+        client.sendTCP(this.world);
+        /*
         int count = 0;
         HashMap<Long, Ship> tmpShip = new HashMap<>(8);
         for(Ship ship : tmpShip.values()){
@@ -98,7 +100,7 @@ public class SpacyServer extends Listener {
             }
             
         }
-        
+        */
     }
 
     public SpacyServer(int maxSlots) {

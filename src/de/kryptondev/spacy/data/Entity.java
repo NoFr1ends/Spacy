@@ -53,7 +53,7 @@ public abstract class Entity {
     }
     
     public void drawRotation(Graphics g){
-        float size = 35f;
+        float size = 50f;
         g.setColor(Color.yellow);
         g.drawLine(this.position.x, this.position.y,this.position.x + this.direction.x * size,this.position.y+ this.direction.y * size);
     }
@@ -63,7 +63,7 @@ public abstract class Entity {
         g.drawOval(this.position.x - this.boundsRadius / 2, this.position.y - this.boundsRadius / 2, this.boundsRadius, this.boundsRadius);
     }
     
-    public void move(int delta) {
+    public void move(int delta) {        
         //Theoretisch kann die Verzweigung weggelassen werden.
         //Die Frage ist ob eine Verzweigung performanter ist als ein unnötiger Methodenaufruf.
         //System.out.println(Float.toString(speed) + "-" + Float.toString(maxSpeed));
@@ -79,6 +79,7 @@ public abstract class Entity {
         }
         if(moving == EMoving.Stopped){
             this.speed = 0;
+            return;
         }
         Vector2f newPosition = new Vector2f();
         newPosition.x = position.x + (direction.x * speed) * (delta / 16f);
