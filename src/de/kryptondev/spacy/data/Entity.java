@@ -74,6 +74,12 @@ public abstract class Entity {
         if(moving == EMoving.Deccelerating){
             this.decelerate();
         }
+        if(moving == EMoving.FullSpeed){
+            this.speed = maxSpeed;
+        }
+        if(moving == EMoving.Stopped){
+            this.speed = 0;
+        }
         Vector2f newPosition = new Vector2f();
         newPosition.x = position.x + (direction.x * speed) * (delta / 16f);
         newPosition.y = position.y + (direction.y * speed) * (delta / 16f);

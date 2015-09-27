@@ -1,25 +1,18 @@
 package de.kryptondev.spacy.share;
 
+import de.kryptondev.spacy.data.EMoving;
+
 
 public class Move {  
-    public boolean status;
-
+    public EMoving status;
+    public long id;
     public Move() {
     }
 
-    public Move(boolean status) {
+    public Move(EMoving status, long id) {
         this.status = status;
+        this.id = id;
     }
 
-    public void start(){
-        status = true;
-    }
-    
-    public void stop(){
-        status = false;
-    }
-    
-    public void invert(){
-        status = !status;
-    }
+  
 }

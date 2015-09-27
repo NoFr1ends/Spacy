@@ -91,8 +91,9 @@ public class GameClient extends Listener {
         }
         
         public void onDisconnect(){
-            GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.instance.playerInfo.playerName + " left the party!");      
+            /*GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.instance.playerInfo.playerName + " left the party!");      
             System.out.println(".disconnected()");
+            */
         }
         
         public void onRecv(Object data) {        
@@ -115,15 +116,13 @@ public class GameClient extends Listener {
             }
             if(data instanceof Move){
                 Move move = (Move)data;
-                if(move.status)
-                    this.getMyShip().moving = EMoving.Accelerating;
-                else
-                    this.getMyShip().moving = EMoving.Deccelerating;
+                this.getMyShip().moving = move.status;
+                move.id = this.shipId;
+                server.getServer().sendToAllTCP(move);
                 return;
             }
             if(data instanceof PlayerRotate){
                 PlayerRotate rotation = (PlayerRotate)data;
-                this.getMyShip().direction = rotation.direction;
                 rotation.ship = this.getMyShip().id;
                 this.server.getServer().sendToAllTCP(rotation);
                 return;
@@ -131,18 +130,16 @@ public class GameClient extends Listener {
             if(data instanceof Projectile){               
                 //Fire
                 Projectile p = (Projectile)data;
-                p.setLifeTime(2.5f);
-                p.acceleration = Float.POSITIVE_INFINITY;
+                p.setLifeTime(2.5f);                
                 p.maxSpeed = 50;
                 p.visible = true;
                 p.position = this.getMyShip().position;
                 p.direction = this.getMyShip().direction;
                 p.id = SpacyServer.instance.EntityCounter++;
-                p.boundsRadius = 4.5f;
-                p.damage = 100;
+                p.boundsRadius = 4.5f*3;
+                p.damage = 30;
                 p.moving = EMoving.FullSpeed;
                 p.texture ="laserRed01.png";
-                System.out.println(p.texture);
                 SpacyServer.instance.world.projectiles.put(p.id, p);
                 SpacyServer.instance.getServer().sendToAllTCP(p);
             }

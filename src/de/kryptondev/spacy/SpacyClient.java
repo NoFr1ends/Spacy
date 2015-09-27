@@ -12,6 +12,7 @@ import de.kryptondev.spacy.helper.UID;
 
 import de.kryptondev.spacy.screen.GameScreen;
 import de.kryptondev.spacy.screen.ScreenManager;
+import de.kryptondev.spacy.share.playerEvents.OnJoin;
 import java.lang.reflect.Field;
 
 
@@ -90,6 +91,13 @@ public class SpacyClient extends Listener{
             }
         }
         
+        if(o instanceof Move){
+            Move move = (Move)o;
+            Ship ship = this.world.ships.get(move.id);
+            ship.moving = move.status;
+            this.world.ships.replace(shipId, ship);
+        }
+        
         if (o instanceof ConnectionAttemptResponse) {
             //Antwort auswerten
             ConnectionAttemptResponse response = (ConnectionAttemptResponse) o;
@@ -158,6 +166,11 @@ public class SpacyClient extends Listener{
             else if(world.entities.containsKey(entity.vid)) {
                 world.entities.remove(entity.vid);
             }
+        }
+        
+        if(o instanceof OnJoin){
+            OnJoin join = (OnJoin)o;
+            this.world.ships.put(join.ship.id, join.ship);
         }
         
         if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
