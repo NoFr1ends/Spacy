@@ -43,8 +43,4 @@ public class Projectile extends Entity {
         this.lifetime = (int)(seconds * GameTick.ticksPerSecond);
         this.remainingLifetime = this.lifetime;
     }
-
-
-
-    
 }

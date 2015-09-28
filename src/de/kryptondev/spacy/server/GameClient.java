@@ -44,7 +44,7 @@ public class GameClient extends Listener {
         
         
         /**
-        * Neues Schiff mit Standartwerten erstellen und zur Welt hinzufügen.
+        * Neues Schiff mit Standardwerten erstellen und zur Welt hinzufügen.
         * @return das neue Schiff
         */
         public Ship addShip(){
@@ -149,8 +149,6 @@ public class GameClient extends Listener {
                 SpacyServer.instance.world.projectiles.put(p.id, p);
                 SpacyServer.instance.getServer().sendToAllTCP(p);
             }
-           
-
         }
         
         public Version getVersion() {
@@ -187,8 +185,6 @@ public class GameClient extends Listener {
 
         public Ship getMyShip() {
             return server.world.ships.get(this.shipId);
-        }
-            
-        
+        }   
     }
 }

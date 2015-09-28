@@ -19,10 +19,6 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Vector2f;
 
-
-
-
-
 public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseInputManager.MouseListener {
     public static final org.newdawn.slick.Color BackgroundColor = new org.newdawn.slick.Color(8,8,64);
     private SpacyClient client;
@@ -69,7 +65,6 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         
         try {       
             viewPort = new Rect(0, 0, gc.getWidth(), gc.getHeight());
-        
             
             int width = this.client.getWorld().worldSize;
             int height = width;      
@@ -92,7 +87,6 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         } catch (SlickException ex) {
             Logger.getLogger(GameScreen.class.getName()).log(Level.SEVERE, null, ex);
         }
-      
     }
 
     @Override
@@ -103,7 +97,6 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             for(Ship ship : ships.values()){
                 ship.move(delta);
             }
-
         }
         catch(Exception ex){
             ex.printStackTrace();
@@ -140,7 +133,6 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             this.viewPort.y = (viewPortCenter.y - (this.viewPort.height / 2));
             
         }
-      
     }
     
     public void drawCross(Vector2f pos, Graphics g){
@@ -169,8 +161,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         g.resetTransform();
         g.scale(zoom, zoom);
         g.translate((-viewPort.x) , (-viewPort.y));
-        
-        
+
         if(client.getWorld() == null)
             return;
         
