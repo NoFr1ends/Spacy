@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
 
 
 public class GameTick implements Runnable{
@@ -45,6 +46,8 @@ public class GameTick implements Runnable{
                     server.getServer().sendToAllTCP(new OnKill(ship.id, ship.id, -1));
                     server.getServer().sendToAllTCP(new DeleteEntity(ship.id));
                     server.world.ships.remove(ship.id);
+                    //TODO: Add Delay
+                    gc.addShip();
                 }
             }
         }

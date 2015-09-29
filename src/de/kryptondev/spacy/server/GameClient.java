@@ -55,7 +55,9 @@ public class GameClient extends Listener {
             this.shipId = s.id;
             server.world.ships.put(s.id,s);
             server.getServer().sendToAllTCP(new OnJoin(s));
-            
+            this.sendTCP(s);            
+            this.sendTCP(new DebugTickDelta(server.getServerTick().getDelta(), GameTick.ticksPerSecond));
+            server.sendWorld(this);
             return s;
         }
         
@@ -65,9 +67,7 @@ public class GameClient extends Listener {
                 return;
             }           
             Ship s = this.addShip();
-            this.sendTCP(s);            
-            this.sendTCP(new DebugTickDelta(server.getServerTick().getDelta(), GameTick.ticksPerSecond));
-            server.sendWorld(this);
+           
         }
 
         @Override

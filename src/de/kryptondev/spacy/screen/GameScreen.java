@@ -144,7 +144,10 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             int world = client.getWorld().worldSize;
             int tolerance = client.getWorld().toleranceDeathRadius;
 
+            boolean alphaChanged = false;
+            
             if(x < 0 | y < 0){
+                alphaChanged = true;
                 if(x < y){
                     alphaWarn = Math.abs(x) / tolerance;
                 }
@@ -152,14 +155,19 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                     alphaWarn = Math.abs(y) / tolerance;
                 }
             }
-
+            
             if(x > world | y > world){
+                alphaChanged = true;
                 if(x > y){
                     alphaWarn = Math.abs(x - world) / tolerance;
                 }
                 else{
                     alphaWarn = Math.abs(y - world) / tolerance;
                 }
+            }
+            
+            if(!alphaChanged){
+                alphaWarn = 0f;
             }
         }
         
