@@ -7,6 +7,7 @@ import de.kryptondev.spacy.SpacyClient;
 import de.kryptondev.spacy.SpriteSheet;
 import de.kryptondev.spacy.input.KeyInputManager;
 import de.kryptondev.spacy.input.MouseInputManager;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -91,6 +92,14 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
 
     @Override
     public void update(GameContainer gc, int delta) {
+        // Delete :)
+        ArrayList<Long> toDelete = new ArrayList<>(SpacyClient.instance.toDelete);
+        for(Long delete: toDelete) {
+            client.getWorld().ships.remove(delete);
+            client.getWorld().entities.remove(delete);
+            client.getWorld().projectiles.remove(delete);
+        }
+        SpacyClient.instance.toDelete.clear();
         
         try{
             ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<>(client.getWorld().ships);
@@ -102,8 +111,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             ex.printStackTrace();
         }
         try{
-            ConcurrentHashMap<Long, Projectile> projectiles = new ConcurrentHashMap<>(client.getWorld().projectiles);
-            for(Projectile p : projectiles.values()){
+            for(Projectile p : client.getWorld().projectiles.values()){
                 p.move(delta);
             }
         }
@@ -168,7 +176,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         //sheet.draw("meteorBrown_big1.png", viewPortCenter.x - 101 / 2, viewPortCenter.y-84/2);
 //        drawCross(viewPortCenter.x, viewPortCenter.y, g);
         try{
-            ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<>(client.getWorld().ships);
+            ConcurrentHashMap<Long, Ship> ships = client.getWorld().ships;
             for(ConcurrentHashMap.Entry<Long, Ship> ship : ships.entrySet()){                 
                 Vector2f renderPosition = ship.getValue().getCenteredRenderPos();            
                 sheet.draw(ship.getValue().texture, 
@@ -183,7 +191,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                     ship.getValue().drawBounds(g);
                 }
             }        
-            ConcurrentHashMap<Long, Projectile> projectiles = new ConcurrentHashMap<>(client.getWorld().projectiles);
+            ConcurrentHashMap<Long, Projectile> projectiles = client.getWorld().projectiles;
             for(ConcurrentHashMap.Entry<Long, Projectile> p : projectiles.entrySet()){
                 
                 Vector2f renderPosition = (p).getValue().getBulletRenderPos();
@@ -207,6 +215,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         DEBUG SECTION
         */
         if(this.debug){
+            long objects = client.getWorld().projectiles.size() + client.getWorld().ships.size();
+            
             g.resetTransform();
             g.setColor(Color.white);
             g.drawString("Serverdelta:     " + client.getServerTickDelta() + "ms", 8, 30);
@@ -215,6 +225,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             g.drawString("Ship Pos:        " + this.viewPortCenter.x + " | " + this.viewPortCenter.y, 8, 90);
             g.drawString("Zoom:            " + this.zoom, 8, 110);
             g.drawString("Viewport Size:   " + this.viewPort.width + "x" + this.viewPort.height, 8, 130);
+            g.drawString("Objects:         " + objects, 8, 150);
         }
         //g.setClip((int)viewPort.x, (int)viewPort.y, (int)(viewPort.width * zoom), (int)(viewPort.height* zoom));
         

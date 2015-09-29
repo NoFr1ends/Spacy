@@ -128,6 +128,8 @@ public class GameClient extends Listener {
             }
             if(data instanceof PlayerRotate){
                 PlayerRotate rotation = (PlayerRotate)data;
+                this.getMyShip().direction = rotation.direction;
+                
                 rotation.ship = this.getMyShip().id;
                 this.server.getServer().sendToAllTCP(rotation);
                 return;

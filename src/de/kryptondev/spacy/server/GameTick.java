@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class GameTick implements Runnable{
@@ -32,16 +33,19 @@ public class GameTick implements Runnable{
             if(ship != null)
                 if(ship.moving != EMoving.Stopped){                        
                     ship.move(delta);
-                    System.out.println("Server: Ship " + ship.id + " is moving!" + ship.position.x);                    
+                    //System.out.println("Server: Ship " + ship.id + " is moving!" + ship.position.x);                    
                 }
         }
-        HashMap<Long, Projectile> projs = server.world.projectiles;
-        long pos = projs.size();
+        ConcurrentHashMap<Long, Projectile> projs = server.world.projectiles;
+        ArrayList<Long> toDelete = new ArrayList<>();
+        for(Projectile p: projs.values()) {
+        /*long pos = projs.size();
         while(projs.containsKey(pos)){
-            Projectile p = projs.get(pos--);
+            Projectile p = projs.get(pos--);*/
                     
             if(p.remainingLifetime <= 0){
-                server.world.projectiles.remove(pos + 1);
+                //server.world.projectiles.remove(pos + 1);
+                toDelete.add(p.id);
                 server.getServer().sendToAllTCP(new DeleteEntity(p.id));
                 System.out.println("Deleting projectile " + p.id);
                 continue;
@@ -51,7 +55,7 @@ public class GameTick implements Runnable{
             }
             
             p.move(delta);
-            System.out.println("Server: Projectile " + p.id + " is moving!" + p.position.x);
+            //System.out.println("Server: Projectile " + p.id + " is moving!" + p.position.x);
             
             for(Connection c : (Connection[])server.getServer().getConnections().clone()) { 
                 SGameClient gc = (SGameClient)c;
@@ -70,14 +74,19 @@ public class GameTick implements Runnable{
                         //TODO Client neues Schiff zuweisen & altes Schiff löschen!
                     }
                     if(p.destroyOnCollision){
-                        server.world.projectiles.remove(pos + 1);
+                        //server.world.projectiles.remove(pos + 1);
+                        toDelete.add(p.id);
                         server.getServer().sendToAllTCP(new DeleteEntity(p.id));
-                        System.out.println("Deleting projectile " + p.id);
+                        //System.out.println("Deleting projectile " + p.id);
                         continue;
                     }
                 }
             }
          }
+        
+        for(Long id: toDelete) {
+            server.world.projectiles.remove(id);
+        }
     }
 
     @Override

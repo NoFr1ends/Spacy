@@ -6,6 +6,7 @@ import de.kryptondev.spacy.share.*;
 import de.kryptondev.spacy.share.playerEvents.*;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.newdawn.slick.geom.Vector2f;
 
@@ -24,6 +25,7 @@ public class KryoRegisterer {
         k.register(String.class);
         k.register(Date.class);
         k.register(HashMap.class); 
+        k.register(ConcurrentHashMap.class);
         k.register(java.util.ArrayList.class);
         k.register(CopyOnWriteArrayList.class);
         k.register(EMoving.class);
