@@ -68,6 +68,8 @@ public abstract class Entity {
     public void move(int delta) {
         //System.out.println(Float.toString(speed) + "-" + Float.toString(maxSpeed));
 
+        Vector2f oldPos = position;
+        
         if (moving == EMoving.Accelerating) {
             this.accelerate();
         }
@@ -85,14 +87,22 @@ public abstract class Entity {
         newPosition.x = position.x + (direction.x * speed) * (delta / 16f);
         newPosition.y = position.y + (direction.y * speed) * (delta / 16f);
         position = newPosition;
+        
+        
+        //System.out.println(id + ": " + moving + " with speed " + speed + " in direction " + direction);
     }
 
     public float getRotation() {
-        float alpha = (float) Math.acos((double) (direction.y / (Math.sqrt(direction.x * direction.x + direction.y * direction.y))));
-        if (alpha < 0) {
-            alpha += 360;
-        }
-        return alpha;
+//        float alpha = (float) Math.acos((double) (direction.y / (Math.sqrt(direction.x * direction.x + direction.y * direction.y))));
+//        if (alpha < 0) {
+//            alpha += 360;
+//        }
+//        return alpha;
+
+        /*if(this instanceof Ship) {
+            System.out.println(direction);
+        }*/
+        return (float) (Math.atan2(direction.y, direction.x) * 180 / Math.PI) + 90;
     }
 
     public void rotateToMouse(Vector2f mouseposition) {

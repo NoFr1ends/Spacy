@@ -14,6 +14,7 @@ import de.kryptondev.spacy.screen.GameScreen;
 import de.kryptondev.spacy.screen.ScreenManager;
 import de.kryptondev.spacy.share.playerEvents.OnJoin;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 
 public class SpacyClient extends Listener{
@@ -28,6 +29,8 @@ public class SpacyClient extends Listener{
     private long shipId;
     private int serverTickDelta;
     private int serverTicksPerSecond;
+    
+    public ArrayList<Long> toDelete = new ArrayList<>();
     
     public SpacyClient() {
         this.info = new PlayerInfo();
@@ -166,15 +169,8 @@ public class SpacyClient extends Listener{
         
         if(o instanceof DeleteEntity){
             DeleteEntity entity = (DeleteEntity)o;
-            if(world.projectiles.containsKey(entity.vid)) {
-                world.projectiles.remove(entity.vid);
-            }
-            else if(world.ships.containsKey(entity.vid)) {
-                world.ships.remove(entity.vid);
-            }
-            else if(world.entities.containsKey(entity.vid)) {
-                world.entities.remove(entity.vid);
-            }
+            
+            toDelete.add(entity.vid);
         }
         
         if(o instanceof OnJoin){

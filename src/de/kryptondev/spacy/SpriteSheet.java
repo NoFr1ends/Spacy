@@ -7,6 +7,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.lwjgl.util.Rectangle;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.w3c.dom.Document;
@@ -21,7 +22,7 @@ public class SpriteSheet {
     private Texture t;
     private Image i;
     
-    private HashMap<String, Rectangle> subTextures = new HashMap<>();
+    private HashMap<String, Image> subTextures = new HashMap<>();
     
     public SpriteSheet(String descFile) {
         this.descFile = descFile;
@@ -34,6 +35,13 @@ public class SpriteSheet {
             doc.getDocumentElement().normalize();
             
             textureFile = doc.getDocumentElement().getAttribute("imagePath");
+            
+            try {
+                t = TextureLoader.getTexture("PNG", new FileInputStream(textureFile));
+                i = new Image(t);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             
             NodeList subTextures = doc.getElementsByTagName("SubTexture");
             for(int i = 0; i < subTextures.getLength(); i++) {
@@ -52,33 +60,29 @@ public class SpriteSheet {
                 texture.setHeight(Integer.parseInt(subTexture.getAttributes()
                         .getNamedItem("height").getNodeValue()));
                 
-                this.subTextures.put(name, texture);
+                this.subTextures.put(name, this.i.getSubImage(texture.getX(), texture.getY(), texture.getWidth(), texture.getHeight()));
             }
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Failed to load SpriteSheet " + descFile);
         }
-        
-        try {
-            t = TextureLoader.getTexture("PNG", new FileInputStream(textureFile));
-            i = new Image(t);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
     
     public void draw(String name, float x, float y) {
+        draw(name, x, y, 0, null);
+    }
+    
+    public void draw(String name, float x, float y, float rotation, Vector2f centerPos) {
         if(!subTextures.containsKey(name)) {
             System.out.println("Failed to find texture " + name);
             return;
         }
         
-        Rectangle bounds = subTextures.get(name);
-        
-        i.draw(x, y, x + bounds.getWidth(), y + bounds.getHeight(), 
-                bounds.getX(), bounds.getY(), 
-                bounds.getX() + bounds.getWidth(), 
-                bounds.getY() + bounds.getHeight());
+        Image image = subTextures.get(name);
+        if(centerPos != null)
+            image.setCenterOfRotation(centerPos.x, centerPos.y);
+        image.setRotation(rotation);
+        image.draw(x, y);
     }
 
     private class SubTexture {

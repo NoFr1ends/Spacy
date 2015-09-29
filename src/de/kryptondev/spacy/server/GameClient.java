@@ -57,7 +57,7 @@ public class GameClient extends Listener {
             s.acceleration = 1.2f;
             s.texture = "playerShip2_orange.png"; // todo change for teams etc
             s.boundsRadius = 87f;
-            s.textureBounds = new Vector2f(99f, 75f);
+            s.textureBounds = new Vector2f(110, 66);
             s.id = server.EntityCounter++;
             this.shipId = s.id;
             server.world.ships.put(s.id,s);
@@ -128,6 +128,8 @@ public class GameClient extends Listener {
             }
             if(data instanceof PlayerRotate){
                 PlayerRotate rotation = (PlayerRotate)data;
+                this.getMyShip().direction = rotation.direction;
+                
                 rotation.ship = this.getMyShip().id;
                 this.server.getServer().sendToAllTCP(rotation);
                 return;
