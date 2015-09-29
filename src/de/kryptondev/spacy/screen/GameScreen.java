@@ -165,6 +165,14 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         if(client.getWorld() == null)
             return;
         
+        
+        //Draw World Borders
+        g.setLineWidth(75f);
+        g.setColor(Color.red);
+        g.drawRect(0, 0, client.getWorld().worldSize, client.getWorld().worldSize);
+        
+        
+        
         //sheet.draw("meteorBrown_big1.png", viewPortCenter.x - 101 / 2, viewPortCenter.y-84/2);
 //        drawCross(viewPortCenter.x, viewPortCenter.y, g);
         try{
@@ -193,6 +201,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         catch(Exception ex){
             ex.printStackTrace();
         }
+        
+        
         
         
         /*

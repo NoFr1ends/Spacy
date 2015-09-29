@@ -29,11 +29,23 @@ public class GameTick implements Runnable{
         for(Connection c : (Connection[])server.getServer().getConnections().clone()) {            
             SGameClient gc = (SGameClient)c;
             Ship ship = gc.getMyShip();
-            if(ship != null)
+            if(ship != null){
                 if(ship.moving != EMoving.Stopped){                        
                     ship.move(delta);
                     System.out.println("Server: Ship " + ship.id + " is moving!" + ship.position.x);                    
                 }
+                int n = server.world.worldSize;
+                int tolerance = 512;
+                if(ship.position.x + tolerance < 0 | ship.position.x - tolerance > n |
+                        ship.position.y + tolerance < 0 | ship.position.y - tolerance > n){
+                    //Kill player
+                    System.out.println("Killing Ship " +ship.id);
+                    gc.sendTCP(new OnDeath(ship.id, -1));
+                    server.getServer().sendToAllTCP(new OnKill(ship.id, ship.id, -1));
+                    server.getServer().sendToAllTCP(new DeleteEntity(ship.id));
+                    server.world.ships.remove(ship.id);
+                }
+            }
         }
         HashMap<Long, Projectile> projs = server.world.projectiles;
         long pos = projs.size();
@@ -67,7 +79,7 @@ public class GameTick implements Runnable{
                     if(ship.hp + (ship.shield != null ? ship.shield.life : 0) < 1){
                         gc.sendTCP(new OnDeath(p.senderId, p.id));
                         server.getServer().sendToAllTCP(new OnKill(ship.id, p.senderId, p.id));
-                        //TODO Client neues Schiff zuweisen & altes Schiff löschen!
+                        server.world.ships.remove(ship.id);
                     }
                     if(p.destroyOnCollision){
                         server.world.projectiles.remove(pos + 1);
@@ -97,8 +109,7 @@ public class GameTick implements Runnable{
                 long finalEnd = new Date().getTime();
                 
                 delta = (int)(finalEnd - start);
-                if(delta != lastDelta){
-                    //System.out.println("Tickdelta is: " + delta);
+                if(delta != lastDelta){                   
                     server.getServer().sendToAllTCP(new DebugTickDelta(delta, ticksPerSecond));
                     lastDelta = delta;
                 }
