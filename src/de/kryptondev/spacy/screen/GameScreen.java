@@ -178,7 +178,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         g.setLineWidth(75f);
         g.setColor(Color.red);
         g.drawRect(0, 0, client.getWorld().worldSize, client.getWorld().worldSize);
-        
+        g.setLineWidth(1f);
         
         
         //sheet.draw("meteorBrown_big1.png", viewPortCenter.x - 101 / 2, viewPortCenter.y-84/2);
