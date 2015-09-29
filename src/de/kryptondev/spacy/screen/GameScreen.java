@@ -31,6 +31,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private final float zoomStep = 0.5f;
     private final Random rand;
     private boolean debug = true;
+    private float alphaWarn = 0f;
     
     //Der letzte Zeitpunkt, andem das PlayerRotate-Paket gesendet wurde.
     //private long timeLastPlayerRotate = 0;
@@ -141,6 +142,34 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             this.viewPort.y = (viewPortCenter.y - (this.viewPort.height / 2));
             
         }
+        
+        //"Redness"-control when leaving battle field
+        float x = client.getShip().position.x;
+        float y = client.getShip().position.y;
+        int world = client.getWorld().worldSize;
+        int tolerance = 512;
+        
+        if(x < 0 | y < 0){
+            if(x < y){
+                System.out.println("ASDFDFAADSFADSFADFS");
+                alphaWarn = Math.abs(x) / tolerance;
+            }
+            else{
+                alphaWarn = Math.abs(y) / tolerance;
+            }
+        }
+        
+        if(x > world | y > world){
+            if(x > y){
+                alphaWarn = (x - world) / tolerance;
+            }
+            else{
+                alphaWarn = (y - world) / tolerance;
+            }
+        }
+        
+        
+        
     }
     
     public void drawCross(Vector2f pos, Graphics g){
@@ -236,11 +265,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             g.drawString("Zoom:            " + this.zoom, 8, 110);
             g.drawString("Viewport Size:   " + this.viewPort.width + "x" + this.viewPort.height, 8, 130);
             g.drawString("Objects:         " + objects, 8, 150);
+            g.drawString("alphaWarn:       " + alphaWarn, 8, 170);
         }
-        //g.setClip((int)viewPort.x, (int)viewPort.y, (int)(viewPort.width * zoom), (int)(viewPort.height* zoom));
         
-        
-      
+        g.resetTransform();
+        g.setColor(new Color(0xff, 0x00, 0x00, alphaWarn));        
+        g.fillRect(0, 0, gc.getWidth(), gc.getHeight());       
         
     }
     
