@@ -88,11 +88,16 @@ public abstract class Entity {
     }
 
     public float getRotation() {
-        float alpha = (float) Math.acos((double) (direction.y / (Math.sqrt(direction.x * direction.x + direction.y * direction.y))));
-        if (alpha < 0) {
-            alpha += 360;
-        }
-        return alpha;
+//        float alpha = (float) Math.acos((double) (direction.y / (Math.sqrt(direction.x * direction.x + direction.y * direction.y))));
+//        if (alpha < 0) {
+//            alpha += 360;
+//        }
+//        return alpha;
+
+        /*if(this instanceof Ship) {
+            System.out.println(direction);
+        }*/
+        return (float) (Math.atan2(direction.y, direction.x) * 180 / Math.PI) + 90;
     }
 
     public void rotateToMouse(Vector2f mouseposition) {

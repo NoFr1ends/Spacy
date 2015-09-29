@@ -29,7 +29,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private float zoom = 1.0f;
     private final float zoomStep = 0.5f;
     private final Random rand;
-    private boolean debug = false;
+    private boolean debug = true;
     
     //Der letzte Zeitpunkt, andem das PlayerRotate-Paket gesendet wurde.
     //private long timeLastPlayerRotate = 0;
@@ -171,7 +171,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<>(client.getWorld().ships);
             for(ConcurrentHashMap.Entry<Long, Ship> ship : ships.entrySet()){                 
                 Vector2f renderPosition = ship.getValue().getCenteredRenderPos();            
-                sheet.draw(ship.getValue().texture, renderPosition.x, renderPosition.y);
+                sheet.draw(ship.getValue().texture, 
+                        renderPosition.x, 
+                        renderPosition.y, 
+                        ship.getValue().getRotation(),
+                        ship.getValue().textureBounds.copy().scale(0.5f));
+                
                 if(this.debug){
                     drawCross(ship.getValue().position.x, ship.getValue().position.y, g);
                     ship.getValue().drawRotation(g);
@@ -182,7 +187,10 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             for(ConcurrentHashMap.Entry<Long, Projectile> p : projectiles.entrySet()){
                 
                 Vector2f renderPosition = (p).getValue().getBulletRenderPos();
-                sheet.draw(p.getValue().texture, renderPosition.x, renderPosition.y);  
+                sheet.draw(p.getValue().texture, 
+                        renderPosition.x, 
+                        renderPosition.y, p.getValue().getRotation(), null); 
+                
                 if(this.debug){
                     drawCross(p.getValue().position.x, p.getValue().position.y, g);
                     p.getValue().drawRotation(g);
