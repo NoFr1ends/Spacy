@@ -64,14 +64,11 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         try {       
             viewPort = new Rect(0, 0, gc.getWidth(), gc.getHeight());
             
-            int width = this.client.getWorld().worldSize;
-            int height = width;
-            
-            width += gc.getWidth() / backgroundMoveFactor;
-            height += gc.getHeight()/ backgroundMoveFactor;
+            int width = gc.getWidth() * 2;
+            int height = gc.getHeight()* 2;
             
             background = new Image(width, height);
-            Graphics g = background.getGraphics();
+            Graphics g = background.getGraphics();            
             g.clear();
             int max = width * height / 800;
             
@@ -194,8 +191,9 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         g.setBackground(BackgroundColor);
         
         g.translate((-viewPort.x) * backgroundMoveFactor - gc.getWidth() / backgroundMoveFactor / 2, (-viewPort.y) * backgroundMoveFactor - gc.getHeight() / backgroundMoveFactor / 2);
-        background.draw(0, 0);
+     
         
+        background.draw();
         g.resetTransform();
        
         //g.scale(zoom, zoom);
