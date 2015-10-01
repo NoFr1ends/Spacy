@@ -7,6 +7,7 @@ import de.kryptondev.spacy.data.Projectile;
 import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.server.GameClient.SGameClient;
 import de.kryptondev.spacy.share.DeleteEntity;
+import de.kryptondev.spacy.share.UpdateLife;
 import de.kryptondev.spacy.share.playerEvents.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -84,6 +85,7 @@ public class GameTick implements Runnable{
                 if(ship != null){
                     if( ship.id != p.senderId && p.position.distance(ship.position) - ship.boundsRadius - p.boundsRadius - p.damagerange <= 0){
                         ship.hit(p);
+                        c.sendTCP(new UpdateLife(ship.hp));
                         server.getServer().sendToAllTCP(new OnHit(ship.id, p.senderId, p.id));
                         //Zu wenig HP + Shield?
                         if(ship.hp + (ship.shield != null ? ship.shield.life : 0) < 1){

@@ -31,7 +31,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private float zoom = 1.0f;
     private final float zoomStep = 0.5f;
     private final Random rand;
-    private boolean debug = true;
+    private boolean debug = false;
     private float alphaWarn = 0f;
     private SpriteSheet sheet;
     private boolean ready = false;
@@ -308,6 +308,16 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         }
         
         
+        // HUD
+        
+        g.resetTransform();
+        g.setColor(Color.white);
+        g.setLineWidth(15);
+        g.drawLine(20, 20, 220, 20);
+        
+        g.setColor(Color.red);
+        if(client.getShip() != null)
+            g.drawLine(20, 20, client.getShip().hp * 2 + 20, 20);
         
         
         /*

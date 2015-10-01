@@ -53,6 +53,7 @@ public class KryoRegisterer {
         k.register(PlayerRotate.class);        
         k.register(Move.class);
         k.register(DeleteEntity.class);
+        k.register(UpdateLife.class);
         
         k.register(OnDeath.class);
         k.register(OnHit.class);
