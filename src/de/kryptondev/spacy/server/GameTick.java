@@ -7,6 +7,7 @@ import de.kryptondev.spacy.data.Projectile;
 import de.kryptondev.spacy.data.Ship;
 import de.kryptondev.spacy.server.GameClient.SGameClient;
 import de.kryptondev.spacy.share.DeleteEntity;
+import de.kryptondev.spacy.share.UpdateLife;
 import de.kryptondev.spacy.share.playerEvents.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,12 +15,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
 
 
 public class GameTick implements Runnable{
     private int delta = 0;
     private GameTick instance;
-    public static final int ticksPerSecond = 100;        
+    public static final int ticksPerSecond = 60;        
     private SpacyServer server;    
     public GameTick(SpacyServer server) {
         this.server = server;
@@ -29,19 +32,38 @@ public class GameTick implements Runnable{
         for(Connection c : (Connection[])server.getServer().getConnections().clone()) {            
             SGameClient gc = (SGameClient)c;
             Ship ship = gc.getMyShip();
-            if(ship != null)
-                if(ship.moving != EMoving.Stopped){                        
-                    ship.move(delta);
-                    System.out.println("Server: Ship " + ship.id + " is moving!" + ship.position.x);                    
+
+            if(ship != null) {
+                ship.move(delta);
+                
+                if(ship.moving != EMoving.Stopped)
+                    System.out.println("Server: Ship " + ship.id + " is moving! " + ship.position + " (delta: " + delta + ", state=" + ship.moving + ")");   
+                     
+                int n = server.world.worldSize;
+                int tolerance = server.world.toleranceDeathRadius;
+                if(ship.position.x + tolerance < 0 | ship.position.x - tolerance > n |
+                        ship.position.y + tolerance < 0 | ship.position.y - tolerance > n){
+                    //Kill player
+                    System.out.println("Killing Ship " + ship.id);
+                    gc.sendTCP(new OnDeath(ship.id, -1));
+                    server.getServer().sendToAllTCP(new OnKill(ship.id, ship.id, -1));
+                    server.getServer().sendToAllTCP(new DeleteEntity(ship.id));
+                    server.world.ships.remove(ship.id);
+                    //TODO: Add Delay
+                    gc.addShip();
                 }
+            }
         }
-        HashMap<Long, Projectile> projs = server.world.projectiles;
-        long pos = projs.size();
+        ConcurrentHashMap<Long, Projectile> projs = server.world.projectiles;
+        ArrayList<Long> toDelete = new ArrayList<>();
+        for(Projectile p: projs.values()) {
+        /*long pos = projs.size();
         while(projs.containsKey(pos)){
-            Projectile p = projs.get(pos--);
+            Projectile p = projs.get(pos--);*/
                     
             if(p.remainingLifetime <= 0){
-                server.world.projectiles.remove(pos + 1);
+                //server.world.projectiles.remove(pos + 1);
+                toDelete.add(p.id);
                 server.getServer().sendToAllTCP(new DeleteEntity(p.id));
                 System.out.println("Deleting projectile " + p.id);
                 continue;
@@ -51,42 +73,54 @@ public class GameTick implements Runnable{
             }
             
             p.move(delta);
-            System.out.println("Server: Projectile " + p.id + " is moving!" + p.position.x);
+            //System.out.println("Server: Projectile " + p.id + " is moving!" + p.position.x);
             
-            for(Connection c : (Connection[])server.getServer().getConnections().clone()) { 
+            for(Connection c : server.getServer().getConnections()) { 
                 SGameClient gc = (SGameClient)c;
                 Ship ship = gc.getMyShip();
                 /*System.out.println("Distance: " + p.position.distance(ship.position));                
                 System.out.println("Projectile @ " + p.position.x + ", " + p.position.y);
                 System.out.println("Ship @ " + ship.position.x + ", " + ship.position.y);
                 */
-                if( ship.id != p.senderId && p.position.distance(ship.position) - ship.boundsRadius - p.boundsRadius - p.damagerange <= 0){
-                    ship.hit(p);
-                    server.getServer().sendToAllTCP(new OnHit(ship.id, p.senderId, p.id));
-                    //Zu wenig HP + Shield?
-                    if(ship.hp + (ship.shield != null ? ship.shield.life : 0) < 1){
-                        gc.sendTCP(new OnDeath(p.senderId, p.id));
-                        server.getServer().sendToAllTCP(new OnKill(ship.id, p.senderId, p.id));
-                        //TODO Client neues Schiff zuweisen & altes Schiff löschen!
-                    }
-                    if(p.destroyOnCollision){
-                        server.world.projectiles.remove(pos + 1);
-                        server.getServer().sendToAllTCP(new DeleteEntity(p.id));
-                        System.out.println("Deleting projectile " + p.id);
-                        continue;
+                if(ship != null){
+                    if( ship.id != p.senderId && p.position.distance(ship.position) - ship.boundsRadius - p.boundsRadius - p.damagerange <= 0){
+                        ship.hit(p);
+                        c.sendTCP(new UpdateLife(ship.hp));
+                        server.getServer().sendToAllTCP(new OnHit(ship.id, p.senderId, p.id));
+                        //Zu wenig HP + Shield?
+                        if(ship.hp + (ship.shield != null ? ship.shield.life : 0) < 1){
+                            gc.sendTCP(new OnDeath(p.senderId, p.id));
+                            server.getServer().sendToAllTCP(new OnKill(ship.id, p.senderId, p.id));                            server.getServer().sendToAllTCP(new OnKill(ship.id, p.senderId, p.id));
+                            server.getServer().sendToAllTCP(new DeleteEntity(ship.id));
+                            server.world.ships.remove(ship.id);
+                            gc.addShip();
+                        }
+                        if(p.destroyOnCollision){
+                            //server.world.projectiles.remove(pos + 1);
+                            toDelete.add(p.id);
+                            server.getServer().sendToAllTCP(new DeleteEntity(p.id));
+                            //System.out.println("Deleting projectile " + p.id);
+                            continue;
+                        }
                     }
                 }
             }
          }
+        
+        for(Long id: toDelete) {
+            server.world.projectiles.remove(id);
+        }
     }
 
     @Override
     public void run() {
         int lastDelta = delta;
         while(true){
-            try {        
+            try { 
+                //long start = System.nanoTime();
                 long start = new Date().getTime();
                 onTick(delta);
+                //long end = System.nanoTime();
                 long end = new Date().getTime();
                 int time = (int)(end - start);                
                 if(time > 1000 / ticksPerSecond){
@@ -95,10 +129,10 @@ public class GameTick implements Runnable{
                 }
                 Thread.sleep((1000 / ticksPerSecond) - time);           
                 long finalEnd = new Date().getTime();
+                //long finalEnd = System.nanoTime();
                 
                 delta = (int)(finalEnd - start);
-                if(delta != lastDelta){
-                    //System.out.println("Tickdelta is: " + delta);
+                if(delta != lastDelta){                   
                     server.getServer().sendToAllTCP(new DebugTickDelta(delta, ticksPerSecond));
                     lastDelta = delta;
                 }

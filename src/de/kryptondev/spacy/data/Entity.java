@@ -29,13 +29,15 @@ public abstract class Entity {
         this.position = position;
     }
 
-    public void accelerate() {
+    public void accelerate(int delta) {
         if (this.speed == 0) {
             this.speed = 1;
             return;
         }
-        if ((this.acceleration * this.speed) < this.maxSpeed) {
-            this.speed = (this.acceleration * this.speed);//Lineare Beschleunigung, können aber auch was anderes nehmen.
+        
+        float next = (this.acceleration * this.speed) * (delta / 16f);
+        if (next < this.maxSpeed) {
+            this.speed = next;//Lineare Beschleunigung, können aber auch was anderes nehmen.
             return;
         } else {
             this.speed = this.maxSpeed;
@@ -44,9 +46,11 @@ public abstract class Entity {
     }
     /*Der Abbremsvorgang. Mal sehen wo wir das einbauen*/
 
-    public void decelerate() {
-        if (((1 / this.acceleration) * this.speed) > 1) {
-            this.speed = ((1 / this.acceleration) * this.speed);//Lineare Bremskraft, können aber auch was anderes nehmen.
+    public void decelerate(int delta) {
+        float next = ((1 / this.acceleration) * this.speed) * (delta / 16f);
+        
+        if (next > 1) {
+            this.speed = next;//Lineare Bremskraft, können aber auch was anderes nehmen.
         } else {
             this.speed = 0;
             moving = EMoving.Stopped;
@@ -68,11 +72,15 @@ public abstract class Entity {
     public void move(int delta) {
         //System.out.println(Float.toString(speed) + "-" + Float.toString(maxSpeed));
 
+        Vector2f oldPos = position;
+        
         if (moving == EMoving.Accelerating) {
-            this.accelerate();
+            moving = EMoving.FullSpeed;
+            //this.accelerate(delta);
         }
         if (moving == EMoving.Deccelerating) {
-            this.decelerate();
+            moving = EMoving.Stopped;
+            //this.decelerate(delta);
         }
         if (moving == EMoving.FullSpeed) {
             this.speed = maxSpeed;
@@ -85,14 +93,21 @@ public abstract class Entity {
         newPosition.x = position.x + (direction.x * speed) * (delta / 16f);
         newPosition.y = position.y + (direction.y * speed) * (delta / 16f);
         position = newPosition;
+        
+        //System.out.println(id + ": " + moving + " with speed " + speed + " in direction " + direction);
     }
 
     public float getRotation() {
-        float alpha = (float) Math.acos((double) (direction.y / (Math.sqrt(direction.x * direction.x + direction.y * direction.y))));
-        if (alpha < 0) {
-            alpha += 360;
-        }
-        return alpha;
+//        float alpha = (float) Math.acos((double) (direction.y / (Math.sqrt(direction.x * direction.x + direction.y * direction.y))));
+//        if (alpha < 0) {
+//            alpha += 360;
+//        }
+//        return alpha;
+
+        /*if(this instanceof Ship) {
+            System.out.println(direction);
+        }*/
+        return (float) (Math.atan2(direction.y, direction.x) * 180 / Math.PI) + 90;
     }
 
     public void rotateToMouse(Vector2f mouseposition) {

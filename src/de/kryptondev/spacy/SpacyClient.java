@@ -12,8 +12,11 @@ import de.kryptondev.spacy.helper.UID;
 
 import de.kryptondev.spacy.screen.GameScreen;
 import de.kryptondev.spacy.screen.ScreenManager;
+import de.kryptondev.spacy.screen.WaitingScreen;
 import de.kryptondev.spacy.share.playerEvents.OnJoin;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import org.omg.PortableServer.THREAD_POLICY_ID;
 
 
 public class SpacyClient extends Listener{
@@ -25,9 +28,11 @@ public class SpacyClient extends Listener{
     public static final Version clientVersion = new Version(1, 0, 0);
     private PlayerInfo info;
     private World world = new World();
-    private long shipId;
+    private long shipId = 0;
     private int serverTickDelta;
     private int serverTicksPerSecond;
+    private WaitingScreen waiting;
+    public ArrayList<Long> toDelete = new ArrayList<>();
     
     public SpacyClient() {
         this.info = new PlayerInfo();
@@ -40,23 +45,28 @@ public class SpacyClient extends Listener{
     }   
    
 
-    public void connect(String server) {
+    public void connect(String server, WaitingScreen waiting) {
         try {
+            ScreenManager.getInstance().changeScreen(waiting);
+            this.waiting = waiting;
+            waiting.setStatusMessage("Initializing client");
             client = new Client();
             KryoRegisterer.registerAll(client.getKryo());
             new Thread(client).start();
             client.addListener(this);
+            waiting.setStatusMessage("Connecting...");
             client.connect(timeout, server, port, 54777);
 
         } catch (Exception ex) {
              System.err.println(ex.getLocalizedMessage());
-            //TODO Handle error
+             waiting.setStatusMessage("Error: "+ex.getLocalizedMessage());
         }
     }
 
     private void connectionDropped(ConnectionAttemptResponse.Type reason) {
-        //GUI Update
         System.out.println("Client is not connected! Reason: " + reason.toString());
+        waiting.setStatusMessage("Client is not connected! Reason: " + reason.toString());
+        ScreenManager.getInstance().changeScreen(waiting);        
     }
 
     public void sendMessage(String message) {
@@ -91,16 +101,17 @@ public class SpacyClient extends Listener{
             if(this.world.ships.containsKey(r.ship)){
                 Ship s = this.world.ships.get(r.ship);
                 s.direction = r.direction;
-                this.world.ships.put(shipId, s);
+                //this.world.ships.put(shipId, s);
             }
         }
         
         if(o instanceof Move){
             Move move = (Move)o;
             Ship ship = this.world.ships.get(move.id);
-            if(this.world.ships.containsKey(move.id)){
+            if(ship != null){
                 ship.moving = move.status;
-                this.world.ships.put(shipId, ship);
+                ship.position = move.pos;
+                //this.world.ships.put(shipId, ship);
             }
             else{
                 System.err.println("Ship " + move.id + " not found!");
@@ -112,11 +123,11 @@ public class SpacyClient extends Listener{
             //Antwort auswerten
             ConnectionAttemptResponse response = (ConnectionAttemptResponse) o;
             if (response.type == ConnectionAttemptResponse.Type.OK) {
+                GameScreen gs = new GameScreen();
+                ScreenManager.getInstance().changeScreen(gs);
                 this.world.worldSize = response.worldSize;
-                   if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
-                        GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
-                        game.onConnected();
-                    }
+                gs.onConnected();
+                    
                 return;
             } else {
                 this.client.close();
@@ -143,11 +154,7 @@ public class SpacyClient extends Listener{
             //SPAWNED
             System.out.println("SHIP RECEIVED!!!");
             world.ships.put(s.id ,s);
-            shipId = s.id;
-            if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
-                GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
-            }
-            
+            shipId = s.id;       
             
             return;
         }
@@ -166,15 +173,8 @@ public class SpacyClient extends Listener{
         
         if(o instanceof DeleteEntity){
             DeleteEntity entity = (DeleteEntity)o;
-            if(world.projectiles.containsKey(entity.vid)) {
-                world.projectiles.remove(entity.vid);
-            }
-            else if(world.ships.containsKey(entity.vid)) {
-                world.ships.remove(entity.vid);
-            }
-            else if(world.entities.containsKey(entity.vid)) {
-                world.entities.remove(entity.vid);
-            }
+            
+            toDelete.add(entity.vid);
         }
         
         if(o instanceof OnJoin){
@@ -184,6 +184,11 @@ public class SpacyClient extends Listener{
         
         if(o instanceof World){
              this.world = (World)o;   
+        }
+        
+        if(o instanceof UpdateLife) {
+            UpdateLife life = (UpdateLife) o;
+            getShip().hp = life.hp;
         }
          
         if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
@@ -205,7 +210,8 @@ public class SpacyClient extends Listener{
     }
 
     @Override
-    public void connected(Connection cnctn) {        
+    public void connected(Connection cnctn) {  
+        waiting.setStatusMessage("Sending data");
         client.sendTCP(clientVersion);       
         client.sendTCP(SpacyClient.this.info);
     }
@@ -246,12 +252,6 @@ public class SpacyClient extends Listener{
     public Ship getShip() {
         return this.world.ships.get(this.shipId);
     }
-    
-    public void setShip(Ship ship){
-        if(this.world.ships.containsKey(ship.id)){
-            this.world.ships.put(ship.id, ship);
-        }
-    }
 
     public Client getClient() {
         return client;
@@ -279,13 +279,6 @@ public class SpacyClient extends Listener{
 
     public void setShipId(long shipId) {
         this.shipId = shipId;
-    }
-    
-    public void replaceShip(Ship ship){
-        if(this.world.ships.containsKey(ship.id)){
-            this.world.ships.put(ship.id, ship);
-        }
-    }
-    
+    }    
     
 }

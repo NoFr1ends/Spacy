@@ -7,6 +7,7 @@ import de.kryptondev.spacy.SpacyClient;
 import de.kryptondev.spacy.SpriteSheet;
 import de.kryptondev.spacy.input.KeyInputManager;
 import de.kryptondev.spacy.input.MouseInputManager;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
@@ -30,23 +31,25 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private SpacyClient client;
     private Image background;
     private Rect viewPort;
-    private final int backgroundMoveFactor = 2;
+    private final float backgroundMoveFactor = 0.5f;
     private Vector2f viewPortCenter = new Vector2f(0f, 0f);
+    private Vector2f lastPos;
     private float zoom = 1.0f;
     private final float zoomStep = 0.5f;
     private final Random rand;
     private boolean debug = false;
-    private boolean canShoot = true;
-    //Der letzte Zeitpunkt, andem das PlayerRotate-Paket gesendet wurde.
-    //private long timeLastPlayerRotate = 0;
-    //Zeit (Ticks) die gewartet wird, bis das nächste PlayerRotate-Paket gesendet wird. 
-    //private final long sendFreq = 100;
+    private float alphaWarn = 0f;
     private SpriteSheet sheet;
     private ScheduledExecutorService cooldown;
+    private boolean ready = false;
+    private int delta;
     
-    public GameScreen(IScreen prevScreen, SpacyClient spacyClient) {
-        this.client = spacyClient;
-        rand = new Random();      
+    private final int paneLenght = 512;
+    private Vector2f backgroundBasePos = new Vector2f();
+    
+    public GameScreen() {
+        this.client = SpacyClient.getInstance();
+        this.rand = new Random();      
     }
     
     public float getRandomFloat(float min, float max){
@@ -73,12 +76,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         try {       
             viewPort = new Rect(0, 0, gc.getWidth(), gc.getHeight());
             
-            int width = this.client.getWorld().worldSize;
-            int height = width;      
-
-            Graphics g = new Graphics(width, height);
+            int width =paneLenght;
+            int height = paneLenght;
+            
+            background = new Image(width, height);
+            Graphics g = background.getGraphics();            
             g.clear();
-
             int max = width * height / 800;
             
             for(int i = 0; i < max; i++){
@@ -86,17 +89,41 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                 g.fillOval(rand.nextInt(width), rand.nextInt(height), rad, rad);
             }
 
-            g.flush();
-            background = new Image(width, height);
-            g.copyArea(background,0,0);                
-            g.destroy();
-            
+            g.flush();            
         } catch (SlickException ex) {
             Logger.getLogger(GameScreen.class.getName()).log(Level.SEVERE, null, ex);
         }
+        ready = true;
         
         this.cooldown = Executors.newScheduledThreadPool(1);
        
+        
+    }
+    
+    private int getPartipalCurrentPane(){
+        if(client.getShip() == null)
+            return -1;
+        int w = (int)client.getShip().position.x % paneLenght;
+        int h = (int)client.getShip().position.y % paneLenght;
+        
+        if(h < paneLenght / 2){
+            //Oben
+            if(w < paneLenght / 2){
+                return 1;
+            }
+            else{
+                return 2;
+            }
+        }
+        else{
+            //Unten
+            if(w < paneLenght / 2){
+                return 3;
+            }
+            else{
+                return 4;
+            }
+        }
         
     }
 
@@ -113,19 +140,31 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     
     @Override
     public void update(GameContainer gc, int delta) {
+        this.delta = delta;
+        
+        // Delete :)
+        ArrayList<Long> toDelete = new ArrayList<>(SpacyClient.instance.toDelete);
+        for(Long delete: toDelete) {
+            client.getWorld().ships.remove(delete);
+            client.getWorld().entities.remove(delete);
+            client.getWorld().projectiles.remove(delete);
+        }
+        SpacyClient.instance.toDelete.clear();
         
         try{
             ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<>(client.getWorld().ships);
             for(Ship ship : ships.values()){
                 ship.move(delta);
+                
+                if(ship.moving != EMoving.Stopped)
+                    System.out.println("Client: Ship " + ship.id + " is moving! " + ship.position + " (delta: " + delta + ", state=" + ship.moving + ")");
             }
         }
         catch(Exception ex){
             ex.printStackTrace();
         }
         try{
-            ConcurrentHashMap<Long, Projectile> projectiles = new ConcurrentHashMap<>(client.getWorld().projectiles);
-            for(Projectile p : projectiles.values()){
+            for(Projectile p : client.getWorld().projectiles.values()){
                 p.move(delta);
             }
         }
@@ -142,37 +181,90 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             ex.printStackTrace();
         }
  
-        if(client.getShip() == null){
-            //Last death point?
-            //viewPortCenter = lastDeath;
-            System.err.println("MyShip is NULL");
+        if(isSpectatorMode()){   
+            viewPortCenter = lastPos;            
+            alphaWarn = 0f;
         }
         else
-        {
+        {           
             Vector2f shipPos = client.getShip().position;
+            lastPos = shipPos;
             this.viewPortCenter = shipPos;
             this.viewPort.x = (viewPortCenter.x - (this.viewPort.width / 2));
             this.viewPort.y = (viewPortCenter.y - (this.viewPort.height / 2));
+            backgroundBasePos = new Vector2f(-(viewPort.x % paneLenght), -(viewPort.y % paneLenght));
+            switch(getPartipalCurrentPane()){
+                case 1:                    
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                default:
+                    //NO SHIP
+            }
+            
+
+
+            //"Redness"-control when leaving battle field
+            float x = client.getShip().position.x;
+            float y = client.getShip().position.y;
+            int world = client.getWorld().worldSize;
+            int tolerance = client.getWorld().toleranceDeathRadius;
+
+            boolean alphaChanged = false;
+            
+            if(x < 0 | y < 0){
+                alphaChanged = true;
+                if(x < y){
+                    alphaWarn = Math.abs(x) / tolerance;
+                }
+                else{
+                    alphaWarn = Math.abs(y) / tolerance;
+                }
+            }
+            
+            if(x > world | y > world){
+                alphaChanged = true;
+                if(x > y){
+                    alphaWarn = Math.abs(x - world) / tolerance;
+                }
+                else{
+                    alphaWarn = Math.abs(y - world) / tolerance;
+                }
+            }
+            
+            if(!alphaChanged){
+                alphaWarn = 0f;
+            }
+            
+            
             
         }
+        
     }
     
-    public void drawCross(Vector2f pos, Graphics g){
+    public void drawCross(Vector2f pos, Graphics g, long vid){
       
         float size = 50f;
         g.setColor(Color.magenta);
         g.drawLine(pos.x - size / 2, pos.y, pos.x + size / 2, pos.y);
         g.drawLine(pos.x, pos.y - size/ 2, pos.x, pos.y +  size / 2);
         g.setColor(Color.white);
-        g.drawString(pos.x + " | " + pos.y , pos.x + 10, pos.y - 10);        
+        g.drawString(pos.x + " | " + pos.y , pos.x + 10, pos.y - 10);  
+        g.drawString("ID: "+vid, pos.x + 10, pos.y - 30);
     }
     
-    public void drawCross(float x, float y, Graphics g){
-        drawCross(new Vector2f(x,y),g);
+    public void drawCross(float x, float y, Graphics g, long vid){
+        drawCross(new Vector2f(x,y),g, vid);
     }
     
     @Override
     public void draw(GameContainer gc, Graphics g) {    
+        g.clear();
+        g.resetTransform();
         //g.setWorldClip(0, 0, client.getWorld().worldSize, client.getWorld().worldSize);
        
         g.scale(zoom, zoom);
@@ -181,33 +273,58 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         g.setBackground(BackgroundColor);
         g.drawImage(background, 0, 0);
         //g.drawImage(background, 0, 0);
+        g.translate(backgroundBasePos.getX(), backgroundBasePos.getY());
+             
+        background.draw();
+        background.draw(0, gc.getHeight() * 2);
+        background.draw(gc.getWidth() * 2, 0);
+        background.draw(gc.getWidth() * 2, gc.getHeight() * 2);
         g.resetTransform();
-        g.scale(zoom, zoom);
+       
+        //g.scale(zoom, zoom);
         g.translate((-viewPort.x) , (-viewPort.y));
-
+        
+        
+        
+        //Draw World Borders
+        g.setLineWidth(32f);
+        g.setColor(new Color(88,88,88, 180));
+        g.drawRect(0, 0, client.getWorld().worldSize, client.getWorld().worldSize);
+        g.setLineWidth(1f);
         if(client.getWorld() == null)
             return;
         
-        //sheet.draw("meteorBrown_big1.png", viewPortCenter.x - 101 / 2, viewPortCenter.y-84/2);
-//        drawCross(viewPortCenter.x, viewPortCenter.y, g);
+        g.setColor(Color.orange);
+        g.drawLine(paneLenght, 0, paneLenght, paneLenght * 2 );        
+        g.drawLine( 0,paneLenght, paneLenght * 2, paneLenght);
+        
+        
         try{
-            ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<>(client.getWorld().ships);
+            ConcurrentHashMap<Long, Ship> ships = client.getWorld().ships;
             for(ConcurrentHashMap.Entry<Long, Ship> ship : ships.entrySet()){                 
                 Vector2f renderPosition = ship.getValue().getCenteredRenderPos();            
-                sheet.draw(ship.getValue().texture, renderPosition.x, renderPosition.y);
+                sheet.draw(ship.getValue().texture, 
+                        renderPosition.x, 
+                        renderPosition.y, 
+                        ship.getValue().getRotation(),
+                        ship.getValue().textureBounds.copy().scale(0.5f));
+                
                 if(this.debug){
-                    drawCross(ship.getValue().position.x, ship.getValue().position.y, g);
+                    drawCross(ship.getValue().position.x, ship.getValue().position.y, g, ship.getValue().id);
                     ship.getValue().drawRotation(g);
                     ship.getValue().drawBounds(g);
                 }
             }        
-            ConcurrentHashMap<Long, Projectile> projectiles = new ConcurrentHashMap<>(client.getWorld().projectiles);
+            ConcurrentHashMap<Long, Projectile> projectiles = client.getWorld().projectiles;
             for(ConcurrentHashMap.Entry<Long, Projectile> p : projectiles.entrySet()){
                 
                 Vector2f renderPosition = (p).getValue().getBulletRenderPos();
-                sheet.draw(p.getValue().texture, renderPosition.x, renderPosition.y);  
+                sheet.draw(p.getValue().texture, 
+                        renderPosition.x, 
+                        renderPosition.y, p.getValue().getRotation(), null); 
+                
                 if(this.debug){
-                    drawCross(p.getValue().position.x, p.getValue().position.y, g);
+                    drawCross(p.getValue().position.x, p.getValue().position.y, g, p.getValue().id);
                     p.getValue().drawRotation(g);
                     p.getValue().drawBounds(g);
                 }
@@ -218,23 +335,44 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         }
         
         
+        // HUD
+        
+        g.resetTransform();
+        g.setColor(Color.white);
+        g.setLineWidth(15);
+        g.drawLine(20, 20, 220, 20);
+        
+        g.setColor(Color.red);
+        if(client.getShip() != null)
+            g.drawLine(20, 20, client.getShip().hp * 2 + 20, 20);
+        
+        
         /*
         DEBUG SECTION
         */
         if(this.debug){
+            long objects = client.getWorld().projectiles.size() + client.getWorld().ships.size();
+            
             g.resetTransform();
             g.setColor(Color.white);
-            g.drawString("Serverdelta:     " + client.getServerTickDelta() + "ms", 8, 30);
-            g.drawString("Ticks/s:         " + client.getServerTicksPerSecond(), 8, 50);            
-            g.drawString("Viewport Pos:    " + this.viewPort.x + " | " + this.viewPort.y, 8, 70);
-            g.drawString("Ship Pos:        " + this.viewPortCenter.x + " | " + this.viewPortCenter.y, 8, 90);
-            g.drawString("Zoom:            " + this.zoom, 8, 110);
-            g.drawString("Viewport Size:   " + this.viewPort.width + "x" + this.viewPort.height, 8, 130);
+            
+            g.drawString("Clientdelta:     " + this.delta + "ms", 8, 30);
+            g.drawString("Serverdelta:     " + client.getServerTickDelta() + "ms", 8, 50);
+            g.drawString("Ticks/s:         " + client.getServerTicksPerSecond(), 8, 70);            
+            g.drawString("Viewport Pos:    " + this.viewPort.x + " | " + this.viewPort.y, 8, 90);
+            //g.drawString("Ship Pos:        " +  , 8, 110);
+            g.drawString("Zoom:            " + this.zoom, 8, 130);
+            g.drawString("Viewport Size:   " + this.viewPort.width + "x" + this.viewPort.height, 8, 150);
+            g.drawString("Objects:         " + objects + "(" + client.getWorld().ships.size() + ")", 8, 170);
+            g.drawString("alphaWarn:       " + alphaWarn, 8, 190);
+            g.drawString("Corner:          " + getPartipalCurrentPane(), 8, 210);
+            if(client.getShip() != null)
+                g.drawString("VID:             " + client.getShipId() + " (" + client.getShip().hashCode() + ")", 8, 230);
         }
-        //g.setClip((int)viewPort.x, (int)viewPort.y, (int)(viewPort.width * zoom), (int)(viewPort.height* zoom));
         
-        
-      
+        g.resetTransform();
+        g.setColor(new Color(0xff, 0x00, 0x00, alphaWarn));        
+        g.fillRect(0, 0, gc.getWidth(), gc.getHeight());       
         
     }
     
@@ -282,21 +420,18 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
        if(key == Input.KEY_F12){
            debug = !debug;
        }
-    }
-    private void print(String id, Vector2f vec){
-        System.out.println(id+  "@ " + vec.x + ", " + vec.y);
-    }
+    } 
     @Override
     public void onButtonDown(int button) {
-        if(button == 1){
-            //if(timeLastPlayerRotate + sendFreq >= System.currentTimeMillis()){
+        if(button == 1){           
+            if(!isSpectatorMode()){           
+                Ship ship = client.getShip();  
                 Vector2f pos = MouseInputManager.getInstance().getPosition();
-                Ship ship = client.getShip();
+                
                 ship.direction = new Vector2f(pos).sub(new Vector2f(viewPort.width / 2, viewPort.height / 2)).normalise();
-                client.setShip(ship);
+                //client.setShip(ship);
                 SpacyClient.getInstance().getClient().sendTCP(new PlayerRotate(client.getShip().direction));
-            //    timeLastPlayerRotate = System.currentTimeMillis();
-            //}
+            }
         }
         
     }
@@ -305,8 +440,11 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     public void onButtonUp(int button) {
         //Move
         if(button == 1){
-            SpacyClient.getInstance().getClient().sendTCP(new Move(EMoving.Deccelerating, client.getShip().id));
-            System.out.println("Stop moving");
+            if(!isSpectatorMode()){   
+                client.getShip().moving = EMoving.Deccelerating;
+                SpacyClient.getInstance().getClient().sendTCP(new Move(EMoving.Deccelerating, client.getShip().id, client.getShip().position));
+                //System.out.println("Stop moving");
+            }
         }
     }
 
@@ -314,16 +452,28 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     public void onButtonPressed(int button) {
         //Rotate
         Ship myShip = client.getShip();
-        Vector2f pos = MouseInputManager.getInstance().getPosition();
+        if(isSpectatorMode()){   
+            //Zuschauer-Modus
+            
+        }
+        else{
+            Vector2f pos = MouseInputManager.getInstance().getPosition();
 
-        myShip.direction = new Vector2f(pos).sub(new Vector2f(viewPort.width / 2, viewPort.height / 2)).normalise();
-        client.getClient().sendTCP(new PlayerRotate(myShip.direction));
-        
-        
-        //Move
-        if(button == 1){
-            SpacyClient.getInstance().getClient().sendTCP(new Move(EMoving.Accelerating,myShip.id));
-            System.out.println("Start moving");
+            myShip.direction = new Vector2f(pos).sub(new Vector2f(viewPort.width / 2, viewPort.height / 2)).normalise();
+            client.getClient().sendTCP(new PlayerRotate(myShip.direction));
+
+            //Move
+            if(button == 1){
+                SpacyClient.getInstance().getClient().sendTCP(new Move(EMoving.Accelerating,myShip.id, myShip.position));
+                //System.out.println("Start moving");
+            }
+            //Fire
+            if(button == 0){
+                //TODO Implement Weapon Cooldown
+
+                SpacyClient.getInstance().getClient().sendTCP(
+                        new Projectile(DamageType.balistic, myShip.id, myShip.direction, myShip.position));
+            }
         }
         
         //Fire
@@ -346,6 +496,14 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         this.viewPort = viewPort;
     }
 
+    public boolean isSpectatorMode(){
+        return this.client.getShip() == null;
+    }
 
+    public boolean isReady() {
+        return ready;
+    }
+    
+    
     
 }

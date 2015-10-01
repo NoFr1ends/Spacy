@@ -126,14 +126,16 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener,
                 testserver = new SpacyServer();
                 testserver.start();
                 SpacyClient.setInstance(new SpacyClient());
-                SpacyClient.getInstance().connect("127.0.0.1");
-                ScreenManager.getInstance().changeScreen(new GameScreen(this,SpacyClient.getInstance()));
+                SpacyClient.getInstance().connect("127.0.0.1", new WaitingScreen());
                 break;
             default:
                 //Connect to selected Entry
                 SpacyClient.setInstance(new SpacyClient());
-                SpacyClient.getInstance().connect(entry);
-                ScreenManager.getInstance().changeScreen(new GameScreen(this,SpacyClient.getInstance()));
+                WaitingScreen newScreen = new WaitingScreen();
+                
+                ScreenManager.getInstance().changeScreen(newScreen);
+                SpacyClient.getInstance().connect(entry, newScreen);
+                
         }
     }
 
