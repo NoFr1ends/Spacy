@@ -154,34 +154,7 @@ public class SpacyClient extends Listener{
             //SPAWNED
             System.out.println("SHIP RECEIVED!!!");
             world.ships.put(s.id ,s);
-            shipId = s.id;
-            
-            if(!(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen)){  
-                new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        ScreenManager.getInstance().changeScreen(new GameScreen());
-                    }
-                }).start();
-                
-                while(!(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen) ){
-                    try{
-                    Thread.sleep(1);
-                    }
-                    catch (Exception ex){
-                        break;
-                    }
-                }
-                while(!((GameScreen)ScreenManager.getInstance().getCurrentScreen()).isReady()){
-                    try{
-                    Thread.sleep(1);
-                    }
-                    catch (Exception ex){
-                        break;
-                    }
-                }
-            }            
+            shipId = s.id;       
             
             return;
         }

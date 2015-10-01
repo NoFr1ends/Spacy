@@ -22,6 +22,7 @@ public class ScreenManager {
     }
     
     public void changeScreen(IScreen screen) {
+        System.out.println("Change screen to " + screen + " in the next frame...");
         newScreen = screen;
     }
     
@@ -48,8 +49,10 @@ public class ScreenManager {
             MouseInputManager.getInstance().clear();
             
             currentScreen = newScreen;
-            currentScreen.init(gc);
             newScreen = null;
+            currentScreen.init(gc);
+            
+            System.out.println("Screen changed to " + currentScreen);
         }
         
         if(currentScreen != null) {
