@@ -49,7 +49,7 @@ public class MainGame extends BasicGame {
             
             AppGameContainer gc = new AppGameContainer(new MainGame());
             gc.setDisplayMode(800, 600, false);
-            //gc.setDisplayMode(1366, 768, true);
+//            gc.setDisplayMode(1366, 768, true);
             gc.setIcons(new String[]{"data/icon16x16.png", "data/icon32x32.png", "data/icon48x48.png", "data/icon64x64.png", "data/icon128x128.png", "data/icon256x256.png"});
             gc.start();
         } catch (Exception e) {

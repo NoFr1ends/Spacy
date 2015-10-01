@@ -34,9 +34,14 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private boolean debug = true;
     private float alphaWarn = 0f;
     private SpriteSheet sheet;
+<<<<<<< HEAD
     
     private int delta;
     
+=======
+    private final int paneLenght = 512;
+    private Vector2f backgroundBasePos = new Vector2f();
+>>>>>>> c95c6ebb61ffdece78b257f5c32bbf08e9c449c1
     public GameScreen(IScreen prevScreen, SpacyClient spacyClient) {
         this.client = spacyClient;
         rand = new Random();      
@@ -66,8 +71,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         try {       
             viewPort = new Rect(0, 0, gc.getWidth(), gc.getHeight());
             
-            int width = gc.getWidth() * 2;
-            int height = gc.getHeight()* 2;
+            int width =paneLenght;
+            int height = paneLenght;
             
             background = new Image(width, height);
             Graphics g = background.getGraphics();            
@@ -83,6 +88,31 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         } catch (SlickException ex) {
             Logger.getLogger(GameScreen.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private int getPartipalCurrentPane(){
+        int w = (int)client.getShip().position.x % paneLenght;
+        int h = (int)client.getShip().position.y % paneLenght;
+        
+        if(h < paneLenght / 2){
+            //Oben
+            if(w < paneLenght / 2){
+                return 1;
+            }
+            else{
+                return 2;
+            }
+        }
+        else{
+            //Unten
+            if(w < paneLenght / 2){
+                return 3;
+            }
+            else{
+                return 4;
+            }
+        }
+        
     }
 
     @Override
@@ -139,6 +169,18 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             this.viewPortCenter = shipPos;
             this.viewPort.x = (viewPortCenter.x - (this.viewPort.width / 2));
             this.viewPort.y = (viewPortCenter.y - (this.viewPort.height / 2));
+            backgroundBasePos = new Vector2f(-(viewPort.x % paneLenght), -(viewPort.y % paneLenght));
+            switch(getPartipalCurrentPane()){
+                case 1:
+                    
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+            }
             
 
 
@@ -173,6 +215,9 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             if(!alphaChanged){
                 alphaWarn = 0f;
             }
+            
+            
+            
         }
         
     }
@@ -197,10 +242,13 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         g.resetTransform();
         g.setBackground(BackgroundColor);
         
-        g.translate((-viewPort.x) * backgroundMoveFactor - gc.getWidth() / backgroundMoveFactor / 2, (-viewPort.y) * backgroundMoveFactor - gc.getHeight() / backgroundMoveFactor / 2);
-     
         
+        g.translate(backgroundBasePos.getX(), backgroundBasePos.getY());
+             
         background.draw();
+        background.draw(0, gc.getHeight() * 2);
+        background.draw(gc.getWidth() * 2, 0);
+        background.draw(gc.getWidth() * 2, gc.getHeight() * 2);
         g.resetTransform();
        
         //g.scale(zoom, zoom);
@@ -216,6 +264,9 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         if(client.getWorld() == null)
             return;
         
+        g.setColor(Color.orange);
+        g.drawLine(paneLenght, 0, paneLenght, paneLenght * 2 );        
+        g.drawLine( 0,paneLenght, paneLenght * 2, paneLenght);
         
         
         try{
@@ -264,6 +315,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             
             g.resetTransform();
             g.setColor(Color.white);
+            
             g.drawString("Clientdelta:     " + this.delta + "ms", 8, 30);
             g.drawString("Serverdelta:     " + client.getServerTickDelta() + "ms", 8, 50);
             g.drawString("Ticks/s:         " + client.getServerTicksPerSecond(), 8, 70);            
@@ -273,7 +325,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             g.drawString("Viewport Size:   " + this.viewPort.width + "x" + this.viewPort.height, 8, 150);
             g.drawString("Objects:         " + objects, 8, 170);
             g.drawString("alphaWarn:       " + alphaWarn, 8, 190);
-            g.drawString("VID:             " + client.getShip().id, 8, 210);
+            g.drawString("Corner:          " + getPartipalCurrentPane(), 8, 210);
+            g.drawString("VID:             " + client.getShip().id, 8, 230);
         }
         
         g.resetTransform();

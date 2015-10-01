@@ -48,7 +48,8 @@ public class GameClient extends Listener {
         public Ship addShip(){
             Ship s = new Ship();
             Random r = new Random();
-            s.position = new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);
+            //s.position = new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);
+            s.position = new Vector2f(0, 0);
             s.texture = "playerShip2_orange.png"; // todo change for teams etc            
             s.textureBounds = new Vector2f(110, 66);
             s.id = server.EntityCounter++;
