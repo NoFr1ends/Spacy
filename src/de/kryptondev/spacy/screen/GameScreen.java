@@ -34,14 +34,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private boolean debug = true;
     private float alphaWarn = 0f;
     private SpriteSheet sheet;
-<<<<<<< HEAD
     
     private int delta;
     
-=======
     private final int paneLenght = 512;
     private Vector2f backgroundBasePos = new Vector2f();
->>>>>>> c95c6ebb61ffdece78b257f5c32bbf08e9c449c1
+    
     public GameScreen(IScreen prevScreen, SpacyClient spacyClient) {
         this.client = spacyClient;
         rand = new Random();      
