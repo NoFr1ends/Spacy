@@ -44,9 +44,9 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private boolean ready = false;
     private int delta;
     private boolean canShoot = true;
-    private final int paneLenght = 512;
+    private int paneLenght = 512;
     private Vector2f backgroundBasePos = new Vector2f();
-    
+    private int panePos = -1;
     public GameScreen() {
         this.client = SpacyClient.getInstance();
         this.rand = new Random();      
@@ -75,9 +75,11 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         
         try {       
             viewPort = new Rect(0, 0, gc.getWidth(), gc.getHeight());
-            
+            paneLenght = gc.getWidth() > gc.getHeight() ? gc.getWidth() : gc.getHeight();
             int width =paneLenght;
             int height = paneLenght;
+            
+         
             
             background = new Image(width, height);
             Graphics g = background.getGraphics();            
@@ -192,19 +194,9 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             this.viewPortCenter = shipPos;
             this.viewPort.x = (viewPortCenter.x - (this.viewPort.width / 2));
             this.viewPort.y = (viewPortCenter.y - (this.viewPort.height / 2));
-            backgroundBasePos = new Vector2f(-(viewPort.x % paneLenght), -(viewPort.y % paneLenght));
-            switch(getPartipalCurrentPane()){
-                case 1:                    
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    break;
-                default:
-                    //NO SHIP
-            }            
+            
+            backgroundBasePos = new Vector2f((-(viewPort.x % paneLenght)), (-(viewPort.y % paneLenght)) );
+            panePos = getPartipalCurrentPane();
 
 
             //"Redness"-control when leaving battle field
@@ -265,12 +257,58 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         g.clear();
         g.resetTransform();
         g.setBackground(BackgroundColor);
-        g.translate(backgroundBasePos.getX(), backgroundBasePos.getY());
-             
-        background.draw();
-        background.draw(0, gc.getHeight() * 2);
-        background.draw(gc.getWidth() * 2, 0);
-        background.draw(gc.getWidth() * 2, gc.getHeight() * 2);
+        g.translate(backgroundBasePos.getX(), backgroundBasePos.getY());        
+        background.draw();   
+     
+        switch(panePos){
+            //Oben Links
+            case 1: 
+                //Links daneben
+                background.draw(-paneLenght, 0);  
+                //Oben drüber
+                background.draw(0, -paneLenght);  
+                //Diagonal
+                background.draw(-paneLenght, -paneLenght);  
+                break;
+            //Oben Rechts
+            case 2:
+                //Rechts daneben
+                background.draw(paneLenght, 0);  
+                //Oben drüber
+                background.draw(0,-paneLenght);  
+                //Diagonal
+                background.draw(paneLenght, 0 - paneLenght);  
+                break;
+            //Unten Links
+            case 3:
+                //Links daneben
+                background.draw(-paneLenght, 0);  
+                //Unten drunter
+                background.draw(0, paneLenght);  
+                //Diagonal
+                background.draw(-paneLenght, -paneLenght);                  
+                break;
+            //Unten Rechts
+            case 4:
+                 //Rechts daneben
+                background.draw(paneLenght, 0);  
+                //Unten drunter
+                background.draw(0, paneLenght);  
+                //Diagonal
+                background.draw(paneLenght, paneLenght);                  
+                break;
+            default:
+                //NO SHIP
+        }   
+        
+        if(debug){            
+            g.setLineWidth(1f);
+            Color c = new Color((float)0xff, (float)0x66, 0f, 255f);
+            g.setColor(c);
+            g.drawLine(paneLenght, 0, paneLenght, paneLenght * 2);        
+            g.drawLine( 0,paneLenght, paneLenght * 2, paneLenght);        
+        }
+        
         g.resetTransform();
 
         g.translate((-viewPort.x) , (-viewPort.y));      
@@ -284,11 +322,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         if(client.getWorld() == null)
             return;
         
-        if(debug){
-            g.setColor(Color.orange);
-            g.drawLine(paneLenght, 0, paneLenght, paneLenght * 2 );        
-            g.drawLine( 0,paneLenght, paneLenght * 2, paneLenght);
-        }
+       
         
         //DrawShips
         
@@ -353,7 +387,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             g.drawString("Serverdelta:     " + client.getServerTickDelta() + "ms", 8, 50);
             g.drawString("Ticks/s:         " + client.getServerTicksPerSecond(), 8, 70);            
             g.drawString("Viewport Pos:    " + this.viewPort.x + " | " + this.viewPort.y, 8, 90);
-            //g.drawString("Ship Pos:        " +  , 8, 110);
+            if(client.getShip() != null)
+                g.drawString("Ship Pos:        " + client.getShip().position.toString() , 8, 110);
             g.drawString("Zoom:            " + this.zoom, 8, 130);
             g.drawString("Viewport Size:   " + this.viewPort.width + "x" + this.viewPort.height, 8, 150);
             g.drawString("Objects:         " + objects + "(" + client.getWorld().ships.size() + ")", 8, 170);
