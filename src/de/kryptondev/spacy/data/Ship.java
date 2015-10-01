@@ -1,11 +1,13 @@
 package de.kryptondev.spacy.data;
 
 import de.kryptondev.spacy.share.PlayerInfo;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Timer;
 import org.newdawn.slick.geom.Vector2f;
 
 
-public class Ship extends Entity implements IHittable {
-
+public class Ship extends Entity implements IHittable {    
     public float turnspeed;
     public PlayerInfo owner;
     public Weapon activeWeapon;

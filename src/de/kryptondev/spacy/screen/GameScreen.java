@@ -7,10 +7,16 @@ import de.kryptondev.spacy.SpacyClient;
 import de.kryptondev.spacy.SpriteSheet;
 import de.kryptondev.spacy.input.KeyInputManager;
 import de.kryptondev.spacy.input.MouseInputManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.timer.Timer;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -30,12 +36,13 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private final float zoomStep = 0.5f;
     private final Random rand;
     private boolean debug = false;
-    
+    private boolean canShoot = true;
     //Der letzte Zeitpunkt, andem das PlayerRotate-Paket gesendet wurde.
     //private long timeLastPlayerRotate = 0;
     //Zeit (Ticks) die gewartet wird, bis das nächste PlayerRotate-Paket gesendet wird. 
     //private final long sendFreq = 100;
     private SpriteSheet sheet;
+    private ScheduledExecutorService cooldown;
     
     public GameScreen(IScreen prevScreen, SpacyClient spacyClient) {
         this.client = spacyClient;
@@ -75,7 +82,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             int max = width * height / 800;
             
             for(int i = 0; i < max; i++){
-                int rad = (int)(getRandomFloat(1.2f,5));                
+                int rad = (int)(getRandomFloat(1.2f,5));
                 g.fillOval(rand.nextInt(width), rand.nextInt(height), rad, rad);
             }
 
@@ -87,8 +94,23 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         } catch (SlickException ex) {
             Logger.getLogger(GameScreen.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        this.cooldown = Executors.newScheduledThreadPool(1);
+       
+        
     }
 
+    public void startCooldown(){
+        this.canShoot = false;
+        cooldown.schedule(new Runnable() {
+
+            @Override
+            public void run() {
+                GameScreen.this.canShoot = true;
+            }
+        }, 1000, TimeUnit.MILLISECONDS);
+    }
+    
     @Override
     public void update(GameContainer gc, int delta) {
         
@@ -152,11 +174,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     @Override
     public void draw(GameContainer gc, Graphics g) {    
         //g.setWorldClip(0, 0, client.getWorld().worldSize, client.getWorld().worldSize);
-        g.drawImage(background, 0, 0);
+       
         g.scale(zoom, zoom);
         g.translate((-viewPort.x) / this.backgroundMoveFactor , 
                 (-viewPort.y) / this.backgroundMoveFactor);
         g.setBackground(BackgroundColor);
+        g.drawImage(background, 0, 0);
         //g.drawImage(background, 0, 0);
         g.resetTransform();
         g.scale(zoom, zoom);
@@ -302,12 +325,13 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             SpacyClient.getInstance().getClient().sendTCP(new Move(EMoving.Accelerating,myShip.id));
             System.out.println("Start moving");
         }
+        
         //Fire
-        if(button == 0){
-            //TODO Implement Weapon Cooldown
+        if(button == 0 & this.canShoot){
            
             SpacyClient.getInstance().getClient().sendTCP(
                     new Projectile(DamageType.balistic, myShip.id, myShip.direction, myShip.position));
+            startCooldown();
         }
         client.replaceShip(myShip);
         
