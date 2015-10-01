@@ -183,6 +183,11 @@ public class SpacyClient extends Listener{
         if(o instanceof World){
              this.world = (World)o;   
         }
+        
+        if(o instanceof UpdateLife) {
+            UpdateLife life = (UpdateLife) o;
+            getShip().hp = life.hp;
+        }
          
         if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
             GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
