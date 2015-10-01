@@ -88,8 +88,10 @@ public class GameTick implements Runnable{
                         //Zu wenig HP + Shield?
                         if(ship.hp + (ship.shield != null ? ship.shield.life : 0) < 1){
                             gc.sendTCP(new OnDeath(p.senderId, p.id));
-                            server.getServer().sendToAllTCP(new OnKill(ship.id, p.senderId, p.id));
+                            server.getServer().sendToAllTCP(new OnKill(ship.id, p.senderId, p.id));                            server.getServer().sendToAllTCP(new OnKill(ship.id, p.senderId, p.id));
+                            server.getServer().sendToAllTCP(new DeleteEntity(ship.id));
                             server.world.ships.remove(ship.id);
+                            gc.addShip();
                         }
                         if(p.destroyOnCollision){
                             //server.world.projectiles.remove(pos + 1);
