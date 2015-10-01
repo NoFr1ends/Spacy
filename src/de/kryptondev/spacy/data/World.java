@@ -1,9 +1,7 @@
 package de.kryptondev.spacy.data;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class World {
     
@@ -11,7 +9,8 @@ public class World {
     public volatile ConcurrentHashMap<Long, Projectile> projectiles;
     public volatile HashMap<Long, Entity> entities;  //alles was nicht in einer der anderen Listen steht
     //Worldsize in Pixeln
-    public int worldSize = 4096 * 2;
+    public int worldSize = 8192;
+    public int toleranceDeathRadius = 800;
     
     public World() {
         ships = new ConcurrentHashMap<>(4);

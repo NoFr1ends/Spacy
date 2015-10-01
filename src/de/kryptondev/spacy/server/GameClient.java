@@ -33,15 +33,13 @@ public class GameClient extends Listener {
         private SpacyServer server;
         private GameClient gameClient;
         private long shipId;
+        
         public SGameClient(SpacyServer server, GameClient gc) {
             this.gameClient = gc;
             this.server = server;
             this.connectionTimeStamp = new Date();     
             
         }
-        
-        
-        
         
         /**
         * Neues Schiff mit Standardwerten erstellen und zur Welt hinzufügen.
@@ -50,19 +48,16 @@ public class GameClient extends Listener {
         public Ship addShip(){
             Ship s = new Ship();
             Random r = new Random();
-            s.position = /*new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);*/ 
-                    new Vector2f(r.nextFloat() * 200, r.nextFloat() * 200);
-            s.moving = EMoving.Stopped;
-            s.maxSpeed = 80f;
-            s.acceleration = 1.2f;
-            s.texture = "playerShip2_orange.png"; // todo change for teams etc
-            s.boundsRadius = 87f;
+            s.position = new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);
+            s.texture = "playerShip2_orange.png"; // todo change for teams etc            
             s.textureBounds = new Vector2f(110, 66);
             s.id = server.EntityCounter++;
             this.shipId = s.id;
             server.world.ships.put(s.id,s);
             server.getServer().sendToAllTCP(new OnJoin(s));
-            
+            this.sendTCP(s);            
+            this.sendTCP(new DebugTickDelta(server.getServerTick().getDelta(), GameTick.ticksPerSecond));
+            server.sendWorld(this);
             return s;
         }
         
@@ -70,14 +65,9 @@ public class GameClient extends Listener {
             if (server.isPlayerBanned(playerInfo.playerUID)) {
                 this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.Banned, 0));
                 return;
-            }
-            //GameClient.this.spacyServer.broadcast(new Chatmessage(GameClient.this.getPlayerInfo().playerName + " joined the party!"));
-            //GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.toString() + " connected right now!");
-          
+            }           
             Ship s = this.addShip();
-            this.sendTCP(s);            
-            this.sendTCP(new DebugTickDelta(server.getServerTick().getDelta(), GameTick.ticksPerSecond));
-            server.sendWorld(this);
+           
         }
 
         @Override
@@ -92,9 +82,7 @@ public class GameClient extends Listener {
         }
         
         public void onDisconnect(){
-            /*GameClient.this.instance.getSpacyServer().writeInfo(GameClient.this.instance.playerInfo.playerName + " left the party!");      
-            System.out.println(".disconnected()");
-            */
+            
         }
         
         public void onRecv(Object data) {        
@@ -112,27 +100,31 @@ public class GameClient extends Listener {
                 return;
             }            
             if (data instanceof Chatmessage) {
-                //spacyServer.broadcast(data);
+                
                 return;
             }
             if(data instanceof Move){
-                Move move = (Move)data;
-                Ship ship = this.getMyShip();
-                ship.moving = move.status;
-                /*if(this.server.world.ships.containsKey(this.shipId))
-                    this.server.world.ships.put(shipId, ship);*/
-                
-                move.id = this.shipId;
-                server.getServer().sendToAllTCP(move);
-                return;
+                if(!isSpectator()){
+                    Move move = (Move)data;
+                    Ship ship = this.getMyShip();
+                    ship.moving = move.status;
+                    /*if(this.server.world.ships.containsKey(this.shipId))
+                        this.server.world.ships.put(shipId, ship);*/
+
+                    move.id = this.shipId;
+                    server.getServer().sendToAllTCP(move);
+                    return;
+                }
             }
             if(data instanceof PlayerRotate){
-                PlayerRotate rotation = (PlayerRotate)data;
-                this.getMyShip().direction = rotation.direction;
-                
-                rotation.ship = this.getMyShip().id;
-                this.server.getServer().sendToAllTCP(rotation);
-                return;
+                if(this.getMyShip() != null){
+                    PlayerRotate rotation = (PlayerRotate)data;
+                    this.getMyShip().direction = rotation.direction;
+
+                    rotation.ship = this.getMyShip().id;
+                    this.server.getServer().sendToAllTCP(rotation);
+                    return;
+                }
             }
             if(data instanceof Projectile){               
                 //Fire
@@ -188,5 +180,9 @@ public class GameClient extends Listener {
         public Ship getMyShip() {
             return server.world.ships.get(this.shipId);
         }   
+        
+        public boolean isSpectator(){
+            return !server.world.ships.containsKey(this.shipId);
+        }
     }
 }
