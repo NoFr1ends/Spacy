@@ -34,15 +34,15 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private boolean debug = true;
     private float alphaWarn = 0f;
     private SpriteSheet sheet;
-    
+    private boolean ready = false;
     private int delta;
     
     private final int paneLenght = 512;
     private Vector2f backgroundBasePos = new Vector2f();
     
-    public GameScreen(IScreen prevScreen, SpacyClient spacyClient) {
-        this.client = spacyClient;
-        rand = new Random();      
+    public GameScreen() {
+        this.client = SpacyClient.getInstance();
+        this.rand = new Random();      
     }
     
     public float getRandomFloat(float min, float max){
@@ -86,9 +86,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         } catch (SlickException ex) {
             Logger.getLogger(GameScreen.class.getName()).log(Level.SEVERE, null, ex);
         }
+        ready = true;
     }
     
     private int getPartipalCurrentPane(){
+        if(client.getShip() == null)
+            return -1;
         int w = (int)client.getShip().position.x % paneLenght;
         int h = (int)client.getShip().position.y % paneLenght;
         
@@ -169,8 +172,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             this.viewPort.y = (viewPortCenter.y - (this.viewPort.height / 2));
             backgroundBasePos = new Vector2f(-(viewPort.x % paneLenght), -(viewPort.y % paneLenght));
             switch(getPartipalCurrentPane()){
-                case 1:
-                    
+                case 1:                    
                     break;
                 case 2:
                     break;
@@ -178,6 +180,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                     break;
                 case 4:
                     break;
+                default:
+                    //NO SHIP
             }
             
 
@@ -319,13 +323,14 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             g.drawString("Serverdelta:     " + client.getServerTickDelta() + "ms", 8, 50);
             g.drawString("Ticks/s:         " + client.getServerTicksPerSecond(), 8, 70);            
             g.drawString("Viewport Pos:    " + this.viewPort.x + " | " + this.viewPort.y, 8, 90);
-            g.drawString("Ship Pos:        " + client.getShip().position, 8, 110);
+            //g.drawString("Ship Pos:        " +  , 8, 110);
             g.drawString("Zoom:            " + this.zoom, 8, 130);
             g.drawString("Viewport Size:   " + this.viewPort.width + "x" + this.viewPort.height, 8, 150);
             g.drawString("Objects:         " + objects + "(" + client.getWorld().ships.size() + ")", 8, 170);
             g.drawString("alphaWarn:       " + alphaWarn, 8, 190);
             g.drawString("Corner:          " + getPartipalCurrentPane(), 8, 210);
-            g.drawString("VID:             " + client.getShipId() + " (" + client.getShip().hashCode() + ")", 8, 230);
+            if(client.getShip() != null)
+                g.drawString("VID:             " + client.getShipId() + " (" + client.getShip().hashCode() + ")", 8, 230);
         }
         
         g.resetTransform();
@@ -378,10 +383,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
        if(key == Input.KEY_F12){
            debug = !debug;
        }
-    }
-    private void print(String id, Vector2f vec){
-        System.out.println(id+  "@ " + vec.x + ", " + vec.y);
-    }
+    } 
     @Override
     public void onButtonDown(int button) {
         if(button == 1){           
@@ -404,7 +406,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             if(!isSpectatorMode()){   
                 client.getShip().moving = EMoving.Deccelerating;
                 SpacyClient.getInstance().getClient().sendTCP(new Move(EMoving.Deccelerating, client.getShip().id, client.getShip().position));
-                System.out.println("Stop moving");
+                //System.out.println("Stop moving");
             }
         }
     }
@@ -426,7 +428,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             //Move
             if(button == 1){
                 SpacyClient.getInstance().getClient().sendTCP(new Move(EMoving.Accelerating,myShip.id, myShip.position));
-                System.out.println("Start moving");
+                //System.out.println("Start moving");
             }
             //Fire
             if(button == 0){
@@ -450,5 +452,11 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     public boolean isSpectatorMode(){
         return this.client.getShip() == null;
     }
+
+    public boolean isReady() {
+        return ready;
+    }
+    
+    
     
 }

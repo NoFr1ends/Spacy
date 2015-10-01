@@ -12,9 +12,11 @@ import de.kryptondev.spacy.helper.UID;
 
 import de.kryptondev.spacy.screen.GameScreen;
 import de.kryptondev.spacy.screen.ScreenManager;
+import de.kryptondev.spacy.screen.WaitingScreen;
 import de.kryptondev.spacy.share.playerEvents.OnJoin;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import org.omg.PortableServer.THREAD_POLICY_ID;
 
 
 public class SpacyClient extends Listener{
@@ -29,7 +31,7 @@ public class SpacyClient extends Listener{
     private long shipId = 0;
     private int serverTickDelta;
     private int serverTicksPerSecond;
-    
+    private WaitingScreen waiting;
     public ArrayList<Long> toDelete = new ArrayList<>();
     
     public SpacyClient() {
@@ -43,23 +45,28 @@ public class SpacyClient extends Listener{
     }   
    
 
-    public void connect(String server) {
+    public void connect(String server, WaitingScreen waiting) {
         try {
+            ScreenManager.getInstance().changeScreen(waiting);
+            this.waiting = waiting;
+            waiting.setStatusMessage("Initializing client");
             client = new Client();
             KryoRegisterer.registerAll(client.getKryo());
             new Thread(client).start();
             client.addListener(this);
+            waiting.setStatusMessage("Connecting...");
             client.connect(timeout, server, port, 54777);
 
         } catch (Exception ex) {
              System.err.println(ex.getLocalizedMessage());
-            //TODO Handle error
+             waiting.setStatusMessage("Error: "+ex.getLocalizedMessage());
         }
     }
 
     private void connectionDropped(ConnectionAttemptResponse.Type reason) {
-        //GUI Update
         System.out.println("Client is not connected! Reason: " + reason.toString());
+        waiting.setStatusMessage("Client is not connected! Reason: " + reason.toString());
+        ScreenManager.getInstance().changeScreen(waiting);        
     }
 
     public void sendMessage(String message) {
@@ -116,11 +123,11 @@ public class SpacyClient extends Listener{
             //Antwort auswerten
             ConnectionAttemptResponse response = (ConnectionAttemptResponse) o;
             if (response.type == ConnectionAttemptResponse.Type.OK) {
+                GameScreen gs = new GameScreen();
+                ScreenManager.getInstance().changeScreen(gs);
                 this.world.worldSize = response.worldSize;
-                   if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
-                        GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
-                        game.onConnected();
-                    }
+                gs.onConnected();
+                    
                 return;
             } else {
                 this.client.close();
@@ -149,10 +156,32 @@ public class SpacyClient extends Listener{
             world.ships.put(s.id ,s);
             shipId = s.id;
             
-            if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
-                GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
-            }
-            
+            if(!(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen)){  
+                new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        ScreenManager.getInstance().changeScreen(new GameScreen());
+                    }
+                }).start();
+                
+                while(!(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen) ){
+                    try{
+                    Thread.sleep(1);
+                    }
+                    catch (Exception ex){
+                        break;
+                    }
+                }
+                while(!((GameScreen)ScreenManager.getInstance().getCurrentScreen()).isReady()){
+                    try{
+                    Thread.sleep(1);
+                    }
+                    catch (Exception ex){
+                        break;
+                    }
+                }
+            }            
             
             return;
         }
@@ -203,7 +232,8 @@ public class SpacyClient extends Listener{
     }
 
     @Override
-    public void connected(Connection cnctn) {        
+    public void connected(Connection cnctn) {  
+        waiting.setStatusMessage("Sending data");
         client.sendTCP(clientVersion);       
         client.sendTCP(SpacyClient.this.info);
     }
