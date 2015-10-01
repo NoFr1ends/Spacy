@@ -113,7 +113,7 @@ public class GameClient extends Listener {
                     /*if(this.server.world.ships.containsKey(this.shipId))
                         this.server.world.ships.put(shipId, ship);*/
 
-                    move.id = this.shipId;
+                    move.id = ship.id;
                     server.getServer().sendToAllTCP(move);
                     return;
                 }
@@ -128,7 +128,10 @@ public class GameClient extends Listener {
                     return;
                 }
             }
-            if(data instanceof Projectile){               
+            if(data instanceof Projectile){  
+                if(this.getMyShip() == null)
+                    return;
+                
                 //Fire
                 Projectile p = (Projectile)data;
                 p.setLifeTime(2.5f);                

@@ -26,7 +26,7 @@ public class SpacyClient extends Listener{
     public static final Version clientVersion = new Version(1, 0, 0);
     private PlayerInfo info;
     private World world = new World();
-    private long shipId;
+    private long shipId = 0;
     private int serverTickDelta;
     private int serverTicksPerSecond;
     
@@ -94,14 +94,14 @@ public class SpacyClient extends Listener{
             if(this.world.ships.containsKey(r.ship)){
                 Ship s = this.world.ships.get(r.ship);
                 s.direction = r.direction;
-                this.world.ships.put(shipId, s);
+                //this.world.ships.put(shipId, s);
             }
         }
         
         if(o instanceof Move){
             Move move = (Move)o;
             Ship ship = this.world.ships.get(move.id);
-            if(this.world.ships.containsKey(move.id)){
+            if(ship != null){
                 ship.moving = move.status;
                 ship.position = move.pos;
                 //this.world.ships.put(shipId, ship);
@@ -148,6 +148,7 @@ public class SpacyClient extends Listener{
             System.out.println("SHIP RECEIVED!!!");
             world.ships.put(s.id ,s);
             shipId = s.id;
+            
             if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){
                 GameScreen game = (GameScreen)ScreenManager.getInstance().getCurrentScreen();
             }
@@ -243,12 +244,6 @@ public class SpacyClient extends Listener{
     public Ship getShip() {
         return this.world.ships.get(this.shipId);
     }
-    
-    public void setShip(Ship ship){
-        if(this.world.ships.containsKey(ship.id)){
-            this.world.ships.put(ship.id, ship);
-        }
-    }
 
     public Client getClient() {
         return client;
@@ -276,13 +271,6 @@ public class SpacyClient extends Listener{
 
     public void setShipId(long shipId) {
         this.shipId = shipId;
-    }
-    
-    public void replaceShip(Ship ship){
-        if(this.world.ships.containsKey(ship.id)){
-            this.world.ships.put(ship.id, ship);
-        }
-    }
-    
+    }    
     
 }

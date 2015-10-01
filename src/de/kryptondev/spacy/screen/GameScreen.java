@@ -220,18 +220,19 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         
     }
     
-    public void drawCross(Vector2f pos, Graphics g){
+    public void drawCross(Vector2f pos, Graphics g, long vid){
       
         float size = 50f;
         g.setColor(Color.magenta);
         g.drawLine(pos.x - size / 2, pos.y, pos.x + size / 2, pos.y);
         g.drawLine(pos.x, pos.y - size/ 2, pos.x, pos.y +  size / 2);
         g.setColor(Color.white);
-        g.drawString(pos.x + " | " + pos.y , pos.x + 10, pos.y - 10);        
+        g.drawString(pos.x + " | " + pos.y , pos.x + 10, pos.y - 10);  
+        g.drawString("ID: "+vid, pos.x + 10, pos.y - 30);
     }
     
-    public void drawCross(float x, float y, Graphics g){
-        drawCross(new Vector2f(x,y),g);
+    public void drawCross(float x, float y, Graphics g, long vid){
+        drawCross(new Vector2f(x,y),g, vid);
     }
     
     @Override
@@ -278,7 +279,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                         ship.getValue().textureBounds.copy().scale(0.5f));
                 
                 if(this.debug){
-                    drawCross(ship.getValue().position.x, ship.getValue().position.y, g);
+                    drawCross(ship.getValue().position.x, ship.getValue().position.y, g, ship.getValue().id);
                     ship.getValue().drawRotation(g);
                     ship.getValue().drawBounds(g);
                 }
@@ -292,7 +293,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                         renderPosition.y, p.getValue().getRotation(), null); 
                 
                 if(this.debug){
-                    drawCross(p.getValue().position.x, p.getValue().position.y, g);
+                    drawCross(p.getValue().position.x, p.getValue().position.y, g, p.getValue().id);
                     p.getValue().drawRotation(g);
                     p.getValue().drawBounds(g);
                 }
@@ -318,13 +319,13 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             g.drawString("Serverdelta:     " + client.getServerTickDelta() + "ms", 8, 50);
             g.drawString("Ticks/s:         " + client.getServerTicksPerSecond(), 8, 70);            
             g.drawString("Viewport Pos:    " + this.viewPort.x + " | " + this.viewPort.y, 8, 90);
-            g.drawString("Ship Pos:        " + this.viewPortCenter.x + " | " + this.viewPortCenter.y, 8, 110);
+            g.drawString("Ship Pos:        " + client.getShip().position, 8, 110);
             g.drawString("Zoom:            " + this.zoom, 8, 130);
             g.drawString("Viewport Size:   " + this.viewPort.width + "x" + this.viewPort.height, 8, 150);
-            g.drawString("Objects:         " + objects, 8, 170);
+            g.drawString("Objects:         " + objects + "(" + client.getWorld().ships.size() + ")", 8, 170);
             g.drawString("alphaWarn:       " + alphaWarn, 8, 190);
             g.drawString("Corner:          " + getPartipalCurrentPane(), 8, 210);
-            g.drawString("VID:             " + client.getShip().id, 8, 230);
+            g.drawString("VID:             " + client.getShipId() + " (" + client.getShip().hashCode() + ")", 8, 230);
         }
         
         g.resetTransform();
@@ -434,7 +435,6 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                 SpacyClient.getInstance().getClient().sendTCP(
                         new Projectile(DamageType.balistic, myShip.id, myShip.direction, myShip.position));
             }
-            client.replaceShip(myShip);
         }
     }
 
