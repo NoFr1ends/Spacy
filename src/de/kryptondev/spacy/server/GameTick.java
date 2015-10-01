@@ -30,11 +30,14 @@ public class GameTick implements Runnable{
         for(Connection c : (Connection[])server.getServer().getConnections().clone()) {            
             SGameClient gc = (SGameClient)c;
             Ship ship = gc.getMyShip();
-            if(ship != null)
-                if(ship.moving != EMoving.Stopped){                        
-                    ship.move(delta);
-                    //System.out.println("Server: Ship " + ship.id + " is moving!" + ship.position.x);                    
-                }
+            if(ship != null) {
+                ship.move(delta);
+                
+                if(ship.moving != EMoving.Stopped)
+                    System.out.println("Server: Ship " + ship.id + " is moving! " + ship.position + " (delta: " + delta + ")");   
+                                 
+            }
+                
         }
         ConcurrentHashMap<Long, Projectile> projs = server.world.projectiles;
         ArrayList<Long> toDelete = new ArrayList<>();

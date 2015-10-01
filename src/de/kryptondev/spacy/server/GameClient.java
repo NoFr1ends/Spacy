@@ -119,8 +119,8 @@ public class GameClient extends Listener {
                 Move move = (Move)data;
                 Ship ship = this.getMyShip();
                 ship.moving = move.status;
-                if(this.server.world.ships.containsKey(this.shipId))
-                    this.server.world.ships.put(shipId, ship);
+                /*if(this.server.world.ships.containsKey(this.shipId))
+                    this.server.world.ships.put(shipId, ship);*/
                 
                 move.id = this.shipId;
                 server.getServer().sendToAllTCP(move);

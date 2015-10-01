@@ -88,7 +88,6 @@ public abstract class Entity {
         newPosition.y = position.y + (direction.y * speed) * (delta / 16f);
         position = newPosition;
         
-        
         //System.out.println(id + ": " + moving + " with speed " + speed + " in direction " + direction);
     }
 
