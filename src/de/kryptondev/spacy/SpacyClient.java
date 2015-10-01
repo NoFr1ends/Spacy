@@ -103,7 +103,8 @@ public class SpacyClient extends Listener{
             Ship ship = this.world.ships.get(move.id);
             if(this.world.ships.containsKey(move.id)){
                 ship.moving = move.status;
-                this.world.ships.put(shipId, ship);
+                ship.position = move.pos;
+                //this.world.ships.put(shipId, ship);
             }
             else{
                 System.err.println("Ship " + move.id + " not found!");

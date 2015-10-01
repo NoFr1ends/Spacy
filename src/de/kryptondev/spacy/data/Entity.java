@@ -29,13 +29,15 @@ public abstract class Entity {
         this.position = position;
     }
 
-    public void accelerate() {
+    public void accelerate(int delta) {
         if (this.speed == 0) {
             this.speed = 1;
             return;
         }
-        if ((this.acceleration * this.speed) < this.maxSpeed) {
-            this.speed = (this.acceleration * this.speed);//Lineare Beschleunigung, können aber auch was anderes nehmen.
+        
+        float next = (this.acceleration * this.speed) * (delta / 16f);
+        if (next < this.maxSpeed) {
+            this.speed = next;//Lineare Beschleunigung, können aber auch was anderes nehmen.
             return;
         } else {
             this.speed = this.maxSpeed;
@@ -44,9 +46,11 @@ public abstract class Entity {
     }
     /*Der Abbremsvorgang. Mal sehen wo wir das einbauen*/
 
-    public void decelerate() {
-        if (((1 / this.acceleration) * this.speed) > 1) {
-            this.speed = ((1 / this.acceleration) * this.speed);//Lineare Bremskraft, können aber auch was anderes nehmen.
+    public void decelerate(int delta) {
+        float next = ((1 / this.acceleration) * this.speed) * (delta / 16f);
+        
+        if (next > 1) {
+            this.speed = next;//Lineare Bremskraft, können aber auch was anderes nehmen.
         } else {
             this.speed = 0;
             moving = EMoving.Stopped;
@@ -71,10 +75,12 @@ public abstract class Entity {
         Vector2f oldPos = position;
         
         if (moving == EMoving.Accelerating) {
-            this.accelerate();
+            moving = EMoving.FullSpeed;
+            //this.accelerate(delta);
         }
         if (moving == EMoving.Deccelerating) {
-            this.decelerate();
+            moving = EMoving.Stopped;
+            //this.decelerate(delta);
         }
         if (moving == EMoving.FullSpeed) {
             this.speed = maxSpeed;

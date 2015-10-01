@@ -21,7 +21,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class GameTick implements Runnable{
     private int delta = 0;
     private GameTick instance;
-    public static final int ticksPerSecond = 100;        
+    public static final int ticksPerSecond = 60;        
     private SpacyServer server;    
     public GameTick(SpacyServer server) {
         this.server = server;
@@ -36,7 +36,7 @@ public class GameTick implements Runnable{
                 ship.move(delta);
                 
                 if(ship.moving != EMoving.Stopped)
-                    System.out.println("Server: Ship " + ship.id + " is moving! " + ship.position + " (delta: " + delta + ")");   
+                    System.out.println("Server: Ship " + ship.id + " is moving! " + ship.position + " (delta: " + delta + ", state=" + ship.moving + ")");   
                      
                 int n = server.world.worldSize;
                 int tolerance = server.world.toleranceDeathRadius;
@@ -112,9 +112,11 @@ public class GameTick implements Runnable{
     public void run() {
         int lastDelta = delta;
         while(true){
-            try {        
+            try { 
+                //long start = System.nanoTime();
                 long start = new Date().getTime();
                 onTick(delta);
+                //long end = System.nanoTime();
                 long end = new Date().getTime();
                 int time = (int)(end - start);                
                 if(time > 1000 / ticksPerSecond){
@@ -123,6 +125,7 @@ public class GameTick implements Runnable{
                 }
                 Thread.sleep((1000 / ticksPerSecond) - time);           
                 long finalEnd = new Date().getTime();
+                //long finalEnd = System.nanoTime();
                 
                 delta = (int)(finalEnd - start);
                 if(delta != lastDelta){                   
