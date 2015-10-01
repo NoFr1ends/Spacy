@@ -43,7 +43,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private ScheduledExecutorService cooldown;
     private boolean ready = false;
     private int delta;
-    
+    private boolean canShoot = true;
     private final int paneLenght = 512;
     private Vector2f backgroundBasePos = new Vector2f();
     
@@ -204,8 +204,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                     break;
                 default:
                     //NO SHIP
-            }
-            
+            }            
 
 
             //"Redness"-control when leaving battle field
@@ -265,14 +264,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     public void draw(GameContainer gc, Graphics g) {    
         g.clear();
         g.resetTransform();
-        //g.setWorldClip(0, 0, client.getWorld().worldSize, client.getWorld().worldSize);
-       
-        g.scale(zoom, zoom);
-        g.translate((-viewPort.x) / this.backgroundMoveFactor , 
-                (-viewPort.y) / this.backgroundMoveFactor);
         g.setBackground(BackgroundColor);
-        g.drawImage(background, 0, 0);
-        //g.drawImage(background, 0, 0);
         g.translate(backgroundBasePos.getX(), backgroundBasePos.getY());
              
         background.draw();
@@ -280,10 +272,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         background.draw(gc.getWidth() * 2, 0);
         background.draw(gc.getWidth() * 2, gc.getHeight() * 2);
         g.resetTransform();
-       
-        //g.scale(zoom, zoom);
-        g.translate((-viewPort.x) , (-viewPort.y));
-        
+
+        g.translate((-viewPort.x) , (-viewPort.y));      
         
         
         //Draw World Borders
@@ -294,10 +284,13 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         if(client.getWorld() == null)
             return;
         
-        g.setColor(Color.orange);
-        g.drawLine(paneLenght, 0, paneLenght, paneLenght * 2 );        
-        g.drawLine( 0,paneLenght, paneLenght * 2, paneLenght);
+        if(debug){
+            g.setColor(Color.orange);
+            g.drawLine(paneLenght, 0, paneLenght, paneLenght * 2 );        
+            g.drawLine( 0,paneLenght, paneLenght * 2, paneLenght);
+        }
         
+        //DrawShips
         
         try{
             ConcurrentHashMap<Long, Ship> ships = client.getWorld().ships;
@@ -482,9 +475,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             SpacyClient.getInstance().getClient().sendTCP(
                     new Projectile(DamageType.balistic, myShip.id, myShip.direction, myShip.position));
             startCooldown();
-        }
-        client.replaceShip(myShip);
-        
+        }        
     }
 
 
