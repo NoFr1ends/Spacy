@@ -76,6 +76,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         try {       
             viewPort = new Rect(0, 0, gc.getWidth(), gc.getHeight());
             paneLenght = gc.getWidth() > gc.getHeight() ? gc.getWidth() : gc.getHeight();
+            
             int width =paneLenght;
             int height = paneLenght;
             
@@ -102,11 +103,16 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         
     }
     
+    private Vector2f getCurrentPane(){
+        return new Vector2f((float)((int)viewPort.x / paneLenght),
+            (float)((int)viewPort.y / paneLenght));
+    }
+    
     private int getPartipalCurrentPane(){
-        if(client.getShip() == null)
+        if(viewPort == null)
             return -1;
-        int w = (int)client.getShip().position.x % paneLenght;
-        int h = (int)client.getShip().position.y % paneLenght;
+        int w = (int)viewPort.x % paneLenght;
+        int h = (int)viewPort.y % paneLenght;
         
         if(h < paneLenght / 2){
             //Oben
@@ -195,7 +201,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             this.viewPort.x = (viewPortCenter.x - (this.viewPort.width / 2));
             this.viewPort.y = (viewPortCenter.y - (this.viewPort.height / 2));
             
-            backgroundBasePos = new Vector2f((-(viewPort.x % paneLenght)), (-(viewPort.y % paneLenght)) );
+            backgroundBasePos = getCurrentPane();
             panePos = getPartipalCurrentPane();
 
 
@@ -257,60 +263,37 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         g.clear();
         g.resetTransform();
         g.setBackground(BackgroundColor);
-        g.translate(backgroundBasePos.getX(), backgroundBasePos.getY());        
+        g.translate(backgroundBasePos.getX() * paneLenght- viewPort.x, backgroundBasePos.getY() * paneLenght- viewPort.y);        
+        //Current
         background.draw();   
-     
-        switch(panePos){
-            //Oben Links
-            case 1: 
-                //Links daneben
-                background.draw(-paneLenght, 0);  
-                //Oben drüber
-                background.draw(0, -paneLenght);  
-                //Diagonal
-                background.draw(-paneLenght, -paneLenght);  
-                break;
-            //Oben Rechts
-            case 2:
-                //Rechts daneben
-                background.draw(paneLenght, 0);  
-                //Oben drüber
-                background.draw(0,-paneLenght);  
-                //Diagonal
-                background.draw(paneLenght, 0 - paneLenght);  
-                break;
-            //Unten Links
-            case 3:
-                //Links daneben
-                background.draw(-paneLenght, 0);  
-                //Unten drunter
-                background.draw(0, paneLenght);  
-                //Diagonal
-                background.draw(-paneLenght, -paneLenght);                  
-                break;
-            //Unten Rechts
-            case 4:
-                 //Rechts daneben
-                background.draw(paneLenght, 0);  
-                //Unten drunter
-                background.draw(0, paneLenght);  
-                //Diagonal
-                background.draw(paneLenght, paneLenght);                  
-                break;
-            default:
-                //NO SHIP
-        }   
+        //Right
+        background.draw(paneLenght, 0);
+        //Bottom
+        background.draw(0, paneLenght);
+        //Bottm-Right
+        background.draw(paneLenght, paneLenght);       
+        
+        if(viewPort.x < 0){
+            background.draw(-paneLenght, 0);
+        }
+        
+        if(viewPort.y < 0){
+            background.draw(0, -paneLenght);
+        }
+        
+        if(viewPort.x < 0 & viewPort.y < 0){
+            background.draw(-paneLenght, -paneLenght);
+        }
         
         if(debug){            
             g.setLineWidth(1f);
             Color c = new Color((float)0xff, (float)0x66, 0f, 255f);
             g.setColor(c);
             g.drawLine(paneLenght, 0, paneLenght, paneLenght * 2);        
-            g.drawLine( 0,paneLenght, paneLenght * 2, paneLenght);        
+            g.drawLine( 0,paneLenght, paneLenght * 2, paneLenght);    
         }
         
         g.resetTransform();
-
         g.translate((-viewPort.x) , (-viewPort.y));      
         
         
@@ -324,9 +307,9 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         
        
         
-        //DrawShips
         
-        try{
+        try{            
+            //DrawShips
             ConcurrentHashMap<Long, Ship> ships = client.getWorld().ships;
             for(ConcurrentHashMap.Entry<Long, Ship> ship : ships.entrySet()){                 
                 Vector2f renderPosition = ship.getValue().getCenteredRenderPos();            
@@ -341,11 +324,11 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                     ship.getValue().drawRotation(g);
                     ship.getValue().drawBounds(g);
                 }
-            }        
+            }      
+            //Draw Projectiles
             ConcurrentHashMap<Long, Projectile> projectiles = client.getWorld().projectiles;
-            for(ConcurrentHashMap.Entry<Long, Projectile> p : projectiles.entrySet()){
-                
-                Vector2f renderPosition = (p).getValue().getBulletRenderPos();
+            for(ConcurrentHashMap.Entry<Long, Projectile> p : projectiles.entrySet()){                
+                Vector2f renderPosition = (p).getValue().getCenteredRenderPos();
                 sheet.draw(p.getValue().texture, 
                         renderPosition.x, 
                         renderPosition.y, p.getValue().getRotation(), null); 
@@ -383,19 +366,20 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             g.resetTransform();
             g.setColor(Color.white);
             
-            g.drawString("Clientdelta:     " + this.delta + "ms", 8, 30);
-            g.drawString("Serverdelta:     " + client.getServerTickDelta() + "ms", 8, 50);
-            g.drawString("Ticks/s:         " + client.getServerTicksPerSecond(), 8, 70);            
-            g.drawString("Viewport Pos:    " + this.viewPort.x + " | " + this.viewPort.y, 8, 90);
+            g.drawString("Clientdelta:      " + this.delta + "ms", 8, 30);
+            g.drawString("Serverdelta:      " + client.getServerTickDelta() + "ms", 8, 50);
+            g.drawString("Ticks/s:          " + client.getServerTicksPerSecond(), 8, 70);            
+            g.drawString("Viewport Pos:     " + this.viewPort.x + " | " + this.viewPort.y, 8, 90);
+            if(client.getShip() != null) 
+                g.drawString("Ship Pos:         " + client.getShip().position.toString() , 8, 110);
+            g.drawString("Zoom:             " + this.zoom, 8, 130);
+            g.drawString("Viewport Size:    " + this.viewPort.width + "x" + this.viewPort.height, 8, 150);
+            g.drawString("Objects:          " + objects + "(" + client.getWorld().ships.size() + ")", 8, 170);
+            g.drawString("alphaWarn:        " + alphaWarn, 8, 190);
+            g.drawString("Corner:           " + getPartipalCurrentPane(), 8, 210);
+            g.drawString("BackgroundBasePos " + getCurrentPane(), 8, 230);
             if(client.getShip() != null)
-                g.drawString("Ship Pos:        " + client.getShip().position.toString() , 8, 110);
-            g.drawString("Zoom:            " + this.zoom, 8, 130);
-            g.drawString("Viewport Size:   " + this.viewPort.width + "x" + this.viewPort.height, 8, 150);
-            g.drawString("Objects:         " + objects + "(" + client.getWorld().ships.size() + ")", 8, 170);
-            g.drawString("alphaWarn:       " + alphaWarn, 8, 190);
-            g.drawString("Corner:          " + getPartipalCurrentPane(), 8, 210);
-            if(client.getShip() != null)
-                g.drawString("VID:             " + client.getShipId() + " (" + client.getShip().hashCode() + ")", 8, 230);
+                g.drawString("VID:             " + client.getShipId() + " (" + client.getShip().hashCode() + ")", 8, 250);
         }
         
         g.resetTransform();
