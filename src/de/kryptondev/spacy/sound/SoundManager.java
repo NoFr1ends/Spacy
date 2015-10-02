@@ -52,4 +52,13 @@ public class SoundManager {
     public void dispose(){
         AL.destroy();
     }
+
+    public HashMap<String, Audio> getSounds() {
+        return sounds;
+    }
+
+    public HashMap<String, Audio> getMusic() {
+        return music;
+    }
+    
 }
