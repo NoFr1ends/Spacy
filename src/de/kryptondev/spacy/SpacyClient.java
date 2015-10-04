@@ -162,7 +162,7 @@ public class SpacyClient extends Listener{
         
         if(o instanceof Projectile){
             Projectile p = (Projectile)o;
-            this.world.projectiles.put(p.id, p);
+            this.world.projectiles.put(p.id, p);            
         }
         
         if(o instanceof DebugTickDelta){
