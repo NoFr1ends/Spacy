@@ -19,9 +19,9 @@ public class Ship extends Entity implements IHittable {
         this.position = new Vector2f(0, 0);
         this.direction = new Vector2f(0, 0);
         
-        this.acceleration = 1.2f;
+        this.acceleration = 1.005f;
         this.speed = 0f;      
-        this.maxSpeed = 50f;
+        this.maxSpeed = 32f;
         this.moving = EMoving.Stopped;
         
         this.boundsRadius = 87f;

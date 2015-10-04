@@ -10,10 +10,10 @@ public abstract class Entity {
     public Vector2f direction;
     public Vector2f position;
     public float speed = 10f;
-    public float acceleration = 2f; //nötig? Carl:Ja! aber mehr als 0 ;-)
+    public float acceleration = 3f; //nötig? Carl:Ja! aber mehr als 0 ;-)
     public float maxSpeed = 100f;
     public float boundsRadius = 0f;
-
+    public long movementChangedTime;
     public Vector2f textureBounds;
 
     public long id;
@@ -29,28 +29,28 @@ public abstract class Entity {
         this.position = position;
     }
 
-    public void accelerate(int delta) {
+    public void accelerate(int delta, float timeOffSetPercentage) {
         if (this.speed == 0) {
             this.speed = 1;
             return;
         }
         
-        float next = (this.acceleration * this.speed) * (delta / 16f);
+        float next = 3*(timeOffSetPercentage * timeOffSetPercentage)+ this.speed;
+        //System.out.println("Time : "+ currentTime + "-next= "+next+" ; (3*"+ TimeOffSetPercentage+ "("+ movementChangedTime+")" +"²+"+this.speed + ")");
         if (next < this.maxSpeed) {
-            this.speed = next;//Lineare Beschleunigung, können aber auch was anderes nehmen.
-            return;
+            this.speed = next;
         } else {
             this.speed = this.maxSpeed;
             moving = EMoving.FullSpeed;
         }
     }
-    /*Der Abbremsvorgang. Mal sehen wo wir das einbauen*/
 
-    public void decelerate(int delta) {
-        float next = ((1 / this.acceleration) * this.speed) * (delta / 16f);
+    public void deccelerate(int delta, float timeOffSetPercentage) {
         
+        float next = this.speed - 3*(timeOffSetPercentage * timeOffSetPercentage);
+        System.out.println(next);
         if (next > 1) {
-            this.speed = next;//Lineare Bremskraft, können aber auch was anderes nehmen.
+            this.speed = next;
         } else {
             this.speed = 0;
             moving = EMoving.Stopped;
@@ -69,18 +69,21 @@ public abstract class Entity {
         g.drawOval(this.position.x - this.boundsRadius / 2, this.position.y - this.boundsRadius / 2, this.boundsRadius, this.boundsRadius);
     }
 
-    public void move(int delta) {
+    public void move( int delta) {
         //System.out.println(Float.toString(speed) + "-" + Float.toString(maxSpeed));
 
         Vector2f oldPos = position;
+        long currentTime = (System.nanoTime() /1000000) - delta;
+        float TimeOffSet = currentTime - movementChangedTime;
+        float TimeOffSetPercentage = TimeOffSet / (this.acceleration  * 1000);
         
         if (moving == EMoving.Accelerating) {
-            moving = EMoving.FullSpeed;
-            //this.accelerate(delta);
+            //moving = EMoving.FullSpeed;
+            this.accelerate(delta, TimeOffSetPercentage);
         }
         if (moving == EMoving.Deccelerating) {
-            moving = EMoving.Stopped;
-            //this.decelerate(delta);
+            //moving = EMoving.Stopped;
+            this.deccelerate(delta, TimeOffSetPercentage);
         }
         if (moving == EMoving.FullSpeed) {
             this.speed = maxSpeed;

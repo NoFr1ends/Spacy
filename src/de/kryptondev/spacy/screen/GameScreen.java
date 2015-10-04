@@ -156,10 +156,11 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         try{
             ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<>(client.getWorld().ships);
             for(Ship ship : ships.values()){
-                ship.move(delta);
+                if (ship.moving != EMoving.Stopped)
+                    ship.move(delta);
                 
                 if(ship.moving != EMoving.Stopped)
-                    System.out.println("Client: Ship " + ship.id + " is moving! " + ship.position + " (delta: " + delta + ", state=" + ship.moving + ")");
+                    System.out.println("Client:[" + ((System.nanoTime()/1000000)-ship.movementChangedTime) + "] Ship " + ship.id + " is moving! " + ship.position + " (delta: " + delta + ", state=" + ship.moving + ")");
             }
         }
         catch(Exception ex){
@@ -167,7 +168,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         }
         try{
             for(Projectile p : client.getWorld().projectiles.values()){
-                p.move(delta);
+                if (p.moving != EMoving.Stopped)
+                    p.move(delta);
             }
         }
         catch(Exception ex){
@@ -176,7 +178,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         try{
             ConcurrentHashMap<Long, Entity> entities = new ConcurrentHashMap<>(client.getWorld().entities);
             for(Entity e : entities.values()){
-                e.move(delta);
+                if (e.moving != EMoving.Stopped)
+                    e.move(delta);
             }
         }
         catch(Exception ex){
@@ -470,6 +473,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         if(button == 1){
             if(!isSpectatorMode()){   
                 client.getShip().moving = EMoving.Deccelerating;
+                client.getShip().movementChangedTime = System.nanoTime() / 1000000;
                 SpacyClient.getInstance().getClient().sendTCP(new Move(EMoving.Deccelerating, client.getShip().id, client.getShip().position));
                 //System.out.println("Stop moving");
             }
@@ -492,6 +496,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
 
             //Move
             if(button == 1){
+                client.getShip().movementChangedTime = System.nanoTime() / 1000000;
                 SpacyClient.getInstance().getClient().sendTCP(new Move(EMoving.Accelerating,myShip.id, myShip.position));
                 //System.out.println("Start moving");
             }

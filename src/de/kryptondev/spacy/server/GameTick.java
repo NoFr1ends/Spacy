@@ -34,11 +34,13 @@ public class GameTick implements Runnable{
             Ship ship = gc.getMyShip();
 
             if(ship != null) {
-                ship.move(delta);
                 
-                if(ship.moving != EMoving.Stopped)
-                    System.out.println("Server: Ship " + ship.id + " is moving! " + ship.position + " (delta: " + delta + ", state=" + ship.moving + ")");   
-                     
+                
+                if(ship.moving != EMoving.Stopped){
+                    ship.move(delta);
+                    System.out.println("Server:[" + ((System.nanoTime()/1000000)-ship.movementChangedTime) + "] Ship " + ship.id + " is moving! " + ship.position + " (delta: " + delta + ", state=" + ship.moving + ")");   
+                }
+                
                 int n = server.world.worldSize;
                 int tolerance = server.world.toleranceDeathRadius;
                 if(ship.position.x + tolerance < 0 | ship.position.x - tolerance > n |
