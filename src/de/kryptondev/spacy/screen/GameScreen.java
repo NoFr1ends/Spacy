@@ -485,21 +485,22 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                 //System.out.println("Start moving");
             }
             //Fire
-            if(button == 0){
+            if(button == 0 && this.canShoot){
                 //TODO Implement Weapon Cooldown
 
                 SpacyClient.getInstance().getClient().sendTCP(
                         new Projectile(DamageType.balistic, myShip.id, myShip.direction, myShip.position));
+                startCooldown();
             }
         }
         
-        //Fire
-        if(button == 0 & this.canShoot){
-           
-            SpacyClient.getInstance().getClient().sendTCP(
-                    new Projectile(DamageType.balistic, myShip.id, myShip.direction, myShip.position));
-            startCooldown();
-        }        
+//        //Fire
+//        if(button == 0 & this.canShoot){
+//           
+//            SpacyClient.getInstance().getClient().sendTCP(
+//                    new Projectile(DamageType.balistic, myShip.id, myShip.direction, myShip.position));
+//            startCooldown();
+//        }        
     }
 
 

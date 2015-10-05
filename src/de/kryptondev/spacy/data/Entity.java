@@ -14,8 +14,9 @@ public abstract class Entity {
     public float maxSpeed = 100f;
     public float boundsRadius = 0f;
     public long movementChangedTime;
+    public long movementChangedTimeOld;
     public Vector2f textureBounds;
-
+    
     public long id;
     public String texture;
 
