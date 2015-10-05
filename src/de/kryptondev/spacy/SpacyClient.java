@@ -109,6 +109,14 @@ public class SpacyClient extends Listener{
             Move move = (Move)o;
             Ship ship = this.world.ships.get(move.id);
             if(ship != null){
+                if (move.status != EMoving.FullSpeed && move.status != EMoving.Stopped){
+                        ship.movementChangedTimeOld = ship.movementChangedTime;
+                        ship.movementChangedTime = move.movementChangedTime+16;
+                        long currTime = System.nanoTime()/1000000;
+                        System.out.println(currTime + " - " + ship.movementChangedTimeOld);
+                        if (currTime-ship.movementChangedTimeOld < ship.acceleration && (ship.movementChangedTimeOld-ship.movementChangedTime)<500)
+                            ship.movementChangedTime -= ship.acceleration -(System.nanoTime()/1000000 - ship.movementChangedTimeOld);
+                }
                 ship.moving = move.status;
                 ship.position = move.pos;
                 //this.world.ships.put(shipId, ship);

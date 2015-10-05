@@ -108,8 +108,14 @@ public class GameClient extends Listener {
                 if(!isSpectator()){
                     Move move = (Move)data;
                     Ship ship = this.getMyShip();
-                    if ((ship.moving == EMoving.FullSpeed ||ship.moving == EMoving.Stopped) && (move.status == EMoving.Accelerating || move.status == EMoving.Deccelerating))
-                        ship.movementChangedTime = System.nanoTime() /1000000 -2;//Add "*(delta /16f)" if positions of server and client differ heavily
+                    if (move.status != EMoving.FullSpeed && move.status != EMoving.Stopped){
+                        ship.movementChangedTimeOld = ship.movementChangedTime;
+                        ship.movementChangedTime = move.movementChangedTime+16;
+                        long currTime = System.nanoTime()/1000000;
+                        System.out.println(currTime + " - " + ship.movementChangedTimeOld);
+                        if (currTime-ship.movementChangedTimeOld < ship.acceleration && (ship.movementChangedTimeOld-ship.movementChangedTime)<500)
+                            ship.movementChangedTime -= ship.acceleration -(System.nanoTime()/1000000 - ship.movementChangedTimeOld );
+                    }
                     ship.moving = move.status;
                     ship.position = move.pos;
                     

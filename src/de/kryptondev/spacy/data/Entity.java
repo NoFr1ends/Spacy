@@ -10,7 +10,7 @@ public abstract class Entity {
     public Vector2f direction;
     public Vector2f position;
     public float speed = 10f;
-    public float acceleration = 3f; //nötig? Carl:Ja! aber mehr als 0 ;-)
+    public long acceleration = 5000; //nötig? Carl:Ja! aber mehr als 0 ;-)
     public float maxSpeed = 100f;
     public float boundsRadius = 0f;
     public long movementChangedTime;
@@ -29,14 +29,13 @@ public abstract class Entity {
         this.position = position;
     }
 
-    public void accelerate(int delta, float timeOffSetPercentage) {
+    public void accelerate(int delta, long TimeOffSet) {
         if (this.speed == 0) {
             this.speed = 1;
             return;
         }
-        
-        float next = 3*(timeOffSetPercentage * timeOffSetPercentage)+ this.speed;
-        //System.out.println("Time : "+ currentTime + "-next= "+next+" ; (3*"+ TimeOffSetPercentage+ "("+ movementChangedTime+")" +"²+"+this.speed + ")");
+        float next = calculateCurrentSpeed(TimeOffSet);
+        System.out.println(next);
         if (next < this.maxSpeed) {
             this.speed = next;
         } else {
@@ -44,11 +43,17 @@ public abstract class Entity {
             moving = EMoving.FullSpeed;
         }
     }
+    
+    public float calculateCurrentSpeed(long TimeOffSet){
+        if (moving == EMoving.Deccelerating)
+            TimeOffSet = acceleration-TimeOffSet;
+        return 0.000002f * (TimeOffSet*TimeOffSet) + 0.0024f * TimeOffSet;
+    }
 
-    public void deccelerate(int delta, float timeOffSetPercentage) {
+    public void deccelerate(int delta, long TimeOffSet) {
         
-        float next = this.speed - 3*(timeOffSetPercentage * timeOffSetPercentage);
-        System.out.println(next);
+        float next = calculateCurrentSpeed(TimeOffSet);
+        System.out.println(next + " - " + TimeOffSet);
         if (next > 1) {
             this.speed = next;
         } else {
@@ -73,17 +78,15 @@ public abstract class Entity {
         //System.out.println(Float.toString(speed) + "-" + Float.toString(maxSpeed));
 
         Vector2f oldPos = position;
-        long currentTime = (System.nanoTime() /1000000) - delta;
-        float TimeOffSet = currentTime - movementChangedTime;
-        float TimeOffSetPercentage = TimeOffSet / (this.acceleration  * 1000);
+        long TimeOffSet = getTimeOffSet(movementChangedTime, delta);
         
         if (moving == EMoving.Accelerating) {
             //moving = EMoving.FullSpeed;
-            this.accelerate(delta, TimeOffSetPercentage);
+            this.accelerate(delta, TimeOffSet);
         }
         if (moving == EMoving.Deccelerating) {
             //moving = EMoving.Stopped;
-            this.deccelerate(delta, TimeOffSetPercentage);
+            this.deccelerate(delta, TimeOffSet);
         }
         if (moving == EMoving.FullSpeed) {
             this.speed = maxSpeed;
@@ -112,7 +115,14 @@ public abstract class Entity {
         }*/
         return (float) (Math.atan2(direction.y, direction.x) * 180 / Math.PI) + 90;
     }
-
+    
+    public long getTimeOffSet(long MovementChangedTime, int delta){
+        if (MovementChangedTime==0)
+            return 0;
+        long currentTime = (System.nanoTime() /1000000);
+        return currentTime - MovementChangedTime;
+    }
+    
     public void rotateToMouse(Vector2f mouseposition) {
         //Ich weiß, das geht auch in einer Zeile, aber dann wird es unlesbar.
         Vector2f newDirection = new Vector2f();
