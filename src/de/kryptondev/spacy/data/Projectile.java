@@ -8,7 +8,7 @@ import org.newdawn.slick.geom.Vector2f;
 public class Projectile extends Entity {   
     public int remainingLifetime = 0;
     public int damage = 0;
-    public int damagerange = 0;
+    public int damageRange = 0;
     public int lifetime = 0;
     public DamageType damagetype;
     public ArrayList<Effect> Effects;

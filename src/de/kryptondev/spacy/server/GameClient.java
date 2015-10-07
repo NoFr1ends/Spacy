@@ -143,17 +143,18 @@ public class GameClient extends Listener {
                 
                 //Fire
                 Projectile p = (Projectile)data;
-                p.setLifeTime(2.5f);                
-                p.maxSpeed = 50;
-                p.speed = p.maxSpeed;
-                p.visible = true;
+                p.setLifeTime(2.5f);
                 p.position = this.getMyShip().position;
                 p.direction = this.getMyShip().direction;
                 p.id = SpacyServer.instance.EntityCounter++;
-                p.boundsRadius = 4.5f*3;
-                p.damage = 30;
-                p.moving = EMoving.FullSpeed;
-                p.texture ="laserRed01.png";
+//                p.maxSpeed = 50;
+//                p.speed = p.maxSpeed;
+//                p.visible = true;
+//                p.boundsRadius = 4.5f*3;
+//                p.damage = 30;
+//                p.moving = EMoving.FullSpeed;
+//                p.texture ="laserRed01.png";
+                
                 SpacyServer.instance.world.projectiles.put(p.id, p);
                 SpacyServer.instance.getServer().sendToAllTCP(p);
             }

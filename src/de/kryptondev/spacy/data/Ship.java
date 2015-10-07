@@ -23,6 +23,8 @@ public class Ship extends Entity implements IHittable {
         this.speed = 0f;      
         this.maxSpeed = 32f;
         this.moving = EMoving.Stopped;
+        this.activeWeapon = Weapons.StandardBallisticCannon;
+        this.activeWeapon.ammo.senderId = this.id;
         
         this.boundsRadius = 87f;
         this.texture = "";

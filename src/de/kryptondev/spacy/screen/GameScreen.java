@@ -135,7 +135,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         
     }
 
-    public void startCooldown(){
+    public void startCooldown(int cooldownMilliseconds){
         this.canShoot = false;
         cooldown.schedule(new Runnable() {
 
@@ -143,7 +143,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             public void run() {
                 GameScreen.this.canShoot = true;
             }
-        }, 1000, TimeUnit.MILLISECONDS);
+        }, cooldownMilliseconds, TimeUnit.MILLISECONDS);
     }
     
     @Override
@@ -488,19 +488,10 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             if(button == 0 && this.canShoot){
                 //TODO Implement Weapon Cooldown
 
-                SpacyClient.getInstance().getClient().sendTCP(
-                        new Projectile(DamageType.balistic, myShip.id, myShip.direction, myShip.position));
-                startCooldown();
+                SpacyClient.getInstance().getClient().sendTCP(myShip.activeWeapon.ammo);
+                startCooldown(myShip.activeWeapon.cooldown);
             }
-        }
-        
-//        //Fire
-//        if(button == 0 & this.canShoot){
-//           
-//            SpacyClient.getInstance().getClient().sendTCP(
-//                    new Projectile(DamageType.balistic, myShip.id, myShip.direction, myShip.position));
-//            startCooldown();
-//        }        
+        }   
     }
 
 

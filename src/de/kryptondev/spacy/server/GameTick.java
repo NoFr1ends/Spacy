@@ -85,14 +85,14 @@ public class GameTick implements Runnable{
                 System.out.println("Ship @ " + ship.position.x + ", " + ship.position.y);
                 */
                 if(ship != null){
-                    if( ship.id != p.senderId && p.position.distance(ship.position) - ship.boundsRadius - p.boundsRadius - p.damagerange <= 0){
+                    if( ship.id != p.senderId && p.position.distance(ship.position) - ship.boundsRadius - p.boundsRadius - p.damageRange <= 0){
                         ship.hit(p);
                         c.sendTCP(new UpdateLife(ship.hp));
                         server.getServer().sendToAllTCP(new OnHit(ship.id, p.senderId, p.id));
                         //Zu wenig HP + Shield?
                         if(ship.hp + (ship.shield != null ? ship.shield.life : 0) < 1){
                             gc.sendTCP(new OnDeath(p.senderId, p.id));
-                            server.getServer().sendToAllTCP(new OnKill(ship.id, p.senderId, p.id));                            server.getServer().sendToAllTCP(new OnKill(ship.id, p.senderId, p.id));
+                            server.getServer().sendToAllTCP(new OnKill(ship.id, p.senderId, p.id));
                             server.getServer().sendToAllTCP(new DeleteEntity(ship.id));
                             server.world.ships.remove(ship.id);
                             gc.addShip();
@@ -102,7 +102,6 @@ public class GameTick implements Runnable{
                             toDelete.add(p.id);
                             server.getServer().sendToAllTCP(new DeleteEntity(p.id));
                             //System.out.println("Deleting projectile " + p.id);
-                            continue;
                         }
                     }
                 }
