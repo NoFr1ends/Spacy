@@ -7,6 +7,7 @@ import de.kryptondev.spacy.SpacyClient;
 import de.kryptondev.spacy.SpriteSheet;
 import de.kryptondev.spacy.input.KeyInputManager;
 import de.kryptondev.spacy.input.MouseInputManager;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,12 +25,16 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.TrueTypeFont;
+import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Vector2f;
 
 public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseInputManager.MouseListener {
     public static final org.newdawn.slick.Color BackgroundColor = new org.newdawn.slick.Color(8,8,64);
     private SpacyClient client;
     private Image background;
+    private TrueTypeFont font;
+    private TrueTypeFont scoreFont;
     private Rect viewPort;
     private final float backgroundMoveFactor = 0.5f;
     private Vector2f viewPortCenter = new Vector2f(0f, 0f);
@@ -38,6 +43,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private final float zoomStep = 0.5f;
     private final Random rand;
     private boolean debug = false;
+    private boolean showScoreboard = false;
     private float alphaWarn = 0f;
     private SpriteSheet sheet;
     private ScheduledExecutorService cooldown;
@@ -62,13 +68,30 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         MouseInputManager.getInstance().registerListener("Throttle", Input.MOUSE_RIGHT_BUTTON, this);
         
         KeyInputManager.getInstance().registerListener("Debug", Input.KEY_F12, this);
+        KeyInputManager.getInstance().registerListener("showScorboard", Input.KEY_TAB, this);
         
         KeyInputManager.getInstance().registerListener("Zoom In", Input.KEY_ADD, this);        
         KeyInputManager.getInstance().registerListener("Zoom Out", Input.KEY_SUBTRACT, this);
-         KeyInputManager.getInstance().registerListener("Zoom Reset", Input.KEY_NUMPAD0, this);
+        KeyInputManager.getInstance().registerListener("Zoom Reset", Input.KEY_NUMPAD0, this);
 
         Random r = new Random();
         gc.setAlwaysRender(true);
+        
+        Font awtFont = new Font("Arial", Font.BOLD, 20);
+        font = new TrueTypeFont(awtFont, true);
+        
+        //Adjust fontsize if strings are displayed weirdly
+        int fontsize;
+        if (gc.getHeight()>=1080)
+            fontsize= 20;
+        else if (gc.getHeight()>=768)
+            fontsize= 15;
+        else if (gc.getHeight()>=600)
+            fontsize= 12;
+        else
+            fontsize = 10;
+        Font scoreAwtFont = new Font("Arial", Font.PLAIN, fontsize);
+        scoreFont = new TrueTypeFont(scoreAwtFont, true);
         
         // Load main sprite sheet
         sheet = new SpriteSheet("data/sheet.xml");
@@ -308,8 +331,6 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         if(client.getWorld() == null)
             return;
         
-       
-        
         
         try{            
             //DrawShips
@@ -360,6 +381,150 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             g.drawLine(20, 20, client.getShip().hp * 2 + 20, 20);
         
         
+        //SCOREBOARD
+        
+        if (showScoreboard){
+            g.resetTransform();
+           
+            g.setColor(Color.darkGray);
+            Rectangle ScoreBoard = new Rectangle(gc.getWidth()/6, gc.getHeight()/6,gc.getWidth()/6*4,gc.getHeight()/6*4);
+            g.fill(ScoreBoard);
+            font.drawString((gc.getWidth() - font.getWidth("SCOREBOARD")) / 2, 
+                 ScoreBoard.getY()+ScoreBoard.getHeight()*0.025f,
+                 "SCOREBOARD", Color.white);
+            g.setColor(Color.lightGray);
+            g.setLineWidth(1);
+            
+            g.drawLine(ScoreBoard.getX()+ ScoreBoard.getWidth()*0.05f,
+                    ScoreBoard.getY()+font.getHeight("SCOREBOARD")+ScoreBoard.getHeight()*0.045f,
+                    ScoreBoard.getMaxX()-ScoreBoard.getWidth()*0.05f,
+                    ScoreBoard.getY()+font.getHeight("SCOREBOARD")+ScoreBoard.getHeight()*0.045f);
+            
+            Rectangle Scores = new Rectangle(ScoreBoard.getX(),
+                    ScoreBoard.getY()+font.getHeight("SCOREBOARD")+ScoreBoard.getHeight()*0.1f,
+                    ScoreBoard.getWidth(),
+                    ScoreBoard.getHeight()-font.getHeight("SCOREBOARD")*0.9f-ScoreBoard.getHeight()*0.15f);
+            
+            if(false)//ADD TDM CHECK
+            {
+                float cellWidth = ScoreBoard.getWidth()*0.4f;
+                float cellHeight = (ScoreBoard.getHeight()-ScoreBoard.getHeight()*0.05f*17)/16;
+
+                scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.3f -scoreFont.getWidth("Name")/2, Scores.getY(), "Name", Color.blue);
+                scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.6f + cellWidth*0.1f -scoreFont.getWidth("Kills")/2, Scores.getY(), "Kills", Color.blue);
+                scoreFont.drawString( Scores.getX() + Scores.getWidth()*0.05f + cellWidth*0.8f + cellWidth*0.1f -scoreFont.getWidth("Deaths")/2, Scores.getY(), "Deaths", Color.blue);
+
+                scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth + Scores.getWidth()*0.05f + Scores.getWidth()*0.05f + cellWidth*0.3f -scoreFont.getWidth("Name")/2, Scores.getY(), "Name", Color.red);
+                scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth + Scores.getWidth()*0.05f + Scores.getWidth()*0.05f + cellWidth*0.6f + cellWidth*0.1f -scoreFont.getWidth("Kills")/2, Scores.getY(), "Kills", Color.red);
+                scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth + Scores.getWidth()*0.05f + Scores.getWidth()*0.05f + cellWidth*0.8f + cellWidth*0.1f -scoreFont.getWidth("Deaths")/2, Scores.getY(), "Deaths", Color.red);
+
+                if (debug)
+                {
+                    g.drawLine(Scores.getX()+ Scores.getWidth()*0.05f,
+                            Scores.getY()+Scores.getHeight()*0.05f,
+                            Scores.getX() + Scores.getWidth()*0.05f,
+                            Scores.getMaxY()-Scores.getHeight()*0.05f);
+
+                    g.drawLine(Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.6f,
+                            Scores.getY()+Scores.getHeight()*0.05f,
+                            Scores.getX() + Scores.getWidth()*0.05f + cellWidth*0.6f,
+                            Scores.getMaxY()-Scores.getHeight()*0.05f);
+
+                    g.drawLine(Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.8f,
+                            Scores.getY()+Scores.getHeight()*0.05f,
+                            Scores.getX() + Scores.getWidth()*0.05f + cellWidth*0.8f,
+                            Scores.getMaxY()-Scores.getHeight()*0.05f);
+
+                    g.drawLine(Scores.getX()+ Scores.getWidth()*0.05f + cellWidth,
+                            Scores.getY()+Scores.getHeight()*0.05f,
+                            Scores.getX() + Scores.getWidth()*0.05f + cellWidth,
+                            Scores.getMaxY()-Scores.getHeight()*0.05f);
+
+                    g.drawLine(Scores.getX()+ Scores.getWidth()*0.05f + cellWidth + Scores.getWidth()*0.05f + Scores.getWidth()*0.05f,
+                            Scores.getY()+Scores.getHeight()*0.05f,
+                            Scores.getX() + Scores.getWidth()*0.05f + cellWidth + Scores.getWidth()*0.05f + Scores.getWidth()*0.05f,
+                            Scores.getMaxY()-Scores.getHeight()*0.05f);
+
+                    g.drawLine(Scores.getX()+ Scores.getWidth()*0.05f + cellWidth + Scores.getWidth()*0.05f + Scores.getWidth()*0.05f + cellWidth*0.6f,
+                            Scores.getY()+Scores.getHeight()*0.05f,
+                            Scores.getX() + Scores.getWidth()*0.05f + cellWidth + Scores.getWidth()*0.05f + Scores.getWidth()*0.05f + cellWidth*0.6f,
+                            Scores.getMaxY()-Scores.getHeight()*0.05f);
+
+                    g.drawLine(Scores.getX()+ Scores.getWidth()*0.05f + cellWidth + Scores.getWidth()*0.05f + Scores.getWidth()*0.05f + cellWidth*0.8f,
+                            Scores.getY()+Scores.getHeight()*0.05f,
+                            Scores.getX() + Scores.getWidth()*0.05f + cellWidth + Scores.getWidth()*0.05f + Scores.getWidth()*0.05f + cellWidth*0.8f,
+                            Scores.getMaxY()-Scores.getHeight()*0.05f);
+
+                    g.drawLine(Scores.getX()+ Scores.getWidth()*0.05f + cellWidth + Scores.getWidth()*0.05f + Scores.getWidth()*0.05f + cellWidth,
+                            Scores.getY()+Scores.getHeight()*0.05f,
+                            Scores.getX() + Scores.getWidth()*0.05f + cellWidth + Scores.getWidth()*0.05f + Scores.getWidth()*0.05f + cellWidth,
+                            Scores.getMaxY()-Scores.getHeight()*0.05f);
+                }
+
+                g.drawLine(Scores.getX()+ Scores.getWidth()*0.05f + cellWidth + Scores.getWidth()*0.05f,
+                        Scores.getY()+Scores.getHeight()*0.05f,
+                        Scores.getX() + Scores.getWidth()*0.05f + cellWidth + Scores.getWidth()*0.05f,
+                        Scores.getMaxY()-Scores.getHeight()*0.05f);
+
+
+                try{
+                    World world = client.getWorld();
+                    ConcurrentHashMap<Long, Ship> ships = world.ships;
+                    
+                    for(ConcurrentHashMap.Entry<Long, Ship> ship : ships.entrySet()){
+                        //Todo TDM Team Management
+                        
+                    }
+                }
+                catch (Exception ex){
+                    throw ex;
+                }
+            }
+            else
+            {
+                float cellWidth = ScoreBoard.getWidth()*0.9f;
+                float cellHeight = ScoreBoard.getHeight()/32;
+
+                scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.3f -scoreFont.getWidth("Name")/2, Scores.getY(), "Name");
+                scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.6f + cellWidth*0.1f -scoreFont.getWidth("Kills")/2, Scores.getY(), "Kills");
+                scoreFont.drawString( Scores.getX() + Scores.getWidth()*0.05f + cellWidth*0.8f + cellWidth*0.1f -scoreFont.getWidth("Deaths")/2, Scores.getY(), "Deaths");
+                
+                
+                try{
+                    World world = client.getWorld();
+                    ConcurrentHashMap<Long, Ship> ships = world.ships;
+                    float posY = Scores.getY()+Scores.getHeight()*0.05f;
+                    boolean grey=false;
+                    Color fontColor = Color.white;
+                    
+                    for(ConcurrentHashMap.Entry<Long, Ship> ship : ships.entrySet()){
+                        if (grey)
+                        {
+                            g.setColor(Color.lightGray);
+                            g.fillRect(Scores.getX()+ Scores.getWidth()*0.05f, posY+ cellHeight*0.1f, cellWidth, cellHeight*1.1f);
+                            fontColor = Color.black;
+                        }
+                        else
+                            fontColor = Color.white;
+                        
+                        
+                        scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.3f -scoreFont.getWidth(ship.getValue().owner.playerName)/2, posY, ship.getValue().owner.playerName, fontColor);
+                        scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.6f + cellWidth*0.1f -scoreFont.getWidth(Integer.toString(ship.getValue().owner.kills))/2, posY, Integer.toString(ship.getValue().owner.kills), fontColor);
+                        scoreFont.drawString( Scores.getX() + Scores.getWidth()*0.05f + cellWidth*0.8f + cellWidth*0.1f -scoreFont.getWidth(Integer.toString(ship.getValue().owner.deaths))/2, posY, Integer.toString(ship.getValue().owner.deaths), fontColor);
+                        
+                        posY+=cellHeight+ cellHeight*0.05f;
+                        grey = !grey;
+                        if (posY>Scores.getMaxY())
+                            break;
+                    }
+                }
+                catch (Exception ex){
+                    throw ex;
+                } 
+            }
+        }
+        
+        
         /*
         DEBUG SECTION
         */
@@ -405,12 +570,14 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     
     @Override
     public void onKeyDown(int key) {
-      
+      if (key == Input.KEY_TAB)
+          showScoreboard = true;
     }
 
     @Override
     public void onKeyUp(int key) {
-        
+      if (key == Input.KEY_TAB)
+          showScoreboard = false;
     }
     
     @Override
@@ -491,6 +658,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                 SpacyClient.getInstance().getClient().sendTCP(myShip.activeWeapon.ammo);
                 startCooldown(myShip.activeWeapon.cooldown);
             }
+            
         }   
     }
 

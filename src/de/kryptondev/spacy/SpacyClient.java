@@ -41,7 +41,7 @@ public class SpacyClient extends Listener{
 
         //For test pourpose
         info.playerName = System.getProperty("user.name");
-
+        
     }   
    
 
@@ -163,7 +163,7 @@ public class SpacyClient extends Listener{
             System.out.println("SHIP RECEIVED!!!");
             world.ships.put(s.id ,s);
             shipId = s.id;       
-            
+            this.info = s.owner;
             return;
         }
         

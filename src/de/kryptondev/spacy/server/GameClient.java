@@ -5,6 +5,7 @@ import de.kryptondev.spacy.data.DebugTickDelta;
 import de.kryptondev.spacy.data.EMoving;
 import de.kryptondev.spacy.data.Projectile;
 import de.kryptondev.spacy.data.Ship;
+import de.kryptondev.spacy.helper.UID;
 import de.kryptondev.spacy.share.Chatmessage;
 import de.kryptondev.spacy.share.ConnectionAttemptResponse;
 import de.kryptondev.spacy.share.PlayerInfo;
@@ -52,6 +53,7 @@ public class GameClient extends Listener {
             s.position = new Vector2f(0, 0);
             s.texture = "playerShip2_orange.png"; // todo change for teams etc            
             s.textureBounds = new Vector2f(110, 66);
+            s.owner = this.playerInfo;
             s.id = server.EntityCounter++;
             this.shipId = s.id;
             server.world.ships.put(s.id,s);

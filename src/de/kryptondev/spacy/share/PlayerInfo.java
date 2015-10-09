@@ -4,6 +4,8 @@ public class PlayerInfo {
     public String OS;
     public String playerName;   
     public byte[] playerUID;
+    public int kills = 0;
+    public int deaths = 0;
 
     public PlayerInfo() {
     }
