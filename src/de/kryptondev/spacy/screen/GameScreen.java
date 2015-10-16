@@ -333,7 +333,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         
         
         try{            
-            //DrawShips
+            //DrawShips & Player Names
             ConcurrentHashMap<Long, Ship> ships = client.getWorld().ships;
             for(ConcurrentHashMap.Entry<Long, Ship> ship : ships.entrySet()){                 
                 Vector2f renderPosition = ship.getValue().getCenteredRenderPos();            
@@ -343,6 +343,10 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                         ship.getValue().getRotation(),
                         ship.getValue().textureBounds.copy().scale(0.5f));
                 
+                font.drawString(
+                        ship.getValue().position.x - font.getWidth(ship.getValue().owner.playerName) / 2, 
+                        ship.getValue().position.y - 50, ship.getValue().owner.playerName, 
+                        Color.white);
                 if(this.debug){
                     drawCross(ship.getValue().position.x, ship.getValue().position.y, g, ship.getValue().id);
                     ship.getValue().drawRotation(g);
