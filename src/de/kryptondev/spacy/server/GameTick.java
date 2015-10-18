@@ -38,7 +38,7 @@ public class GameTick implements Runnable{
                 
                 if(ship.moving != EMoving.Stopped){
                     ship.move(delta);
-                    System.out.println("Server:[" + ((System.nanoTime()/1000000)-ship.movementChangedTime) + "] Ship " + ship.id + " is moving! " + ship.position + " (delta: " + delta + ", state=" + ship.moving + ")");   
+                    //System.out.println("Server:[" + ((System.nanoTime()/1000000)-ship.movementChangedTime) + "] Ship " + ship.id + " is moving! " + ship.position + " (delta: " + delta + ", state=" + ship.moving + ")");   
                 }
                 
                 int n = server.world.worldSize;
@@ -93,6 +93,7 @@ public class GameTick implements Runnable{
                         if(ship.hp + (ship.shield != null ? ship.shield.life : 0) < 1){
                             gc.sendTCP(new OnDeath(p.senderId, p.id));
                             server.getServer().sendToAllTCP(new OnKill(ship.id, p.senderId, p.id));
+                            
                             server.getServer().sendToAllTCP(new DeleteEntity(ship.id));
                             server.world.ships.remove(ship.id);
                             gc.addShip();

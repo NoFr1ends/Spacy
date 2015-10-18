@@ -14,6 +14,7 @@ import de.kryptondev.spacy.screen.GameScreen;
 import de.kryptondev.spacy.screen.ScreenManager;
 import de.kryptondev.spacy.screen.WaitingScreen;
 import de.kryptondev.spacy.share.playerEvents.OnJoin;
+import de.kryptondev.spacy.share.playerEvents.OnKill;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import org.omg.PortableServer.THREAD_POLICY_ID;
@@ -109,14 +110,14 @@ public class SpacyClient extends Listener{
             Move move = (Move)o;
             Ship ship = this.world.ships.get(move.id);
             if(ship != null){
-                if (move.status != EMoving.FullSpeed && move.status != EMoving.Stopped){
-                        ship.movementChangedTimeOld = ship.movementChangedTime;
-                        ship.movementChangedTime = move.movementChangedTime+16;
-                        long currTime = System.nanoTime()/1000000;
-                        System.out.println(currTime + " - " + ship.movementChangedTimeOld);
-                        if (currTime-ship.movementChangedTimeOld < ship.acceleration && (ship.movementChangedTimeOld-ship.movementChangedTime)<500)
-                            ship.movementChangedTime -= ship.acceleration -(System.nanoTime()/1000000 - ship.movementChangedTimeOld);
-                }
+//                if (move.status != EMoving.FullSpeed && move.status != EMoving.Stopped){
+//                        ship.movementChangedTimeOld = ship.movementChangedTime;
+//                        ship.movementChangedTime = move.movementChangedTime+16;
+//                        long currTime = System.nanoTime()/1000000;
+//                        System.out.println(currTime + " - " + ship.movementChangedTimeOld);
+//                        if (currTime-ship.movementChangedTimeOld < ship.acceleration && (ship.movementChangedTimeOld-ship.movementChangedTime)<500)
+//                            ship.movementChangedTime -= ship.acceleration -(System.nanoTime()/1000000 - ship.movementChangedTimeOld);
+//                }
                 ship.moving = move.status;
                 ship.position = move.pos;
                 //this.world.ships.put(shipId, ship);
@@ -162,8 +163,10 @@ public class SpacyClient extends Listener{
             //SPAWNED
             System.out.println("SHIP RECEIVED!!!");
             world.ships.put(s.id ,s);
-            shipId = s.id;       
-            this.info = s.owner;
+            shipId = s.id;
+            world.ships.get(s.id).owner.kills = instance.info.kills;
+            world.ships.get(s.id).owner.deaths = instance.info.deaths;
+            //this.info = s.owner;
             return;
         }
         
@@ -197,6 +200,17 @@ public class SpacyClient extends Listener{
         if(o instanceof UpdateLife) {
             UpdateLife life = (UpdateLife) o;
             getShip().hp = life.hp;
+        }
+        
+        if (o instanceof OnKill){
+            OnKill kill = (OnKill)o;
+            if (kill.victim == this.shipId)
+            {
+                instance.info.kills = world.ships.get(kill.victim).owner.kills;
+                instance.info.deaths = world.ships.get(kill.victim).owner.deaths;
+            }
+            world.ships.get(kill.killer).owner.kills++;
+            world.ships.get(kill.victim).owner.deaths++;
         }
          
         if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){

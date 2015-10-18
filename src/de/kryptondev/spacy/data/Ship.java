@@ -21,15 +21,38 @@ public class Ship extends Entity implements IHittable {
         
         this.acceleration = 5000;
         this.speed = 0f;      
-        this.maxSpeed = 32f;
+        this.maxSpeed = 21f;
         this.moving = EMoving.Stopped;
         this.activeWeapon = Weapons.StandardBallisticCannon;
-        this.activeWeapon.ammo.senderId = this.id;
+//        Projectile p = new Projectile();
+//        p.setLifeTime(2.5f);
+//        p.maxSpeed = 50;
+//        p.speed = p.maxSpeed;
+//        
+//        p.boundsRadius = 4.5f*3;
+//        p.damage = 30;
+//        p.moving = EMoving.FullSpeed;
+//        p.damageRange = 0;
+//        p.damagetype = DamageType.balistic;
+//        p.texture = "laserRed01.png";
+//        p.Effects = null;
+//        p.destroyOnCollision = true;
+//        p.visible = true;
+//        this.activeWeapon = new Weapon(
+//            "Schwerer Gustav",
+//            1000,
+//            p);
         
         this.boundsRadius = 87f;
         this.texture = "";
         
         
+    }
+    
+    public void SetId(long newId)
+    {
+        this.id = newId;
+        this.activeWeapon.ammo.senderId = newId;
     }
 
     @Override

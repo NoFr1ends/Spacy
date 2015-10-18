@@ -54,7 +54,7 @@ public class GameClient extends Listener {
             s.texture = "playerShip2_orange.png"; // todo change for teams etc            
             s.textureBounds = new Vector2f(110, 66);
             s.owner = this.playerInfo;
-            s.id = server.EntityCounter++;
+            s.SetId(server.EntityCounter++);
             this.shipId = s.id;
             server.world.ships.put(s.id,s);
             server.getServer().sendToAllTCP(new OnJoin(s));
@@ -110,14 +110,14 @@ public class GameClient extends Listener {
                 if(!isSpectator()){
                     Move move = (Move)data;
                     Ship ship = this.getMyShip();
-                    if (move.status != EMoving.FullSpeed && move.status != EMoving.Stopped){
-                        ship.movementChangedTimeOld = ship.movementChangedTime;
-                        ship.movementChangedTime = move.movementChangedTime+16;
-                        long currTime = System.nanoTime()/1000000;
-                        System.out.println(currTime + " - " + ship.movementChangedTimeOld);
-                        if (currTime-ship.movementChangedTimeOld < ship.acceleration && (ship.movementChangedTimeOld-ship.movementChangedTime)<500)
-                            ship.movementChangedTime -= ship.acceleration -(System.nanoTime()/1000000 - ship.movementChangedTimeOld );
-                    }
+//                    if (move.status != EMoving.FullSpeed && move.status != EMoving.Stopped){
+//                        ship.movementChangedTimeOld = ship.movementChangedTime;
+//                        ship.movementChangedTime = move.movementChangedTime+16;
+//                        long currTime = System.nanoTime()/1000000;
+//                        System.out.println(currTime + " - " + ship.movementChangedTimeOld);
+//                        if (currTime-ship.movementChangedTimeOld < ship.acceleration && (ship.movementChangedTimeOld-ship.movementChangedTime)<500)
+//                            ship.movementChangedTime -= ship.acceleration -(System.nanoTime()/1000000 - ship.movementChangedTimeOld );
+//                    }
                     ship.moving = move.status;
                     ship.position = move.pos;
                     

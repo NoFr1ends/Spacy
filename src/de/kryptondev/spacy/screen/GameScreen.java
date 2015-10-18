@@ -512,9 +512,13 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                             fontColor = Color.white;
                         
                         
-                        scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.3f -scoreFont.getWidth(ship.getValue().owner.playerName)/2, posY, ship.getValue().owner.playerName, fontColor);
-                        scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.6f + cellWidth*0.1f -scoreFont.getWidth(Integer.toString(ship.getValue().owner.kills))/2, posY, Integer.toString(ship.getValue().owner.kills), fontColor);
-                        scoreFont.drawString( Scores.getX() + Scores.getWidth()*0.05f + cellWidth*0.8f + cellWidth*0.1f -scoreFont.getWidth(Integer.toString(ship.getValue().owner.deaths))/2, posY, Integer.toString(ship.getValue().owner.deaths), fontColor);
+                        String name = ship.getValue().owner.playerName;
+                        int kills = ship.getValue().owner.kills;
+                        int deaths = ship.getValue().owner.deaths;
+                        
+                            scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.3f -scoreFont.getWidth(name)/2, posY, name, fontColor);
+                        scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.6f + cellWidth*0.1f -scoreFont.getWidth(Integer.toString(kills))/2, posY, Integer.toString(kills), fontColor);
+                        scoreFont.drawString( Scores.getX() + Scores.getWidth()*0.05f + cellWidth*0.8f + cellWidth*0.1f -scoreFont.getWidth(Integer.toString(deaths))/2, posY, Integer.toString(deaths), fontColor);
                         
                         posY+=cellHeight+ cellHeight*0.05f;
                         grey = !grey;
@@ -657,8 +661,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             }
             //Fire
             if(button == 0 && this.canShoot){
-                //TODO Implement Weapon Cooldown
-
+                System.out.println("Ship " + myShip.id + " - Projectile " + myShip.activeWeapon.ammo.id);
                 SpacyClient.getInstance().getClient().sendTCP(myShip.activeWeapon.ammo);
                 startCooldown(myShip.activeWeapon.cooldown);
             }

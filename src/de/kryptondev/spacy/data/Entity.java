@@ -79,15 +79,15 @@ public abstract class Entity {
         //System.out.println(Float.toString(speed) + "-" + Float.toString(maxSpeed));
 
         Vector2f oldPos = position;
-        long TimeOffSet = getTimeOffSet(movementChangedTime, delta);
+//        long TimeOffSet = getTimeOffSet(movementChangedTime, delta);
         
         if (moving == EMoving.Accelerating) {
-            //moving = EMoving.FullSpeed;
-            this.accelerate(delta, TimeOffSet);
+            moving = EMoving.FullSpeed;
+//            this.accelerate(delta, TimeOffSet);
         }
         if (moving == EMoving.Deccelerating) {
-            //moving = EMoving.Stopped;
-            this.deccelerate(delta, TimeOffSet);
+            moving = EMoving.Stopped;
+//            this.deccelerate(delta, TimeOffSet);
         }
         if (moving == EMoving.FullSpeed) {
             this.speed = maxSpeed;
