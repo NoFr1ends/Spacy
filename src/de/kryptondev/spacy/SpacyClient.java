@@ -164,12 +164,14 @@ public class SpacyClient extends Listener{
             System.out.println("SHIP RECEIVED!!!");
             world.ships.put(s.id ,s);
             shipId = s.id;
-            world.ships.get(s.id).owner.kills = instance.info.kills;
-            world.ships.get(s.id).owner.deaths = instance.info.deaths;
-            //this.info = s.owner;
             return;
         }
         
+        if (o instanceof PlayerInfo)
+        {
+            PlayerInfo player = (PlayerInfo)o;
+            world.players.put(player.id, player);
+        }
         
         if(o instanceof Projectile){
             Projectile p = (Projectile)o;
@@ -191,6 +193,7 @@ public class SpacyClient extends Listener{
         if(o instanceof OnJoin){
             OnJoin join = (OnJoin)o;
             this.world.ships.put(join.ship.id, join.ship);
+            
         }
         
         if(o instanceof World){
@@ -204,13 +207,8 @@ public class SpacyClient extends Listener{
         
         if (o instanceof OnKill){
             OnKill kill = (OnKill)o;
-            if (kill.victim == this.shipId)
-            {
-                instance.info.kills = world.ships.get(kill.victim).owner.kills;
-                instance.info.deaths = world.ships.get(kill.victim).owner.deaths;
-            }
-            world.ships.get(kill.killer).owner.kills++;
-            world.ships.get(kill.victim).owner.deaths++;
+            world.players.get(world.ships.get(kill.killer).owner).kills++;
+            world.players.get(world.ships.get(kill.victim).owner).deaths++;
         }
          
         if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){

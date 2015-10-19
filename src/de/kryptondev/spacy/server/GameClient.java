@@ -13,6 +13,7 @@ import de.kryptondev.spacy.share.Move;
 import de.kryptondev.spacy.share.PlayerRotate;
 import de.kryptondev.spacy.share.Version;
 import de.kryptondev.spacy.share.playerEvents.OnJoin;
+import de.kryptondev.spacy.share.playerEvents.OnKill;
 
 import java.util.Date;
 import java.util.Random;
@@ -46,14 +47,14 @@ public class GameClient extends Listener {
         * Neues Schiff mit Standardwerten erstellen und zur Welt hinzufügen.
         * @return das neue Schiff
         */
-        public Ship addShip(){
+        public Ship addShip(long playerID){
             Ship s = new Ship();
             Random r = new Random();
             //s.position = new Vector2f(r.nextFloat() * this.getSpacyServer().world.worldSize,r.nextFloat() * this.getSpacyServer().world.worldSize);
             s.position = new Vector2f(0, 0);
             s.texture = "playerShip2_orange.png"; // todo change for teams etc            
             s.textureBounds = new Vector2f(110, 66);
-            s.owner = this.playerInfo;
+            s.owner = playerID;
             s.SetId(server.EntityCounter++);
             this.shipId = s.id;
             server.world.ships.put(s.id,s);
@@ -68,8 +69,11 @@ public class GameClient extends Listener {
             if (server.isPlayerBanned(playerInfo.playerUID)) {
                 this.sendTCP(new ConnectionAttemptResponse(ConnectionAttemptResponse.Type.Banned, 0));
                 return;
-            }           
-            Ship s = this.addShip();
+            }
+            playerInfo.id = server.PlayerCounter++;
+            this.server.world.players.put(playerInfo.id, playerInfo);
+            server.getServer().sendToAllTCP(playerInfo);
+            Ship s = this.addShip(playerInfo.id);
            
         }
 
@@ -106,6 +110,7 @@ public class GameClient extends Listener {
                 
                 return;
             }
+            
             if(data instanceof Move){
                 if(!isSpectator()){
                     Move move = (Move)data;

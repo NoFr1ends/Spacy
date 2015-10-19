@@ -9,7 +9,7 @@ import org.newdawn.slick.geom.Vector2f;
 
 public class Ship extends Entity implements IHittable {    
     public float turnspeed;
-    public PlayerInfo owner;
+    public Long owner;
     public Weapon activeWeapon;
     public Shield shield;
     public int hp = 100;

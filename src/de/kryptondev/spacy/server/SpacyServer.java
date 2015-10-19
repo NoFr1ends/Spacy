@@ -16,6 +16,7 @@ import java.util.HashMap;
 public class SpacyServer extends Listener {
     public static SpacyServer instance;
     public volatile long EntityCounter = 0;
+    public volatile long PlayerCounter = 0;
     private int maxSlots = 32;
     private int port = 30300;    
     private final int broadcastPort = 54777;

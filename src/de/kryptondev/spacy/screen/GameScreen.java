@@ -7,6 +7,7 @@ import de.kryptondev.spacy.SpacyClient;
 import de.kryptondev.spacy.SpriteSheet;
 import de.kryptondev.spacy.input.KeyInputManager;
 import de.kryptondev.spacy.input.MouseInputManager;
+import de.kryptondev.spacy.share.PlayerInfo;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
@@ -344,8 +345,8 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                         ship.getValue().textureBounds.copy().scale(0.5f));
                 
                 font.drawString(
-                        ship.getValue().position.x - font.getWidth(ship.getValue().owner.playerName) / 2, 
-                        ship.getValue().position.y - 50, ship.getValue().owner.playerName, 
+                        ship.getValue().position.x - font.getWidth(client.getWorld().players.get(ship.getValue().owner).playerName) / 2, 
+                        ship.getValue().position.y - 50, client.getWorld().players.get(ship.getValue().owner).playerName, 
                         Color.white);
                 if(this.debug){
                     drawCross(ship.getValue().position.x, ship.getValue().position.y, g, ship.getValue().id);
@@ -511,12 +512,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                         else
                             fontColor = Color.white;
                         
+                        PlayerInfo player = world.players.get(ship.getValue().owner);
+                        String name = player.playerName;
+                        int kills = player.kills;
+                        int deaths = player.deaths;
                         
-                        String name = ship.getValue().owner.playerName;
-                        int kills = ship.getValue().owner.kills;
-                        int deaths = ship.getValue().owner.deaths;
-                        
-                            scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.3f -scoreFont.getWidth(name)/2, posY, name, fontColor);
+                        scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.3f -scoreFont.getWidth(name)/2, posY, name, fontColor);
                         scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.6f + cellWidth*0.1f -scoreFont.getWidth(Integer.toString(kills))/2, posY, Integer.toString(kills), fontColor);
                         scoreFont.drawString( Scores.getX() + Scores.getWidth()*0.05f + cellWidth*0.8f + cellWidth*0.1f -scoreFont.getWidth(Integer.toString(deaths))/2, posY, Integer.toString(deaths), fontColor);
                         
