@@ -12,6 +12,8 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -54,6 +56,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private int paneLenght = 512;
     private Vector2f backgroundBasePos = new Vector2f();
     private int panePos = -1;
+    
     public GameScreen() {
         this.client = SpacyClient.getInstance();
         this.rand = new Random();      
@@ -502,27 +505,60 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
                     boolean grey=false;
                     Color fontColor = Color.white;
                     
+                    ArrayList<PlayerInfo> scores = new ArrayList<>();
+                    
                     for(ConcurrentHashMap.Entry<Long, Ship> ship : ships.entrySet()){
-                        if (grey)
+                        
+                        PlayerInfo player = world.players.get(ship.getValue().owner);
+                        if (scores.isEmpty())
+                            scores.add(player);
+                        else
                         {
-                            g.setColor(Color.lightGray);
-                            g.fillRect(Scores.getX()+ Scores.getWidth()*0.05f, posY+ cellHeight*0.1f, cellWidth, cellHeight*1.1f);
-                            fontColor = Color.black;
+                            for (int x = 0 ;x < scores.size();x++)
+                            {
+                                PlayerInfo score = scores.get(x);
+                                if (score.kills<player.kills)
+                                {
+                                    scores.add(scores.indexOf(score), player);
+                                    break;
+                                }
+                                else if (score.kills == player.kills)
+                                    if (score.deaths>player.deaths)
+                                    {
+                                        scores.add(scores.indexOf(score), player);
+                                        break;
+                                    }
+                            }
+                            if (!scores.contains(player))
+                                scores.add(player);
                         }
+                    }
+                    
+                    for(PlayerInfo score : scores){
+//                        if (grey)
+//                        {
+//                            g.setColor(Color.lightGray);
+//                            g.fillRect(Scores.getX()+ Scores.getWidth()*0.05f, posY+ cellHeight*0.1f, cellWidth, cellHeight*1.1f);
+//                            fontColor = Color.black;
+//                        }
+//                        else
+//                            fontColor = Color.white;
+                        
+                        if (score.id == client.getShip().owner)
+                            fontColor = new Color(108, 143, 240);
                         else
                             fontColor = Color.white;
                         
-                        PlayerInfo player = world.players.get(ship.getValue().owner);
-                        String name = player.playerName;
-                        int kills = player.kills;
-                        int deaths = player.deaths;
+                        String name = score.playerName;
+                        int kills = score.kills;
+                        int deaths = score.deaths;
                         
                         scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.3f -scoreFont.getWidth(name)/2, posY, name, fontColor);
                         scoreFont.drawString( Scores.getX()+ Scores.getWidth()*0.05f + cellWidth*0.6f + cellWidth*0.1f -scoreFont.getWidth(Integer.toString(kills))/2, posY, Integer.toString(kills), fontColor);
                         scoreFont.drawString( Scores.getX() + Scores.getWidth()*0.05f + cellWidth*0.8f + cellWidth*0.1f -scoreFont.getWidth(Integer.toString(deaths))/2, posY, Integer.toString(deaths), fontColor);
                         
                         posY+=cellHeight+ cellHeight*0.05f;
-                        grey = !grey;
+//                        grey = !grey;
                         if (posY>Scores.getMaxY())
                             break;
                     }

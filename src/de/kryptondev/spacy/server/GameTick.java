@@ -84,7 +84,7 @@ public class GameTick implements Runnable{
                 System.out.println("Projectile @ " + p.position.x + ", " + p.position.y);
                 System.out.println("Ship @ " + ship.position.x + ", " + ship.position.y);
                 */
-                if(ship != null){
+                if(ship != null && !toDelete.contains(p.id)){
                     if( ship.id != p.senderId && p.position.distance(ship.position) - ship.boundsRadius - p.boundsRadius - p.damageRange <= 0){
                         ship.hit(p);
                         c.sendTCP(new UpdateLife(ship.hp));
