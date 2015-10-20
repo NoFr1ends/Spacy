@@ -8,12 +8,17 @@ import de.kryptondev.spacy.SpriteSheet;
 import de.kryptondev.spacy.input.KeyInputManager;
 import de.kryptondev.spacy.input.MouseInputManager;
 import de.kryptondev.spacy.share.PlayerInfo;
+import de.kryptondev.spacy.share.playerEvents.OnKill;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -55,12 +60,25 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private int paneLenght = 512;
     private Vector2f backgroundBasePos = new Vector2f();
     private int panePos = -1;
-    
+    private Queue<Feed> killFeed = new ConcurrentLinkedQueue<>();
     private TextField field;
     
+    private long killFeedShowTime = 6000;
     public GameScreen() {
         this.client = SpacyClient.getInstance();
         this.rand = new Random();      
+    }
+    
+    public String getPlayerName(long id){
+        try
+        {
+            return client.getWorld().players.get(client.getWorld().ships.get(id).owner).playerName;
+        }
+        catch (Exception ex)
+        {
+            return String.valueOf(id);
+        }
+        
     }
     
     public float getRandomFloat(float min, float max){
@@ -268,6 +286,12 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             
             
             
+        }
+        
+        //Kill Feed        
+        if(killFeed.peek() != null && 
+                killFeed.peek().getSpawnTime().getTime() + killFeedShowTime <= new Date().getTime()){
+            killFeed.poll();
         }
         
     }
@@ -535,6 +559,21 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             }
         }
         
+        /*
+        Kill-Feed
+        */
+        g.resetTransform();
+        g.translate(-15, 15);
+        int counter = 0;
+        for(Feed f : killFeed){
+            int fw = 250; //font.getWidth(f.getMessage());
+            int fh = 25; //font.getHeight() + 5;
+            g.setColor(new Color(0x80,0x80,0x80,128));
+            g.fillRoundRect(gc.getWidth() - fw, counter * (fh + 5), fw, fh, 10);
+            g.setColor(new Color(0xff,0xff,0xff,128));
+            g.drawString(f.getMessage(), gc.getWidth() - fw + 6, counter++ * (fh + 5) + 3);
+            //scoreFont.drawString(-fw, counter++ * fh, f.getMessage(), Color.lightGray);
+        }
         
         /*
         DEBUG SECTION
@@ -559,7 +598,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             g.drawString("BackgroundBasePos " + getCurrentPane(), 8, 230);
             if(client.getShip() != null)
                 g.drawString("VID:             " + client.getShipId() + " (" + client.getShip().hashCode() + ")", 8, 250);
-        }
+            }
         
         g.resetTransform();
         g.setColor(new Color(0xff, 0x00, 0x00, alphaWarn));        
@@ -572,7 +611,11 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     }
     
     public void onRecv(Object o){
-        
+        if(o instanceof OnKill){
+            OnKill msg = (OnKill)o;            
+            Feed f = new Feed(getPlayerName(msg.killer) + " killed " + getPlayerName(msg.victim));
+            killFeed.add(f);
+        }
     }
     
     public void onConnected(){

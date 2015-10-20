@@ -17,5 +17,4 @@ public class OnKill {
         this.projectile = projectile;
     }
     
-    
 }

@@ -64,25 +64,29 @@ public class SpacyServer extends Listener {
     
     public void sendWorld(SGameClient client){
         client.sendTCP(this.world);
+        
+        //TODO FIX!!!
         /*
         int count = 0;
         HashMap<Long, Ship> tmpShip = new HashMap<>(8);
         for(Ship ship : tmpShip.values()){
             tmpShip.put(ship.id, ship);
             count++;
-            if(count > 8){
+            if(count > 7){
                 client.sendTCP(new ChunkedShip(tmpShip));
                 tmpShip.clear();
                 count = 0;
             }
             
         }
-        
+        if(!tmpShip.isEmpty())
+            client.sendTCP(new ChunkedShip(tmpShip));
+            
        HashMap<Long, Projectile> tmpProjectiles = new HashMap<>(32);
         for(Projectile p : tmpProjectiles.values()){
             tmpProjectiles.put(p.id, p);
             count++;
-            if(count > 32){
+            if(count > 31){
                 client.sendTCP(new ChunkedProjectiles(tmpProjectiles));
                 tmpProjectiles.clear();
                 count = 0;
@@ -90,17 +94,23 @@ public class SpacyServer extends Listener {
             
         }
         
+        if(!tmpProjectiles.isEmpty())
+            client.sendTCP(new ChunkedProjectiles(tmpProjectiles));
+        
         HashMap<Long, Entity> tmpEntity = new HashMap<>(8);
         for(Entity e : tmpEntity.values()){
             tmpEntity.put(e.id, e);
             count++;
-            if(count > 8){
+            if(count > 7){
                 client.sendTCP(new ChunkedEntity(tmpEntity));
                 tmpEntity.clear();
                 count = 0;
             }
             
         }
+        
+        if(!tmpEntity.isEmpty())
+             client.sendTCP(new ChunkedEntity(tmpEntity));
         */
     }
 
