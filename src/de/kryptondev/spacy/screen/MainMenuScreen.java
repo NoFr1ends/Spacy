@@ -16,6 +16,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.geom.Vector2f;
+import org.newdawn.slick.gui.TextField;
 
 public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener, 
         MouseInputManager.MouseListener {
@@ -25,6 +26,8 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener,
     
     private TrueTypeFont font;    
     private TrueTypeFont titleFont;
+    
+    private TextField field;
 
     private int currentEntry;
     
@@ -144,6 +147,9 @@ public class MainMenuScreen implements IScreen, KeyInputManager.KeyListener,
                 break;
             case START_GAME:
                 MainGame.getScreenManager().changeScreen(new ConnectMenuScreen(this));
+                break;
+            case OPTIONS:
+                MainGame.getScreenManager().changeScreen(new OptionScreen());
                 break;
         }
     }

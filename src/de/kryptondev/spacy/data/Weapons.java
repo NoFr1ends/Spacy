@@ -5,13 +5,13 @@ public class Weapons {
 //Benennung nach bekannten echten und fiktiven Waffen
     static Weapon StandardBallisticCannon = new Weapon(
             "Schwerer Gustav",
-            1000,
+            100,
             ProjectileGenerator(2.5f, 50, 4.5f*3, 30, EMoving.FullSpeed, 0, DamageType.balistic, "laserRed01.png", null, true, true)
     );
     
     static Weapon AreaBallisticCannon = new Weapon (
             "",
-            3000,
+            300,
             ProjectileGenerator(4f, 24, 4.5f*3, 65, EMoving.FullSpeed, 25, DamageType.balistic, null, null, true, true)//Needs to be updated
     );
     

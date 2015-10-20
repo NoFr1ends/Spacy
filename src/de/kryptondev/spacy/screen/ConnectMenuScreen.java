@@ -19,6 +19,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.TrueTypeFont;
+import org.newdawn.slick.gui.TextField;
 
 
 public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener, 
@@ -34,6 +35,8 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener,
     private SpacyServer testserver;
     private Client testclient = new Client();
     private IScreen prevScreen;
+    
+    private TextField field;
     
     public ConnectMenuScreen(IScreen prevScreen) {
         menuEntries = new ArrayList<>();
@@ -117,7 +120,10 @@ public class ConnectMenuScreen  implements IScreen, KeyInputManager.KeyListener,
                 this
         );
         
-        t.start();       
+        t.start();   
+        
+        field = new TextField(gc, font, 0, 0, 300, 30);
+        field.setBorderColor(null);
     }
     
     public void onMenuPressed(String entry) {

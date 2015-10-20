@@ -28,6 +28,8 @@ public class MainGame extends BasicGame {
         screenManager = ScreenManager.getInstance();
         
         screenManager.changeScreen(new MainMenuScreen());
+        
+        
     }
 
     @Override

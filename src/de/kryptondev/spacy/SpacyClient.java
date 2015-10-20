@@ -41,7 +41,7 @@ public class SpacyClient extends Listener{
         info.playerUID = UID.getUID();
 
         //For test pourpose
-        info.playerName = System.getProperty("user.name");
+        info.playerName = SaveState.getInstance().getPlayerName();
         
     }   
    

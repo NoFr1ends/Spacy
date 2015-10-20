@@ -29,6 +29,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Vector2f;
+import org.newdawn.slick.gui.TextField;
 
 public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseInputManager.MouseListener {
     public static final org.newdawn.slick.Color BackgroundColor = new org.newdawn.slick.Color(8,8,64);
@@ -54,6 +55,9 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
     private int paneLenght = 512;
     private Vector2f backgroundBasePos = new Vector2f();
     private int panePos = -1;
+    
+    private TextField field;
+    
     public GameScreen() {
         this.client = SpacyClient.getInstance();
         this.rand = new Random();      
@@ -123,8 +127,6 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         ready = true;
         
         this.cooldown = Executors.newScheduledThreadPool(1);
-       
-        
     }
     
     private Vector2f getCurrentPane(){
