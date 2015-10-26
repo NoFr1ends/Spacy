@@ -17,5 +17,5 @@ public class PlayerInfo {
         this.playerName = playerName;
         this.playerUID = playerUID;
     }
-    
+
 }

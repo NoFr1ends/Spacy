@@ -6,19 +6,13 @@ import com.esotericsoftware.kryonet.Listener;
 
 import de.kryptondev.spacy.data.*;
 import de.kryptondev.spacy.share.*;
-
+import de.kryptondev.spacy.share.playerEvents.*;
 import de.kryptondev.spacy.helper.KryoRegisterer;
 import de.kryptondev.spacy.helper.UID;
+import de.kryptondev.spacy.screen.*;
 
-import de.kryptondev.spacy.screen.GameScreen;
-import de.kryptondev.spacy.screen.ScreenManager;
-import de.kryptondev.spacy.screen.WaitingScreen;
-import de.kryptondev.spacy.share.playerEvents.OnJoin;
-import de.kryptondev.spacy.share.playerEvents.OnKill;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import org.omg.PortableServer.THREAD_POLICY_ID;
-
 
 public class SpacyClient extends Listener{
 
@@ -154,14 +148,16 @@ public class SpacyClient extends Listener{
             this.world.entities.putAll(((ChunkedEntity)o).entities);         
         }
         
-         if(o instanceof ChunkedProjectiles){
+        if(o instanceof ChunkedProjectiles){
             this.world.projectiles.putAll(((ChunkedProjectiles)o).projectiles);         
         }
          
+        if(o instanceof ChunkedPlayer){
+            this.world.players.putAll(((ChunkedPlayer)o).players);            
+        }
+         
         if(o instanceof Ship){
-            Ship s = (Ship)o;
-            //SPAWNED
-            System.out.println("SHIP RECEIVED!!!");
+            Ship s = (Ship)o;            
             world.ships.put(s.id ,s);
             shipId = s.id;
             return;
@@ -204,11 +200,21 @@ public class SpacyClient extends Listener{
             UpdateLife life = (UpdateLife) o;
             getShip().hp = life.hp;
         }
+        if(o instanceof OnRespawn){
+            OnRespawn r = (OnRespawn)o;
+            
+            PlayerInfo old = (PlayerInfo)world.players.get(r.oldId);
+            //world.players.remove(r.oldId);
+            //world.players.put(r.newId, old);
+            
+        }       
         
         if (o instanceof OnKill){
             OnKill kill = (OnKill)o;
-            world.players.get(world.ships.get(kill.killer).owner).kills++;
-            world.players.get(world.ships.get(kill.victim).owner).deaths++;
+            long killer = world.ships.get(kill.killer).owner;
+            long victim = world.ships.get(kill.victim).owner;
+            world.players.get(killer).kills++;
+            world.players.get(victim).deaths++;
         }
          
         if(ScreenManager.getInstance().getCurrentScreen() instanceof GameScreen){

@@ -362,7 +362,7 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
         try{            
             //DrawShips & Player Names
             ConcurrentHashMap<Long, Ship> ships = client.getWorld().ships;
-            for(ConcurrentHashMap.Entry<Long, Ship> ship : ships.entrySet()){                 
+            for(ConcurrentHashMap.Entry<Long, Ship> ship : ships.entrySet()){  
                 Vector2f renderPosition = ship.getValue().getCenteredRenderPos();            
                 sheet.draw(ship.getValue().texture, 
                         renderPosition.x, 
@@ -596,9 +596,13 @@ public class GameScreen implements IScreen, KeyInputManager.KeyListener, MouseIn
             g.drawString("alphaWarn:        " + alphaWarn, 8, 190);
             g.drawString("Corner:           " + getPartipalCurrentPane(), 8, 210);
             g.drawString("BackgroundBasePos " + getCurrentPane(), 8, 230);
-            if(client.getShip() != null)
+            if(client.getShip() != null){
                 g.drawString("VID:             " + client.getShipId() + " (" + client.getShip().hashCode() + ")", 8, 250);
+                g.drawString("OwnerId:         " + client.getShip().owner ,8,270);
             }
+           
+            }
+          
         
         g.resetTransform();
         g.setColor(new Color(0xff, 0x00, 0x00, alphaWarn));        

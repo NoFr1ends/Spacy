@@ -63,10 +63,11 @@ public class SpacyServer extends Listener {
     }
     
     public void sendWorld(SGameClient client){
-        client.sendTCP(this.world);
+        //client.sendTCP(this.world);
         
         //TODO FIX!!!
-        /*
+        
+        //Send Ships
         int count = 0;
         HashMap<Long, Ship> tmpShip = new HashMap<>(8);
         for(Ship ship : tmpShip.values()){
@@ -82,6 +83,7 @@ public class SpacyServer extends Listener {
         if(!tmpShip.isEmpty())
             client.sendTCP(new ChunkedShip(tmpShip));
             
+        //Send Projectiles
        HashMap<Long, Projectile> tmpProjectiles = new HashMap<>(32);
         for(Projectile p : tmpProjectiles.values()){
             tmpProjectiles.put(p.id, p);
@@ -97,6 +99,7 @@ public class SpacyServer extends Listener {
         if(!tmpProjectiles.isEmpty())
             client.sendTCP(new ChunkedProjectiles(tmpProjectiles));
         
+        //Send Entities
         HashMap<Long, Entity> tmpEntity = new HashMap<>(8);
         for(Entity e : tmpEntity.values()){
             tmpEntity.put(e.id, e);
@@ -111,7 +114,21 @@ public class SpacyServer extends Listener {
         
         if(!tmpEntity.isEmpty())
              client.sendTCP(new ChunkedEntity(tmpEntity));
-        */
+        
+        //Send Players
+        HashMap<Long, PlayerInfo> tmpPlayer = new HashMap<>(8);
+        for(PlayerInfo e : tmpPlayer.values()){
+            tmpPlayer.put(e.id, e);
+            count++;
+            if(count > 7){
+                client.sendTCP(new ChunkedPlayer(tmpPlayer));
+                tmpPlayer.clear();
+                count = 0;
+            }            
+        }
+         if(!tmpPlayer.isEmpty())
+             client.sendTCP(new ChunkedPlayer(tmpPlayer));
+      
     }
 
     public SpacyServer(int maxSlots) {

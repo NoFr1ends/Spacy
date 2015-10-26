@@ -52,7 +52,10 @@ public class GameTick implements Runnable{
                     server.getServer().sendToAllTCP(new DeleteEntity(ship.id));
                     server.world.ships.remove(ship.id);
                     //TODO: Add Delay
-                    gc.addShip(ship.owner);
+                    
+                    Ship s = gc.addShip(ship.owner);
+                    server.getServer().sendToAllTCP(new OnRespawn(ship.id, s.id));
+                    
                 }
             }
         }
@@ -98,6 +101,7 @@ public class GameTick implements Runnable{
                             server.getServer().sendToAllTCP(new DeleteEntity(ship.id));
                             server.world.ships.remove(ship.id);
                             gc.addShip(ship.owner);
+                            
                         }
                         if(p.destroyOnCollision){
                             //server.world.projectiles.remove(pos + 1);

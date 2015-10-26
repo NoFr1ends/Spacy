@@ -33,7 +33,8 @@ public class KryoRegisterer {
         k.register(ChunkedEntity.class);        
         k.register(ChunkedShip.class);        
         k.register(ChunkedProjectiles.class);        
-
+        k.register(ChunkedPlayer.class);        
+        
         k.register(Rect.class);
         k.register(Vector2f.class);         
         
@@ -59,5 +60,6 @@ public class KryoRegisterer {
         k.register(OnHit.class);
         k.register(OnKill.class);
         k.register(OnJoin.class);
+        k.register(OnRespawn.class);
     }
 }

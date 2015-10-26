@@ -60,8 +60,7 @@ public class GameClient extends Listener {
             server.world.ships.put(s.id,s);
             server.getServer().sendToAllTCP(new OnJoin(s));
             this.sendTCP(s);            
-            this.sendTCP(new DebugTickDelta(server.getServerTick().getDelta(), GameTick.ticksPerSecond));
-            server.sendWorld(this);
+            this.sendTCP(new DebugTickDelta(server.getServerTick().getDelta(), GameTick.ticksPerSecond));            
             return s;
         }
         
@@ -74,7 +73,7 @@ public class GameClient extends Listener {
             this.server.world.players.put(playerInfo.id, playerInfo);
             server.getServer().sendToAllTCP(playerInfo);
             Ship s = this.addShip(playerInfo.id);
-           
+            server.sendWorld(this);
         }
 
         @Override
